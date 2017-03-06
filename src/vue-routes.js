@@ -1,10 +1,7 @@
-import forum_group_list from './vue-components/theme_list.vue'; // под замену
-import forum_list from './vue-components/theme_list.vue'; // под замену
-import theme_list from './vue-components/theme_list.vue'; // под замену
-import reply_list from './vue-components/reply_list.vue';
+import start from './vue-components/start.vue';
+import event from './vue-components/event.vue';
 import user_profile from './vue-components/user-profile.vue';
 import user_register from './vue-components/user-register.vue';
-
 
 export default [
 	// Профайлы
@@ -21,30 +18,16 @@ export default [
 		path: '/register',
 		component: user_register
 	},
-	// 1. Список групп форумов
 	{
-		path: '/forum_group_list',
+		path: '/start',
+		name: 'start',
 		alias: '/',
-		name: 'forum_group_list',
-		component: forum_group_list
+		component: start
 	},
-	// 2. Список форумов конкретной группы
 	{
-		path: '/forum_list/:forum_group_id',
-		name: 'forum_list',
-		component: forum_list
-	},
-	// 3. Список тем конкретного форума
-	{
-		path: '/theme_list/:forum_id',
-		name: 'theme_list',
-		component: theme_list
-	},
-	// 4. Список сообщений конкретной темы
-	{
-		path: '/reply_list/:theme_id',
-		name: 'reply_list',
-		component: reply_list
+		path: '/event/:event_id',
+		name: 'event',
+		component: event
 	},
 	// 404
 	{

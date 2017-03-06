@@ -78,9 +78,6 @@
 
 <template>
 	<div>
-		<!-- <div class="f-navbar">
-			<router-link v-bind:to="rt.path" v-html="rt._title" v-for="rt in routes" v-if="!rt._hidden" class="btn btn-default" v-bind:disabled="rt._disabled" active-class="active"></router-link>
-		</div> -->
 		<div class="row header">
 			<div class="col-xs-7">
 				<span v-on:click="$router.push('/')" style="font-size: 3em;cursor: pointer;">

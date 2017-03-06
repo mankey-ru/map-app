@@ -47,7 +47,6 @@
 </template>
 
 <script>
-	import $ from 'jquery';	
 	var apiUrl = require('./../api-url.js');
 
 	var Comp = {

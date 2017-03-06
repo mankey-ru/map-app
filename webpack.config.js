@@ -7,7 +7,7 @@ var conf_browser = {
 	// I used babel-regenerator-runtime instead of bundle babel-polyfill
 	// because right now I dont need all polyfills
 	// http://stackoverflow.com/a/36590887
-	entry: [/*'babel-regenerator-runtime',*/ './src/_main-browser.js'],
+	entry: [ /*'babel-regenerator-runtime',*/ './src/_main-browser.js'],
 	output: {
 		path: path.resolve(__dirname, './www/'),
 		publicPath: '', // ахтунг! это путь не на ФС, а из урла. Если он кривой, не открывается сокет-коннект (см. консоль) и следовательно не работает HMR
@@ -15,6 +15,9 @@ var conf_browser = {
 	},
 	module: {
 		rules: [{
+			test: /\.css$/,
+			loader: "style-loader!css-loader"
+		}, {
 			test: /\.vue$/,
 			loader: 'vue-loader',
 			// https://github.com/vuejs/vue-loader/blob/master/docs/en/options.md
@@ -77,7 +80,7 @@ if (process.env.NODE_ENV === 'production') {
 			threshold: 10240,
 			minRatio: 0.8
 		})
-		
+
 	])
 }
 
