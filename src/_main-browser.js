@@ -10,6 +10,8 @@ const router = new VueRouter({
 	routes: routes
 });
 
+import './../node_modules/notie/dist/notie.min.css';
+
 request
 	.get(apiUrl + 'commondata')
 	.end((err, res) => {
@@ -18,7 +20,6 @@ request
 			window.setTimeout(window.location.reload, 3000)
 		}
 		else {
-			// Когда основные данные приехали, стартуем собственно приложение
 			new Vue({
 				el: '#vue-app',
 				router: router,
