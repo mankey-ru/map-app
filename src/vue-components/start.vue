@@ -18,6 +18,8 @@
 		},
 		mixins: [mixins],
 		mounted: function(){
+			// http://leafletjs.com/reference-1.0.3.html
+			// http://leafletjs.com/plugins.html
 			var map = L.map('map-container').setView([51.505, -0.09], 13);
 			L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
 			    attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'

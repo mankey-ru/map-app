@@ -1,6 +1,6 @@
 const mongodb = require("mongodb");
 
-const MONGODB_URI_ENV_KEY = 'VANILLA_FORUM_MONGODB_URI';
+const MONGODB_URI_ENV_KEY = 'MAP_APP_MONGODB_URI';
 const mongoUri = process.env[MONGODB_URI_ENV_KEY];
 if (!mongoUri) {
 	console.log('\n\n   ERROR! App can not be initialized without environment variable ' + MONGODB_URI_ENV_KEY + ', which should be a standard URI with "mongo" protocol and, if needed, access credentials\n\n\n');
