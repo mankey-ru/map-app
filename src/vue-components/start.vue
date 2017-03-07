@@ -35,13 +35,14 @@
 			*/
 			Mapzen.apiKey = 'mapzen-33jrZyT';
 			var layer = Mapzen._tangram({
-				scene: 'scene.yaml',
+				scene: 'scene.yaml', // https://mapzen.com/documentation/tangram/Scene-file/
 				attribution: 'GenericLayer'
 			});
 			window.addEventListener('load', function () {
 				// need to wait until scene loads
 				layer.addTo(map);
 				layer.on('init', function() {});
+				console.log('L.Mapzen1' + L.Mapzen)
 		    });
 
 		    /**
@@ -50,6 +51,8 @@
 				Mapzen.bug has no styles in npm bundle so its useless
 			*/
 			var map = L.map('map-container');
+			// https://mapzen.com/documentation/mapzen-js/api-reference/
+			// TODO define debugTangram + scene
   			map.setView([55.73305, 37.61751], 16);
 
 			/**
@@ -66,6 +69,7 @@
 				.addTo(map);
 
 			
+			console.log('L.Mapzen' + L.Mapzen)
 
 
 		},
