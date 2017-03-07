@@ -1,12 +1,13 @@
 <script>
 	import './../../node_modules/leaflet/dist/leaflet.css';
-	import './../../node_modules/leaflet-control-geocoder/dist/Control.Geocoder.css';
+	import './../../node_modules/leaflet-geocoder-mapzen/dist/leaflet-geocoder-mapzen.min.css';
+	//import './../../node_modules/leaflet-control-geocoder/dist/Control.Geocoder.css';
 
 	import _ from 'lodash';
 	import mixins from './../vue-mixins.js';
 
 	import L from 'leaflet';
-	import Lgc from 'leaflet-control-geocoder';
+	import 'leaflet-geocoder-mapzen';
 
 	import Mapzen from 'mapzen.js';
 	//import Tangram from 'mapzen.js/Tangram';
@@ -52,27 +53,15 @@
   			map.setView([55.73305, 37.61751], 16);
 
 			/**
-  				Geocoder plugin for Leaflet
-  				https://www.npmjs.com/package/leaflet-control-geocoder#options
-  				own db https://wiki.openstreetmap.org/wiki/Nominatim/Installation
+  				Geocoder plugin for Leaflet by Mapzen
   			*/
-			var geocoder = L.Control
-				.geocoder({
-					defaultMarkGeocode: false,
-					collapsed: false,
+			var geocoder = L.control
+				.geocoder(Mapzen.apiKey, {
 					placeholder: 'Искать',
 					errorMessage: 'Ничего не найдено',
-					showResultIcons: true
-				})
-				.on('markgeocode', function(e) {
-					var bbox = e.geocode.bbox;
-					var poly = L.polygon([
-						bbox.getSouthEast(),
-						bbox.getNorthEast(),
-						bbox.getNorthWest(),
-						bbox.getSouthWest()
-					]).addTo(map);
-					map.fitBounds(poly.getBounds());
+					bounds: true,
+					position: 'topright',
+					expanded: true
 				})
 				.addTo(map);
 
