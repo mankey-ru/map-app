@@ -2,6 +2,8 @@ import start from './vue-components/start.vue';
 import event from './vue-components/event.vue';
 import user_profile from './vue-components/user-profile.vue';
 import user_register from './vue-components/user-register.vue';
+import mapGoogle from './vue-components/map-google.vue';
+import mapMapzen from './vue-components/map-mapzen.vue';
 
 export default [
 	// Профайлы
@@ -23,6 +25,16 @@ export default [
 		name: 'start',
 		alias: '/',
 		component: start
+	},
+	{
+		path: '/map-google',
+		name: 'map-google',
+		component: mapGoogle
+	},
+	{
+		path: '/map-mapzen',
+		name: 'map-mapzen',
+		component: mapMapzen
 	},
 	{
 		path: '/event/:event_id',

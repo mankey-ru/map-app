@@ -81,7 +81,7 @@
 		<div class="row header">
 			<div class="col-xs-7">
 				<span v-on:click="$router.push('/')" style="font-size: 3em;cursor: pointer;">
-					<i class="glyphicon glyphicon-equalizer"></i>&#160;LOGO
+					<i class="glyphicon glyphicon-equalizer"></i>&#160;ROOT
 				</span>
 			</div>
 			<div class="col-xs-17">
