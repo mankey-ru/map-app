@@ -17,10 +17,11 @@ var conf_browser = {
 		rules: [{
 			test: /\.css$/,
 			loader: "style-loader!css-loader"
-		}, {
+		}, 
+		// https://github.com/vuejs/vue-loader/blob/master/docs/en/options.md
+		{
 			test: /\.vue$/,
 			loader: 'vue-loader',
-			// https://github.com/vuejs/vue-loader/blob/master/docs/en/options.md
 			options: {
 				loaders: {}
 			}
@@ -34,7 +35,21 @@ var conf_browser = {
 			options: {
 				name: '[name].[ext]?[hash]'
 			}
-		}]
+		}
+		/*
+		Loader for SCSS|SASS
+		https://github.com/webpack-contrib/sass-loader
+		npm install sass-loader --save-dev
+		,{
+			test: /\.scss$/,
+			use: [{
+				loader: "style-loader" // creates style nodes from JS strings
+			}, {
+				loader: "css-loader" // translates CSS into CommonJS
+			}, {
+				loader: "sass-loader" // compiles Sass to CSS
+			}]
+		}*/ ]
 	},
 	resolve: {
 		alias: {
