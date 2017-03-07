@@ -16,7 +16,7 @@ export default {
 	name: 'Mapzen',
 	data: function () {
 		return {
-			title: 'Mapzen maps with Mapzen geocoding'
+			title: 'Mapzen maps with default tiles and Mapzen geocoding'
 		}
 	},
 	methods: {
@@ -34,7 +34,7 @@ export default {
 		*/
 		Mapzen.apiKey = 'mapzen-33jrZyT';
 		var map
-		var layer = this.$router._maplayer;
+		var layer = 1 || this.$router._maplayer;
 		if (layer) {
 			initMap()
 		}
@@ -54,7 +54,7 @@ export default {
 				note: its init should be BEFORE map
 				Mapzen.bug has no styles in npm bundle so its useless
 			*/
-			map = Mapzen.map('map-container');
+			map = Mapzen.map('map-container'); // or L.map
 			// https://mapzen.com/documentation/mapzen-js/api-reference/
 			// TODO define debugTangram + scene
 			map.setView([55.73305, 37.61751], 16);
@@ -73,8 +73,8 @@ export default {
 				})
 				.addTo(map);
 
-			layer.addTo(map);
-			layer.on('init', function () {});
+			//layer.addTo(map);
+			//layer.on('init', function () {});
 		}
 
 	},

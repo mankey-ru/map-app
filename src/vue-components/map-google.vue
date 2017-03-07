@@ -24,8 +24,8 @@
 			GoogleMapsLoader.load(function(google) {
 				var el = document.getElementById('map-container')
 			    var map = new google.maps.Map(el, {
-				    center: {lat: -34.397, lng: 150.644},
-				    zoom: 8
+				    center: {lat: 55.73305, lng: 37.61751},
+				    zoom: 16
 				  });
 
 			    // Create the search box and link it to the UI element.

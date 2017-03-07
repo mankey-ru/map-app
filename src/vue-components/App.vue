@@ -125,6 +125,12 @@
 				</div>
 			</div>					
 		</div>
+		<h1 class="text-center">
+			<router-link to="/map-google">Google</router-link> | 
+			<router-link to="/map-mapzen">Mapzen with fancy 3D view</router-link>  | 
+			<router-link to="/map-mapzen-v0">Mapzen with default tiles</router-link>  | 
+			<router-link to="/map-osm">OSM</router-link> 
+		</h1>
 		<router-view></router-view>
 	</div>
 </template>
