@@ -64,6 +64,13 @@
 			}
 		},
 		mixins: [mixins],
+		watch: {
+			'$route' : function(to, from){
+				if (to.name.indexOf('mapzen')!==-1) {
+					window.location.reload();
+				}
+			}
+		},
 		computed: {
 			signIn_valid: function(){
 				return this.signIn.email && this.signIn.password
@@ -125,19 +132,31 @@
 				</div>
 			</div>					
 		</div>
-		<h1 class="text-center">
-			<router-link to="/map-google">Google</router-link> | 
-			<router-link to="/map-mapzen">Mapzen with fancy 3D view</router-link>  | 
-			<router-link to="/map-mapzen-v0">Mapzen with default tiles</router-link>  | 
-			<router-link to="/map-osm">OSM</router-link> 
-		</h1>
+		<h3 class="text-center" style="margin: 2em 0">
+			<router-link :to="{name: 'map-google'}">Google</router-link>  
+			<span class="delim">|</span> 
+			<router-link to="/map-osm">OSM</router-link>  
+			<span class="delim">|</span> 
+			<router-link to="/map-mapzen">Mapzen with fancy 3D view</router-link> 
+			<span class="delim">|</span>
+			<router-link to="/map-mapzen-v0">Mapzen with default tiles</router-link>
+		</h3>
 		<router-view></router-view>
 	</div>
 </template>
 
 
 
-<style>
+<style scoped>
 	.header {margin-bottom: 2em;}
+	.router-link-active, .router-link-active:hover {
+		cursor: default;
+		color: #000 !important;
+		text-decoration: none !important;
+	}
+	.delim {
+		color: #bdbdbd;
+		margin: 0 .5em;
+	}
 </style>
 

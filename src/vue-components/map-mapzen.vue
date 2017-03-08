@@ -16,7 +16,7 @@ export default {
 	name: 'Mapzen',
 	data: function () {
 		return {
-			title: 'Mapzen maps with Mapzen geocoding'
+			title: 'Mapzen maps (fance 3D) with Mapzen geocoding'
 		}
 	},
 	methods: {
@@ -89,7 +89,6 @@ export default {
 <template>
 	<div>
 		<h2>{{title}}</h2>
-		<h2>Refresh page if mapzen not works</h2>
 		<div id="map-container"></div>
 	</div>
 </template>

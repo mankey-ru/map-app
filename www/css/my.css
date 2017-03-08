@@ -29,6 +29,23 @@ body {
 
 
 
+/* ext styles for vuejs-datepicker */
+.__datepicker-clear {
+	position: absolute;
+	top: .5em;
+	right: .7em;
+	color: #666;
+	cursor: pointer;
+}
+.__datepicker-wrap {
+	position:relative
+}
+.__datepicker-wrap .form-control[readonly]{ 
+	background-color: #fff;
+}
+
+
+
 @keyframes spinner_spin {
 	100% {
 		-webkit-transform: rotate(360deg);

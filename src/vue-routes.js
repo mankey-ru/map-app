@@ -25,12 +25,12 @@ export default [
 	{
 		path: '/start',
 		name: 'start',
-		alias: '/',
 		component: start
 	},
 	{
 		path: '/map-google',
 		name: 'map-google',
+		alias: '/',
 		component: mapGoogle
 	},
 	{

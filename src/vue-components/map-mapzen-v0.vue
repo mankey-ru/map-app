@@ -34,20 +34,14 @@ export default {
 		*/
 		Mapzen.apiKey = 'mapzen-33jrZyT';
 		var map
-		var layer = 1 || this.$router._maplayer;
-		if (layer) {
-			initMap()
-		}
-		else {
-			layer = Mapzen._tangram({
-				scene: 'scene.yaml', // https://mapzen.com/documentation/tangram/Scene-file/
-				attribution: 'GenericLayer'
+		var layer = Mapzen._tangram({
+				//scene: 'scene.yaml', // https://mapzen.com/documentation/tangram/Scene-file/
+				attribution: 'GenericLayer2'
 			});
 			window.addEventListener('load', ()=>{
 				initMap()
 				this.$router._maplayer = layer;
 			});
-		}
 		function initMap(){
 			/**
 				Leaflet map init
@@ -89,7 +83,6 @@ export default {
 <template>
 	<div>
 		<h2>{{title}}</h2>
-		<h2>Refresh page if mapzen not works</h2>
 		<div id="map-container"></div>
 	</div>
 </template>
