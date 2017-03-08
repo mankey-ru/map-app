@@ -133,16 +133,16 @@
 			</div>					
 		</div>
 		<div class="mynav">
-			<router-link class="btn btn-default" active-class="active" to="/" exact>
+			<router-link class="btn btn-lg btn-default" active-class="active" to="/" exact>
 				Google
 			</router-link>  
-			<router-link class="btn btn-default" active-class="active" to="/map-osm">
+			<router-link class="btn btn-lg btn-default" active-class="active" to="/map-osm">
 				OSM
 			</router-link>  
-			<router-link class="btn btn-default" active-class="active" to="/map-mapzen">
+			<router-link class="btn btn-lg btn-default" active-class="active" to="/map-mapzen">
 				Mapzen with fancy 3D view
 			</router-link> 
-			<router-link class="btn btn-default" active-class="active" to="/map-mapzen-v0">
+			<router-link class="btn btn-lg btn-default" active-class="active" to="/map-mapzen-v0">
 				Mapzen with default tiles
 			</router-link>
 		</div>
@@ -157,8 +157,8 @@
 		margin: 2em 0;
 		/*text-align: center;*/
 	}
-	.mynav a:active {
-		background-color: #fff; /* bs override */
+	.mynav a {
+		margin-bottom: .3em;
 	}
 	.header {
 		margin-bottom: 2em;
