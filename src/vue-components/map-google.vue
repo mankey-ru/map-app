@@ -112,11 +112,11 @@
 		<h2>{{title}}</h2>
 		<div class="well">
 			<div class="row form-group">
-				<div class="col-xs-7">
+				<div class="col-md-7 col-xs-12">
 					<label>Название</label>
 					<input v-model="textSearch" class="form-control" />
 				</div>
-				<div class="col-xs-10">
+				<div class="col-md-10 col-xs-12">
 					<label>Жанры</label>
 					<token-input 
 					class="form-control" 
@@ -125,7 +125,7 @@
 					v-bind:placeholder="'Type and press enter'"
 					></token-input> 
 				</div>
-				<div class="col-xs-4" v-bind:class="{'datepicker__date-empty': !date}">
+				<div class="col-md-4 col-xs-12" v-bind:class="{'datepicker__date-empty': !date}">
 					<label>Дата</label>
 					<div class="__datepicker-wrap">
 						<datepicker 
@@ -140,7 +140,7 @@
 						</i>
 					</div>
 				</div>
-				<div class="col-xs-3">
+				<div class="col-md-3 col-xs-12">
 					<label>&#160;</label>
 					<a class="btn btn-primary btn-block" v-on:click="submit">Искать</a>
 				</div>

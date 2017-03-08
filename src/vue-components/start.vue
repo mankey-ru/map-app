@@ -5,6 +5,9 @@
 		data: function () {
 			return {
 			}
+		},
+		mounted: function () {
+			this.$router.push({name: 'map-google'})
 		}
 	}
 </script>

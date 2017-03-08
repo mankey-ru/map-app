@@ -23,14 +23,13 @@ export default [
 		component: user_register
 	},
 	{
-		path: '/start',
+		path: '/',
 		name: 'start',
 		component: start
 	},
 	{
 		path: '/map-google',
 		name: 'map-google',
-		alias: '/',
 		component: mapGoogle
 	},
 	{
