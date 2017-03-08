@@ -7,7 +7,7 @@
 			}
 		},
 		mounted: function () {
-			this.$router.push({name: 'map-google'})
+			//this.$router.push({name: 'map-google'})
 		}
 	}
 </script>

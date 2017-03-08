@@ -86,12 +86,12 @@
 <template>
 	<div>
 		<div class="row header">
-			<div class="col-xs-7">
+			<div class="col-md-7 col-xs-24">
 				<span v-on:click="$router.push('/')" style="font-size: 3em;cursor: pointer;">
 					<i class="glyphicon glyphicon-equalizer"></i>&#160;ROOT
 				</span>
 			</div>
-			<div class="col-xs-17">
+			<div class="col-md-17 col-xs-24">
 				<div v-if="currentUser" class="text-right">
 					<button v-on:click="gotoProfile" class="btn btn-default">
 						<i class="glyphicon glyphicon-user"></i> {{currentUser.name}}
@@ -105,15 +105,15 @@
 				<div v-if="!currentUser">
 					<form v-on:submit.prevent="signIn_submit">
 						<div class="row">
-							<div class="col-xs-6 col-xs-offset-4">
+							<div class="col-md-6 col-md-offset-4 col-xs-24">
 								<label>Email</label>
 								<input name="email" type="email" class="form-control" v-model="signIn.email"/>
 							</div>
-							<div class="col-xs-6">
+							<div class="col-md-6 col-xs-24">
 								<label>Password</label>
 								<input name="password" class="form-control" v-model="signIn.password" type="password"/>
 							</div>
-							<div class="col-xs-4">
+							<div class="col-md-4 col-xs-12">
 								<div><label>&#160;</label></div>
 								<button class="btn btn-primary" v-bind:disabled="!signIn_valid || signIn.pending" type="submit">
 									<i v-show="signIn.pending" class="spin"></i> 
@@ -121,7 +121,7 @@
 									Log in
 								</button>
 							</div>
-							<div class="col-xs-4 text-right">
+							<div class="col-md-4  col-xs-12 text-right">
 								<div><label>&#160;</label></div>
 								<button class="btn btn-primary" v-on:click.prevent="gotoRegister" v-bind:disabled="signIn.pending" type="button">
 									Register
@@ -132,15 +132,20 @@
 				</div>
 			</div>					
 		</div>
-		<h3 class="text-center" style="margin: 2em 0">
-			<router-link :to="{name: 'map-google'}">Google</router-link>  
-			<span class="delim">|</span> 
-			<router-link to="/map-osm">OSM</router-link>  
-			<span class="delim">|</span> 
-			<router-link to="/map-mapzen">Mapzen with fancy 3D view</router-link> 
-			<span class="delim">|</span>
-			<router-link to="/map-mapzen-v0">Mapzen with default tiles</router-link>
-		</h3>
+		<div class="mynav">
+			<router-link class="btn btn-default" active-class="active" to="/" exact>
+				Google
+			</router-link>  
+			<router-link class="btn btn-default" active-class="active" to="/map-osm">
+				OSM
+			</router-link>  
+			<router-link class="btn btn-default" active-class="active" to="/map-mapzen">
+				Mapzen with fancy 3D view
+			</router-link> 
+			<router-link class="btn btn-default" active-class="active" to="/map-mapzen-v0">
+				Mapzen with default tiles
+			</router-link>
+		</div>
 		<router-view></router-view>
 	</div>
 </template>
@@ -148,15 +153,15 @@
 
 
 <style scoped>
-	.header {margin-bottom: 2em;}
-	.router-link-active, .router-link-active:hover {
-		cursor: default;
-		color: #000 !important;
-		text-decoration: none !important;
+	.mynav {
+		margin: 2em 0;
+		/*text-align: center;*/
 	}
-	.delim {
-		color: #bdbdbd;
-		margin: 0 .5em;
+	.mynav a:active {
+		background-color: #fff; /* bs override */
+	}
+	.header {
+		margin-bottom: 2em;
 	}
 </style>
 

@@ -85,8 +85,8 @@
 <style>
 	.tok-wrap {
 		overflow: hidden;
-    	padding-left: .5em;
-    	padding-top: .4em;
+    	/*padding-left: .5em;
+    	padding-top: .2em;*/
 		cursor: text;
 		-webkit-appearance: textfield;
 	}

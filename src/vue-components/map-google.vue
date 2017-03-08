@@ -112,11 +112,11 @@
 		<h2>{{title}}</h2>
 		<div class="well">
 			<div class="row form-group">
-				<div class="col-md-7 col-xs-12">
+				<div class="col-md-7 col-xs-24">
 					<label>Название</label>
 					<input v-model="textSearch" class="form-control" />
 				</div>
-				<div class="col-md-10 col-xs-12">
+				<div class="col-md-10 col-xs-24">
 					<label>Жанры</label>
 					<token-input 
 					class="form-control" 
