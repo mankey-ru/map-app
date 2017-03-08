@@ -16,7 +16,7 @@ export default {
 	name: 'Mapzen',
 	data: function () {
 		return {
-			title: 'Mapzen maps (fance 3D) with Mapzen geocoding'
+			title: 'Mapzen maps (fancy-shmancy 3D) with Mapzen geocoding'
 		}
 	},
 	methods: {
