@@ -186,6 +186,8 @@ function setupAuth(app) {
 }
 
 function setupApi(app) {
+	
+	// https://docs.mongodb.com/v3.2/tutorial/geospatial-tutorial/#differences-between-flat-and-spherical-geometry
 
 	app.get(apiUrl + 'commondata', function (req, res) {
 		res.status(200).json({

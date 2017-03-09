@@ -1,5 +1,8 @@
 import start from './vue-components/start.vue';
-import event from './vue-components/event.vue';
+
+import eventNew from './vue-components/event-new.vue';
+import eventCard from './vue-components/event-card.vue';
+
 import user_profile from './vue-components/user-profile.vue';
 import user_register from './vue-components/user-register.vue';
 import mapGoogle from './vue-components/map-google.vue';
@@ -50,9 +53,14 @@ export default [
 		component: mapOsm
 	},
 	{
-		path: '/event/:event_id',
-		name: 'event',
-		component: event
+		path: '/event/new',
+		name: 'event-new',
+		component: eventNew
+	},
+	{
+		path: '/event/card/:event_id',
+		name: 'event-card',
+		component: eventCard
 	},
 	// 404
 	{
