@@ -87,8 +87,8 @@
 	<div>
 		<div class="row header">
 			<div class="col-md-7 col-xs-24">
-				<span v-on:click="$router.push('/')" style="font-size: 3em;cursor: pointer;">
-					<i class="glyphicon glyphicon-equalizer"></i>&#160;ROOT
+				<span v-on:click="$router.push('/')" style="font-size: 4em;cursor: pointer;">
+					<i class="glyphicon glyphicon-picture"></i>
 				</span>
 			</div>
 			<div class="col-md-17 col-xs-24">
@@ -105,7 +105,7 @@
 				<div v-if="!currentUser">
 					<form v-on:submit.prevent="signIn_submit">
 						<div class="row">
-							<div class="col-md-6 col-md-offset-4 col-xs-24">
+							<div class="col-md-6 col-xs-24">
 								<label>Email</label>
 								<input name="email" type="email" class="form-control" v-model="signIn.email"/>
 							</div>
@@ -115,15 +115,15 @@
 							</div>
 							<div class="col-md-4 col-xs-12">
 								<div><label>&#160;</label></div>
-								<button class="btn btn-primary" v-bind:disabled="!signIn_valid || signIn.pending" type="submit">
+								<button class="btn btn-default" v-bind:disabled="!signIn_valid || signIn.pending" type="submit">
 									<i v-show="signIn.pending" class="spin"></i> 
 									<i v-show="!signIn.pending" class="glyphicon glyphicon-log-in"></i> 
 									Log in
 								</button>
 							</div>
-							<div class="col-md-4  col-xs-12 text-right">
+							<div class="col-md-4 col-md-offset-4  col-xs-12 text-right">
 								<div><label>&#160;</label></div>
-								<button class="btn btn-primary" v-on:click.prevent="gotoRegister" v-bind:disabled="signIn.pending" type="button">
+								<button class="btn btn-default" v-on:click.prevent="gotoRegister" v-bind:disabled="signIn.pending" type="button">
 									Register
 								</button>
 							</div>
@@ -132,7 +132,8 @@
 				</div>
 			</div>					
 		</div>
-		<div class="mynav">
+		<router-view></router-view>
+		<!-- <div class="mynav">
 			<router-link class="btn btn-lg btn-default" active-class="active" to="/" exact>
 				Google
 			</router-link>  
@@ -145,21 +146,20 @@
 			<router-link class="btn btn-lg btn-default" active-class="active" to="/map-mapzen-v0">
 				Mapzen with default tiles
 			</router-link>
-		</div>
-		<router-view></router-view>
+		</div> -->
 	</div>
 </template>
 
 
 
 <style scoped>
-	.mynav {
+/*	.mynav {
 		margin: 2em 0;
-		/*text-align: center;*/
+		text-align: center;
 	}
 	.mynav a {
 		margin-bottom: .3em;
-	}
+	}*/
 	.header {
 		margin-bottom: 2em;
 	}
