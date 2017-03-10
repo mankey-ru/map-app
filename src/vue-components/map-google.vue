@@ -51,7 +51,6 @@
 <template>
 
 	<div>
-		<h1>{{map_pending}}</h1>
 		<div class="well">
 			<div class="row form-group">
 				<div class="col-md-7 col-xs-24">
@@ -101,11 +100,6 @@
 
 		<div v-show="!map_pending">
 			<div class="hdn">
-				<div data-pos="TOP_RIGHT" class="map-ctrl-wrap">
-					<a v-on:click="gotoEventNew" class="btn btn-primary btn-lg">
-						<i class="glyphicon glyphicon-plus"></i> Добавить событие
-					</a>
-				</div>
 				<div data-pos="TOP_LEFT" class="map-ctrl-wrap">
 					<input id="map-ctrl-search" class="form-control" style="width: 20em" placeholder="Поиск мест" />
 				</div>

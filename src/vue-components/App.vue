@@ -93,6 +93,9 @@
 			</div>
 			<div class="col-md-17 col-xs-24">
 				<div v-if="currentUser" class="text-right">
+					<a v-if="currentUser.role" v-on:click="gotoEventNew" class="btn btn-primary">
+						<i class="glyphicon glyphicon-plus"></i> Добавить событие
+					</a>
 					<button v-on:click="gotoProfile" class="btn btn-default">
 						<i class="glyphicon glyphicon-user"></i> {{currentUser.name}}
 					</button>
@@ -115,16 +118,16 @@
 							</div>
 							<div class="col-md-4 col-xs-12">
 								<div><label>&#160;</label></div>
-								<button class="btn btn-default" v-bind:disabled="!signIn_valid || signIn.pending" type="submit">
+								<button class="btn btn-default" v-bind:disabled="signIn.pending" type="submit">
 									<i v-show="signIn.pending" class="spin"></i> 
 									<i v-show="!signIn.pending" class="glyphicon glyphicon-log-in"></i> 
-									Log in
+									Вход
 								</button>
 							</div>
 							<div class="col-md-4 col-md-offset-4  col-xs-12 text-right">
 								<div><label>&#160;</label></div>
 								<button class="btn btn-default" v-on:click.prevent="gotoRegister" v-bind:disabled="signIn.pending" type="button">
-									Register
+									Регистрация
 								</button>
 							</div>
 						</div>

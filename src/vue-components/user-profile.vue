@@ -1,82 +1,122 @@
 <template>
 	<div>
-		<br/>
-		<br/>
-		<div v-show="!user" class="text-center">
-			<i class="spin spin-lg"></i>
-		</div>
-		<div v-show="user">
-			<div class="col-md-12 col-xs-24 text-center">
-				<img v-bind:src="user.pic" class="f-userpic"/>
+		<form v-on:submit.prevent="userEdit">
+			<div v-show="!user" class="text-center">
+				<i class="spin spin-lg"></i>
 			</div>
-			<div class="col-md-12 col-xs-24">
-				<h2>{{user.name}}</h2>
-				<table class="table">
-					<tbody>
-						<tr>
-							<td>О себе</td>
-							<td>
-								<div v-if="own">
-									<input v-model="user.about" class="form-control"/>
-								</div>
-								<div v-if="!own">
-									{{user.about}}
-								</div>
-							</td>
-						</tr>
-						<tr>
-							<td>Дата рождения</td>
-							<td>
-								<div v-if="own">
-									<input v-model="user.bdate" class="form-control"/>
-								</div>
-								<div v-if="!own">
-									{{user.bdate}}
-								</div>
-							</td>
-						</tr>
-						<tr>
-							<td>Суммарный рейтинг комментариев пользователя</td>
-							<td>{{user.rating_total}}</td>
-						</tr>
-					</tbody>
-				</table>
+			<div v-show="user">
+				<div class="col-md-12 col-xs-24 text-center">
+					<img v-bind:src="user.pic" class="f-userpic"/>
+				</div>
+				<div class="col-md-12 col-xs-24">
+					<h2 v-if="!own">{{user.name}}</h2>
+
+					<div v-if="own" class="form-group">
+						<label>Имя</label>
+						<input v-model="user.name" v-bind:readonly="!own" class="form-control" />
+					</div>
+					<div class="form-group">
+						<label>О себе</label>
+						<textarea v-model="user.descr" v-bind:readonly="!own" class="form-control"></textarea>
+					</div>
+					<div class="form-group">
+						<label>Музыкант</label>
+						<br />
+						<input type="checkbox" v-bind:readonly="!own" v-model="user.role" style="width: 1.5em; height: 1.5em;vertical-align: middle;">
+					</div>
+					<div class="form-group __datepicker-wrap">
+						<label>Дата рождения</label>
+						<div v-if="own">
+							<datepicker 
+							:input-class="'form-control'" 
+							v-model="user.bdate"
+							:language="'ru'"
+							:monday-first="true"
+							:format="'dd.MM.yyyy'"
+							></datepicker>
+						</div>
+						<div v-if="!own">
+							{{user.bdate}}
+						</div>
+					</div>
+					<div class="text-right">
+						<button type="submit" v-bind:disabled="submit_pending" class="btn btn-primary">
+							<i v-show="submit_pending" class="spin"></i>
+							<i v-show="!submit_pending" class="glyphicon glyphicon-ok"></i>
+							Сохранить
+						</button>
+					</div>
+				</div>
 			</div>
-		</div>
+		</form>
 	</div>
 </template>
 
 <script>
 	var apiUrl = require('./../api-url.js');
 
+	import request from 'superagent';
+	import Datepicker from 'vuejs-datepicker';
+	import notie from 'notie';
+
 	var Comp = {
 		name: 'user-profile',
 		data: function () {
 			return {
 				user: false,
-				own: false
+				own: false,
+				submit_pending: false
 			}
 		},
 		methods: {
 			getUser: function(){
 				var user_id = this.$router.currentRoute.params.user_id;
 				if (user_id) {
-					$.getJSON(apiUrl + 'user/' + user_id, {}) 
-					.done((data)=>{
-						if (data instanceof Object) {
-							this.user = data;
-							this.own = this.currentUser._id === data._id;
-						}
-					})
-					.fail(()=>{
-						console.warn('Неудача. Ждём секунду и пробуем ещё раз.');
-					})
-					.always(()=>{})
+					request
+						.get(apiUrl + 'user/' + user_id) 
+						.end((err, res)=>{
+								if (err || !res.body) {
+									notie.alert({
+										type: 'error', 
+										text: res.body.error || 'User fetch failed'
+									});
+								}
+								else {
+									this.user = data;
+									this.own = this.currentUser._id === data._id;
+								}
+								this.submit_pending = false;
+							})
 				}
 				else {
 					this.user = this.currentUser;
 					this.own = true;
 				}
+			},
+			userEdit: function(){
+
+				this.submit_pending = true;
+				request
+					.post(apiUrl + 'auth/edit')
+					.send(this.user)
+					.end((err, res)=>{
+							if (err || !res.body ||  !res.body.ok) {
+								console.log(res.body)
+								notie.alert({
+									type: 'error', 
+									text: res.body.error || 'User edit failed'
+								});
+							}
+							else {
+								notie.alert({
+									type: 'success', 
+									text:'Успех', 
+									time: 1
+								});
+								this.$root.currentUser = this.user; // TODO check if works
+							}
+							this.submit_pending = false;
+						});
 			}
 		},
 		mounted: function(){
@@ -86,6 +126,9 @@
 			currentUser: function(){
 				return this.$root.$data.currentUser
 			}
+		},
+		components: {
+			Datepicker
 		},
 		watch: {
 		    '$route': 'getUser' // чтобы при смене /#/user-profile/1 на /#/user-profile обовлялся пользователь

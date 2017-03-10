@@ -14,7 +14,7 @@
 					</div>
 					<div class="row form-group">
 						<div class="col-xs-12">
-						<div>
+							<div>
 								<label style="font-size: 1.5em;">
 									<input type="checkbox" v-model="nu.role" style="width: 1.5em; height: 1.5em;vertical-align: middle;">
 									Я музыкант

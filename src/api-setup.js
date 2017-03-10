@@ -30,8 +30,12 @@ function setupApi(app) {
 	// https://docs.mongodb.com/v3.2/tutorial/geospatial-tutorial/#differences-between-flat-and-spherical-geometry
 
 	app.get(apiUrl + 'commondata', function (req, res) {
+		var currentUser = req.user;
+		if (currentUser) {
+			currentUser.pwd = '<NO>';
+		}
 		res.status(200).json({
-			currentUser: req.user,
+			currentUser: currentUser,
 			genreList: [{
 				name: 'Клауд реп',
 				selected: true
@@ -591,7 +595,7 @@ function setupAuth(app) {
 		res.redirect(resultUrl);
 	});
 
-	app.get(apiUrl + 'auth/result', function (req, res) {
+	app.get(resultUrl, function (req, res) {
 		if (req.user) {
 			req.user.pwd = '<NO>';
 		}
@@ -600,7 +604,32 @@ function setupAuth(app) {
 		});
 	});
 
+	app.post(apiUrl + 'auth/edit', function (req, res) {
+		if (!req.user) {
+			handleError(res, 'User not authed');
+			return
+		}
+		if (req.user._id.toString() !== req.body._id) {
+			handleError(res, 'Attempt to edit not own account');
+			return
+		}
+		var userUpd = _.pick(req.body, ['email', 'name', 'bdate', 'password', 'role','descr'])
+		userUpd.role = Math.abs(req.body.role | 0); // -1 is Admin, 0 is listener, 1 is musician
 
+		dbtools.getDb().collection(C_USERS)
+			.updateOne({
+				_id: req.user._id
+			}, {
+				$set: userUpd
+			}, function (err, cmdres) {
+				if (err || !cmdres || !cmdres.result || !cmdres.result.ok) {
+					handleError(res, err || cmdres, 'User update failed');
+				}
+				else {
+					res.status(201).json({ok: 1}).end();
+				}
+			});
+	});
 	/**
 		Reqistration
 	*/
@@ -685,8 +714,8 @@ function setupAuth(app) {
 
 
 function handleError(res, errObjOrStr, message, code) {
-	var reason = !!errObjOrStr && errObjOrStr.message ? errObjOrStr.message : errObjOrStr;
-	console.log('API ERROR: ' + reason);
+	var reason = !!errObjOrStr && errObjOrStr.message ? errObjOrStr.message : errObjOrStr; // sweet jesus
+	console.log('API ERROR: ' + JSON.stringify(reason));
 	res.status(code || 500).json({
 		"error": message
 	}).end();

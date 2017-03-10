@@ -1,5 +1,4 @@
 <script>
-
 	import mapLib from './../map-lib.js'; 
 	var _vm;
 	export default {
@@ -37,9 +36,16 @@
 			},
 			genreList: function(){
 				return this.$root.$data.genreList;
+			},
+			currentUser: function(){
+				return this.$root.currentUser;
 			}
 		},
 		mounted: function(){
+			if (!this.currentUser) {this.$router.push('/'); return}
+			else 
+			if ((this.currentUser.role|0)<1) {this.$router.push('/user-profile')}
+
 			_vm = this;
 
 			mapLib.create((map, google)=>{
