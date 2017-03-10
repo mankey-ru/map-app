@@ -25,14 +25,6 @@ export default {
 				name: 'user-register'
 			})
 		},
-		gotoForum: function (forum) {
-			this.$router.push({
-				name: 'theme_list',
-				params: {
-					forum_id: forum._id
-				}
-			})
-		},
 		gotoTheme: function (th) {
 			this.$router.push({
 				name: 'reply_list',
@@ -40,6 +32,9 @@ export default {
 					theme_id: th._id
 				}
 			})
+		},
+		gotoEventNew: function () {
+			this.$router.push({name: 'event-new'})
 		}
 	},
 	filters: {

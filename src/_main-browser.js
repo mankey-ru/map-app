@@ -29,7 +29,8 @@ request
 				mounted: function () {},
 				methods: {},
 				data: {
-					currentUser: res.body.currentUser ? res.body.currentUser : false
+					currentUser: res.body.currentUser ? res.body.currentUser : false,
+					genreList: res.body.genreList ? res.body.genreList : []
 				}
 			})
 		}

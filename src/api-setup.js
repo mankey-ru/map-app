@@ -25,173 +25,26 @@ module.exports = function (app) {
 	setupApi(app);
 }
 
-function setupAuth(app) {
-	// Local auth
-	// http://passportjs.org/docs/username-password
-	passport.use(new LocalStrategy(
-		function (email, password, done) {
-			dbtools.getDb().collection(C_USERS).findOne({
-				email: email
-			}, function (err, user) {
-				if (err) {
-					return done(err);
-				}
-				if (!user || !bcrypt.compareSync(password, user.pwd)) {
-					return done(null, false, {
-						message: 'XXXX'
-					});
-				}
-				return done(null, user);
-			});
-		}
-	));
-
-	// Configure Passport authenticated session persistence.
-	passport.serializeUser(function (user, cb) {
-		cb(null, user._id);
-	});
-
-	passport.deserializeUser(function (_id, cb) {
-		dbtools.getDb().collection(C_USERS).findOne({
-			_id: ObjectID(_id)
-		}, function (err, user) {
-			if (err) {
-				return cb(err);
-			}
-			cb(null, user);
-		});
-	});
-
-	// Use application-level middleware for common functionality, including
-	// logging, parsing, and session handling.
-	//app.use(require('morgan')('combined'));
-	app.use(require('cookie-parser')());
-	app.use(require('body-parser').urlencoded({
-		extended: true
-	}));
-	app.use(require('express-session')({
-		secret: 't0psecret',
-		resave: false,
-		saveUninitialized: false
-	}));
-
-	// Initialize Passport and restore authentication state, if any, from the
-	// session.
-	app.use(passport.initialize());
-	app.use(passport.session());
-
-	var resultUrl = apiUrl + 'auth/result';
-
-	app.post(apiUrl + 'auth/in',
-		passport.authenticate('local', {
-			successRedirect: resultUrl,
-			failureRedirect: resultUrl
-		})
-	);
-
-	app.post(apiUrl + 'auth/out', function (req, res) {
-		req.logout();
-		res.redirect(resultUrl);
-	});
-
-	app.get(apiUrl + 'auth/result', function (req, res) {
-		if (req.user) {
-			req.user.pwd = '<NO>';
-		}
-		res.json({
-			user: req.user
-		});
-	});
-
-
-	/**
-		Reqistration
-	*/
-	const bcrypt = require('bcrypt');
-	const saltRounds = 8;
-
-	app.post(apiUrl + 'auth/reg', function (req, res) {
-		if (req.user) {
-			// user already authed
-			req.logout();
-		}
-		// checking request data
-		var reqd = ['email', 'password'];
-		for (let k of reqd) {
-			if (typeof req.body[k] === 'undefined') {
-				handleError(res, err, 'Not enough data (' + k + ')');
-				return;
-			}
-		}
-
-		var newUser = _.pick(req.body, ['email', 'name']);
-		newUser.date = new Date;
-		newUser.online = true;
-		newUser.rating_total = 0;
-		newUser.pic = 'userpics/2.png';
-
-		var db = dbtools.getDb();
-
-		waterfall([
-			// check if email is unique
-			// TODO create unique constraint on email
-			// https://docs.mongodb.com/manual/reference/method/db.collection.createIndex/
-			function (next) {
-				db.collection(C_USERS).find({
-					email: req.body.email
-				}).toArray(function (err, docs) {
-					//console.log(err || docs.length !== 0)
-					var fail = err || docs.length !== 0;
-					next(err || docs.length !== 0 ? 'User with speciafied email already exists' : null)
-				})
-			},
-			// Generating pwd hash
-			function (next) { // TODOOOOO
-				//console.log('bcrypt.hash', arguments)
-				bcrypt.hash(req.body.password, saltRounds, function (err, hash) {
-					newUser.pwd = hash;
-					next();
-				});
-			},
-			// Inserting user
-			function (next) {
-				db.collection(C_USERS)
-					.insertOne(newUser, function (err, insert) {
-						newUser = insert.ops[0];
-						next(err || !insert.result.ok ? 'Failed to create new user' : null);
-					});
-			}
-		], waterfallFinal)
-
-		function waterfallFinal(err) {
-			if (err) {
-				handleError(res, err, err);
-			}
-			else {
-				req.login(newUser, function (err) {
-					if (err) {
-						// potential error from the login() callback would come from your serializeUser() function
-						handleError(res, 'Automatic login of new user failed');
-					}
-					else {
-						newUser.pwd = '<NO>';
-						res.status(201).json(newUser).end();
-					}
-				})
-			}
-		}
-	});
-
-
-}
-
 function setupApi(app) {
-	
+
 	// https://docs.mongodb.com/v3.2/tutorial/geospatial-tutorial/#differences-between-flat-and-spherical-geometry
 
 	app.get(apiUrl + 'commondata', function (req, res) {
 		res.status(200).json({
-			currentUser: req.user
+			currentUser: req.user,
+			genreList: [{
+				name: 'Клауд реп',
+				selected: true
+			}, {
+				name: 'Вич хаус',
+				selected: true
+			}, {
+				name: 'Вепорвейв',
+				selected: true
+			}, {
+				name: 'Дарк-фолк',
+				selected: true
+			}]
 		}).end();
 	});
 
@@ -668,6 +521,168 @@ function setupApi(app) {
 		res.status(404).send('<h1>Something went wrong</h1>')
 	})*/
 }
+
+function setupAuth(app) {
+	// Local auth
+	// http://passportjs.org/docs/username-password
+	passport.use(new LocalStrategy(
+		function (email, password, done) {
+			dbtools.getDb().collection(C_USERS).findOne({
+				email: email
+			}, function (err, user) {
+				if (err) {
+					return done(err);
+				}
+				if (!user || !bcrypt.compareSync(password, user.pwd)) {
+					return done(null, false, {
+						message: 'XXXX'
+					});
+				}
+				return done(null, user);
+			});
+		}
+	));
+
+	// Configure Passport authenticated session persistence.
+	passport.serializeUser(function (user, cb) {
+		cb(null, user._id);
+	});
+
+	passport.deserializeUser(function (_id, cb) {
+		dbtools.getDb().collection(C_USERS).findOne({
+			_id: ObjectID(_id)
+		}, function (err, user) {
+			if (err) {
+				return cb(err);
+			}
+			cb(null, user);
+		});
+	});
+
+	// Use application-level middleware for common functionality, including
+	// logging, parsing, and session handling.
+	//app.use(require('morgan')('combined'));
+	app.use(require('cookie-parser')());
+	app.use(require('body-parser').urlencoded({
+		extended: true
+	}));
+	app.use(require('express-session')({
+		secret: 't0psecret',
+		resave: false,
+		saveUninitialized: false
+	}));
+
+	// Initialize Passport and restore authentication state, if any, from the
+	// session.
+	app.use(passport.initialize());
+	app.use(passport.session());
+
+	var resultUrl = apiUrl + 'auth/result';
+
+	app.post(apiUrl + 'auth/in',
+		passport.authenticate('local', {
+			successRedirect: resultUrl,
+			failureRedirect: resultUrl
+		})
+	);
+
+	app.post(apiUrl + 'auth/out', function (req, res) {
+		req.logout();
+		res.redirect(resultUrl);
+	});
+
+	app.get(apiUrl + 'auth/result', function (req, res) {
+		if (req.user) {
+			req.user.pwd = '<NO>';
+		}
+		res.json({
+			user: req.user
+		});
+	});
+
+
+	/**
+		Reqistration
+	*/
+	const bcrypt = require('bcrypt');
+	const saltRounds = 8;
+
+	app.post(apiUrl + 'auth/reg', function (req, res) {
+		if (req.user) {
+			// user already authed
+			req.logout();
+		}
+		// checking request data
+		var reqd = ['email', 'password', 'name'];
+		for (let k of reqd) {
+			if (typeof req.body[k] === 'undefined') {
+				handleError(res, err, 'Not enough data (' + k + ')');
+				return;
+			}
+		}
+
+		var newUser = _.pick(req.body, ['email', 'name']);
+		newUser.role = Math.abs(req.body.role | 0); // -1 is Admin, 0 is listener, 1 is musician
+		newUser.date = new Date;
+		newUser.online = true;
+		newUser.rating_total = 0;
+		newUser.pic = 'userpics/2.png';
+
+		var db = dbtools.getDb();
+
+		waterfall([
+			// check if email is unique
+			// TODO create unique constraint on email
+			// https://docs.mongodb.com/manual/reference/method/db.collection.createIndex/
+			function (next) {
+				db.collection(C_USERS).find({
+					email: req.body.email
+				}).toArray(function (err, docs) {
+					//console.log(err || docs.length !== 0)
+					var fail = err || docs.length !== 0;
+					next(err || docs.length !== 0 ? 'User with speciafied email already exists' : null)
+				})
+			},
+			// Generating pwd hash
+			function (next) { // TODOOOOO
+				//console.log('bcrypt.hash', arguments)
+				bcrypt.hash(req.body.password, saltRounds, function (err, hash) {
+					newUser.pwd = hash;
+					next();
+				});
+			},
+			// Inserting user
+			function (next) {
+				db.collection(C_USERS)
+					.insertOne(newUser, function (err, insert) {
+						newUser = insert.ops[0];
+						next(err || !insert.result.ok ? 'Failed to create new user' : null);
+					});
+			}
+		], waterfallFinal)
+
+		function waterfallFinal(err) {
+			if (err) {
+				handleError(res, err, err);
+			}
+			else {
+				req.login(newUser, function (err) {
+					if (err) {
+						// potential error from the login() callback would come from your serializeUser() function
+						handleError(res, 'Automatic login of new user failed');
+					}
+					else {
+						newUser.pwd = '<NO>';
+						res.status(201).json(newUser).end();
+					}
+				})
+			}
+		}
+	});
+
+
+}
+
 
 function handleError(res, errObjOrStr, message, code) {
 	var reason = !!errObjOrStr && errObjOrStr.message ? errObjOrStr.message : errObjOrStr;

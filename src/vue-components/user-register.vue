@@ -1,22 +1,30 @@
 <template>
 	<div>
-		<br />
-		<br />
-		<br />
-		<br />
 		<div class="row">
 			<form v-on:submit.prevent="register_submit">
 				<div class="col-md-18 col-md-offset-5 col-xs-24">
+					<h1>Регистрация</h1>
+					<br/>
 					<div class="row form-group">
 						<div class="col-xs-18">
-							<label>Name</label>
+							<label>Логин</label>
 							<input v-model="nu.name" class="form-control" />
 						</div>
 						<div class="col-xs-6"></div>
 					</div>
 					<div class="row form-group">
+						<div class="col-xs-12">
+						<div>
+								<label style="font-size: 1.5em;">
+									<input type="checkbox" v-model="nu.role" style="width: 1.5em; height: 1.5em;vertical-align: middle;">
+									Я музыкант
+								</label>
+							</div>
+						</div>
+					</div>
+					<div class="row form-group">
 						<div class="col-xs-18">
-							<label>Email</label>
+							<label>Электронная почта</label>
 							<input v-model="nu.email" class="form-control" />
 						</div>
 						<div class="col-xs-6">
@@ -38,7 +46,7 @@
 					</div>
 					<div class="row form-group">
 						<div class="col-xs-18">
-							<label>Password</label>
+							<label>Пароль</label>
 							<input v-if="!nu.password_visible" type="password" v-model="nu.password" class="form-control" />
 							<input v-if="nu.password_visible" type="text" v-model="nu.password" class="form-control" />
 						</div>
@@ -50,7 +58,7 @@
 					</div>
 					<div class="row form-group" v-bind:class="{opa: nu.password_visible}">
 						<div class="col-xs-18">
-							<label>Confirm password</label>
+							<label>Ещё раз пароль</label>
 							<input v-model="nu.password_confirm" v-bind:disabled="nu.password_visible" class="form-control" type="password"/>
 						</div>
 						<div class="col-xs-6" v-show="!nu.password_visible">
@@ -65,9 +73,9 @@
 							</div>
 						</div>
 					</div>
-					<div>
+					<div class="row">
 						<div class="col-xs-18 text-right">
-							<button type="submit" class="btn btn-primary" v-bind:disabled="form_invalid">Submit</button>
+							<button type="submit" class="btn btn-primary" v-bind:disabled="form_invalid">Готово</button>
 						</div>
 						<div class="col-xs-6">
 							<i v-if="nu.submit_pending" class="spin spin-sm"></i>
@@ -92,6 +100,7 @@
 		data: function () {
 			return {
 				nu: { // NewUser
+					role: 0,
 					name: '',
 					email: '',
 					email_pending: false,
@@ -112,26 +121,26 @@
 				}
 				nu.submit_pending = true;
 				request
-					.post(apiUrl + 'auth/reg')
-					.send(nu)
-					.end((err, res)=>{
-							if (err || !res.body) {
-								notie.alert({
-									type: 'error', 
-									text: res.body.error || 'Registration failed'
-								});
-							}
-							else {
-								notie.alert({
-									type: 'success', 
-									text:'Registration succeeded', 
-									time: 1
-								});
-								this.$root.currentUser = res.body;
-								this.gotoProfile(); 
-							}
-							nu.submit_pending = false;
+				.post(apiUrl + 'auth/reg')
+				.send(nu)
+				.end((err, res)=>{
+					if (err || !res.body) {
+						notie.alert({
+							type: 'error', 
+							text: res.body.error || 'Registration failed'
 						});
+					}
+					else {
+						notie.alert({
+							type: 'success', 
+							text:'Registration succeeded', 
+							time: 1
+						});
+						this.$root.currentUser = res.body;
+						this.gotoProfile(); 
+					}
+					nu.submit_pending = false;
+				});
 			}
 		},
 		mixins: [mixins],
