@@ -55,6 +55,15 @@
 				google.maps.event.addListener(map, 'click', function(evt) {
 					placeMarker(evt.latLng);
 				});
+				google.maps.event.addListener(map, 'mousedown', function(evt) {
+					alert('mousedown')
+				});
+				google.maps.event.addListener(map, 'touchstart', function(evt) {
+					alert('touchstart')
+				});
+				google.maps.event.addListener(map, 'touchmove', function(evt) {
+					alert('touchmove')
+				});
 
 				function placeMarker(location) {
 					var options = {

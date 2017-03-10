@@ -113,7 +113,7 @@
 									text:'Успех', 
 									time: 1
 								});
-								this.$root.currentUser = this.user; // TODO check if works
+								this.$root.currentUser = this.user;
 							}
 							this.submit_pending = false;
 						});

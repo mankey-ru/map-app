@@ -112,7 +112,7 @@
 
 <style scoped>
 	#map-container {
-		/*height: 600px;*/
+		min-height: 600px;
 	}
 	.genre {
 		cursor: pointer;
