@@ -74,11 +74,14 @@
 				google.maps.event.addListener(map, 'mouseup', function(evt) {
 					_vm.log('mouseup')
 				});
-				google.maps.event.addListener(map, 'touchstart', function(evt) {
-					_vm.log('touchstart')
+				google.maps.event.addListener(map, 'dragstart', function(evt) {
+					_vm.log('dragstart')
 				});
-				google.maps.event.addListener(map, 'touchmove', function(evt) {
-					_vm.log('touchmove')
+				google.maps.event.addListener(map, 'dragend', function(evt) {
+					_vm.log('dragend')
+				});
+				google.maps.event.addListener(map, 'rightclick', function(evt) {
+					_vm.log('rightclick')
 				});
 
 				function placeMarker(location) {
