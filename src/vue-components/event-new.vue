@@ -30,7 +30,9 @@
 				this.mark_cur = false;
 			},
 			log: function(txt){
-				this.LOG += txt + '\n';
+				if (txt) {
+					this.LOG += txt + '\n';
+				}
 			}
 		},
 		computed: {
@@ -59,10 +61,17 @@
 				google.maps.event.addListener(map, 'click', function(evt) {
 					placeMarker(evt.latLng);
 				});
+				google.maps.event.addListener(map, 'tilesloaded', function(evt) {
+					_vm.log('tilesloaded')
+				});
+				var isTouch = 'ontouchstart' in document.documentElement;
+				google.maps.event.addListener(map, 'click', function(event) {
+				   _vm.log('click_touch='+isTouch)
+				});
 				google.maps.event.addListener(map, 'mousedown', function(evt) {
 					_vm.log('mousedown')
 				});
-				google.maps.event.addListener(map, 'mousedown', function(evt) {
+				google.maps.event.addListener(map, 'mouseup', function(evt) {
 					_vm.log('mouseup')
 				});
 				google.maps.event.addListener(map, 'touchstart', function(evt) {
