@@ -111,9 +111,6 @@
 </template>
 
 <style scoped>
-	#map-container {
-		min-height: 600px;
-	}
 	.genre {
 		cursor: pointer;
 		margin-top: .1em;

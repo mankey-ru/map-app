@@ -10,7 +10,8 @@
 				nevt: {  // NewEvent
 					name: '',
 					descr: '',
-					latLng: false
+					latLng: false,
+					LOG: ''
 				}
 			}
 		},
@@ -27,6 +28,9 @@
 			nevt_discard: function(){
 				this.mark_cur.setMap(null);
 				this.mark_cur = false;
+			},
+			log: function(txt){
+				this.LOG += txt + '\n';
 			}
 		},
 		computed: {
@@ -56,13 +60,16 @@
 					placeMarker(evt.latLng);
 				});
 				google.maps.event.addListener(map, 'mousedown', function(evt) {
-					alert('mousedown')
+					_vm.log('mousedown')
+				});
+				google.maps.event.addListener(map, 'mousedown', function(evt) {
+					_vm.log('mouseup')
 				});
 				google.maps.event.addListener(map, 'touchstart', function(evt) {
-					alert('touchstart')
+					_vm.log('touchstart')
 				});
 				google.maps.event.addListener(map, 'touchmove', function(evt) {
-					alert('touchmove')
+					_vm.log('touchmove')
 				});
 
 				function placeMarker(location) {
@@ -104,6 +111,7 @@
 				</div>
 				<div class="form-group">
 					<label>Место</label>
+					<pre v-html="LOG" v-if="LOG"></pre>
 					<div v-show="1">
 						<div class="hdn">
 							<div data-pos="TOP_LEFT" class="map-ctrl-wrap">
