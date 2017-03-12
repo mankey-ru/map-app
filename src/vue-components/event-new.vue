@@ -53,14 +53,22 @@
 
 			mapLib.create((map, google)=>{
 
+				var touchmove = false;
+				document.body.addEventListener('mousedown', function(event) {
+					touchmove = false
+				});
 				document.body.addEventListener("touchmove", function(event) {
-					_vm.log('touchmove')
+					touchmove = true
+				});
+				document.body.addEventListener('mouseup', function(event) {
+					_vm.log('touchmove between mouseup and down: ' + touchmove)
 				});
 
 				placeMarker(map.getCenter()); // initial draggable marker
 
 				google.maps.event.addListener(map, 'click', function(evt) {
 					placeMarker(evt.latLng);
+					_vm.log('placeMarker!')
 				});
 				google.maps.event.addListener(map, 'tilesloaded', function(evt) {
 					_vm.log('tilesloaded')
