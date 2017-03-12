@@ -53,11 +53,11 @@
 </template>
 
 <script>
-	var apiUrl = require('./../api-url.js');
+	var apiUrl = require('./../api-url.js')
 
-	import request from 'superagent';
-	import Datepicker from 'vuejs-datepicker';
-	import notie from 'notie';
+	import request from 'superagent'
+	import Datepicker from 'vuejs-datepicker'
+	import miniToastr from 'mini-toastr'
 
 	var Comp = {
 		name: 'user-profile',
@@ -76,10 +76,7 @@
 						.get(apiUrl + 'user/' + user_id) 
 						.end((err, res)=>{
 								if (err || !res.body) {
-									notie.alert({
-										type: 'error', 
-										text: res.body.error || 'User fetch failed'
-									});
+									miniToastr.error(res.body.error || 'User fetch failed')
 								}
 								else {
 									this.user = data;
@@ -102,17 +99,10 @@
 					.end((err, res)=>{
 							if (err || !res.body ||  !res.body.ok) {
 								console.log(res.body)
-								notie.alert({
-									type: 'error', 
-									text: res.body.error || 'User edit failed'
-								});
+								miniToastr.error(res.body.error || 'User edit failed');
 							}
 							else {
-								notie.alert({
-									type: 'success', 
-									text:'Успех', 
-									time: 1
-								});
+								miniToastr.success('Успех');
 								this.$root.currentUser = this.user;
 							}
 							this.submit_pending = false;

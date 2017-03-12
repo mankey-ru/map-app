@@ -1,9 +1,11 @@
 <script>
-	const apiUrl = require('./../api-url.js');
-	import mixins from './../vue-mixins.js';
-	import routes from './../vue-routes.js';
-	import request from 'superagent';
-	import notie from 'notie';
+	const apiUrl = require('./../api-url.js')
+	import mixins from './../vue-mixins.js'
+	import routes from './../vue-routes.js'
+	import request from 'superagent'
+	import miniToastr from 'mini-toastr'
+
+	miniToastr.init();
 
 	export default {
 		name: 'AppRoot',
@@ -32,13 +34,13 @@
 				})
 				.end((err, res)=>{
 					if (err || !res.body) {
-						notie.alert({ type: 'error', text: 'Request error' })
+						miniToastr.error('Request error')
 					}
 					else if (!res.body.user) {
-						notie.alert({ type: 'warning', text: 'Email/password combination not found. Please try again.' })
+						miniToastr.warn('Email/password combination not found. Please try again.')
 					}
 					else {
-						notie.alert({ type: 'success', text: 'Success', time: 1 })
+						miniToastr.success('Success')
 						this.$root.currentUser = res.body.user;
 					}
 					this.signIn.pending = false;
@@ -50,13 +52,13 @@
 				.post(apiUrl + 'auth/out')
 				.end((err, res)=>{
 					if (err || !res.body) {
-						notie.alert({ type: 'error', text: 'Request error' })
+						miniToastr.error('Request error' )
 					}
 					else if (res.body.user) {
-						notie.alert({ type: 'warning', text: 'Signout failed' })
+						miniToastr.warning('Signout failed')
 					}
 					else {
-						notie.alert({ type: 'success', text: 'Success', time: 1 })
+						miniToastr.success('Success')
 						this.$root.currentUser = false;
 					}
 					this.signOut_pending = false;

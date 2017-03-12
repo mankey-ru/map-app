@@ -1,5 +1,6 @@
 <script>
 	import mapLib from './../map-lib.js'; 
+	import miniToastr from 'mini-toastr'; 
 	var _vm;
 	export default {
 		name: 'evt-new',
@@ -17,11 +18,7 @@
 		},
 		methods: {
 			nevt_submit: function(){
-				notie.alert({
-					type: 'success',
-					text: 'Успех',
-					time: 3
-				});
+				miniToastr.success('Успех');
 				// do things
 				this.nevt_discard();
 			},
@@ -55,6 +52,10 @@
 			_vm = this;
 
 			mapLib.create((map, google)=>{
+
+				document.body.addEventListener("touchmove", function(event) {
+					_vm.log('touchmove')
+				});
 
 				placeMarker(map.getCenter()); // initial draggable marker
 

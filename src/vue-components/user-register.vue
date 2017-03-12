@@ -89,8 +89,8 @@
 
 <script>
 	import request from 'superagent';
-	import notie from 'notie';
 	import mixins from './../vue-mixins.js';
+	import miniToastr from 'mini-toastr';
 
 	var apiUrl = require('./../api-url.js');
 	var emailRe = new RegExp("^([0-9a-zA-Z_]([-.\\w]*[0-9a-zA-Z_-])*@([0-9a-zA-Z][-\\w]*[0-9a-zA-Z]\\.)+[a-zA-Z]{2,9})$");
@@ -125,17 +125,10 @@
 				.send(nu)
 				.end((err, res)=>{
 					if (err || !res.body) {
-						notie.alert({
-							type: 'error', 
-							text: res.body.error || 'Registration failed'
-						});
+						miniToastr.error(res.body.error || 'Registration failed');
 					}
 					else {
-						notie.alert({
-							type: 'success', 
-							text:'Registration succeeded', 
-							time: 1
-						});
+						miniToastr.success('Registration succeeded');
 						this.$root.currentUser = res.body;
 						this.gotoProfile(); 
 					}

@@ -3,7 +3,6 @@
 	import Datepicker from 'vuejs-datepicker';
 	import _ from 'lodash';
 	import mixins from './../vue-mixins.js';
-	import notie from 'notie';
 	import mapLib from './../map-lib.js'; 
 
 	var _vm;
