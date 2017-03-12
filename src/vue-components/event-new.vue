@@ -53,44 +53,25 @@
 
 			mapLib.create((map, google)=>{
 
+				placeMarker(map.getCenter()); // initial draggable marker
+
 				var touchmove = false;
-				document.body.addEventListener('mousedown', function(event) {
-					touchmove = false
-				});
+
 				document.body.addEventListener("touchmove", function(event) {
 					touchmove = true
 				});
-				document.body.addEventListener('mouseup', function(event) {
-					_vm.log('touchmove between mouseup and down: ' + touchmove)
-				});
-
-				placeMarker(map.getCenter()); // initial draggable marker
-
-				google.maps.event.addListener(map, 'click', function(evt) {
-					placeMarker(evt.latLng);
-					_vm.log('placeMarker!')
-				});
-				google.maps.event.addListener(map, 'tilesloaded', function(evt) {
-					_vm.log('tilesloaded')
-				});
-				var isTouch = 'ontouchstart' in document.documentElement;
-				google.maps.event.addListener(map, 'click', function(event) {
-				   _vm.log('click_touch='+isTouch)
-				});
 				google.maps.event.addListener(map, 'mousedown', function(evt) {
+					touchmove = false
 					_vm.log('mousedown')
 				});
 				google.maps.event.addListener(map, 'mouseup', function(evt) {
+					_vm.log('touchmove between mouseup and down: ' + touchmove)
 					_vm.log('mouseup')
 				});
-				google.maps.event.addListener(map, 'dragstart', function(evt) {
-					_vm.log('dragstart')
-				});
-				google.maps.event.addListener(map, 'dragend', function(evt) {
-					_vm.log('dragend')
-				});
-				google.maps.event.addListener(map, 'rightclick', function(evt) {
-					_vm.log('rightclick')
+
+				google.maps.event.addListener(map, 'click', function(evt) {
+					_vm.log('placeMarker!')
+					placeMarker(evt.latLng);
 				});
 
 				function placeMarker(location) {
