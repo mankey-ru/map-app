@@ -35,95 +35,113 @@ textarea {
 	display: none;
 }
 
+.btn.btn-material {
+	/*position: fixed;
+	bottom: 1em;
+	right: 1em;*/
+	border-radius: 50%;
+	width: 2em;
+	height: 2em;
+	line-height: 1.8em;
+	font-size: 2em;
+	font-weight: bold;
+	padding: 0;
+	
+	z-index: 777;
+}
+
 /*
 	========================================================================================
 								Map related common styles
 	========================================================================================
-*/
-#map-container {
-	background-color: #eee;
-	border-radius: 3px;
-	min-height: 600px;
-}
+	*/
+	#map-container {
+		background-color: #eee;
+		border-radius: 3px;
+		min-height: 600px;
+	}
 
-.map-ctrl-wrap {
-	margin: 1em;
-}
+	.map-ctrl-wrap {
+		padding: 1em;
+	}
 
 /*
 	========================================================================================
 							ext styles for vuejs-datepicker
 	========================================================================================
-*/
-.__datepicker-clear {
-	position: absolute;
-	top: .5em;
-	right: .7em;
-	color: #666;
-	cursor: pointer;
-}
-.__datepicker-wrap {
-	position:relative
-}
-.__datepicker-wrap .form-control[readonly]{ 
-	background-color: #fff;
-}
+	*/
+	.__datepicker-clear {
+		position: absolute;
+		top: .5em;
+		right: .7em;
+		color: #666;
+		cursor: pointer;
+	}
+	.__datepicker-wrap {
+		position:relative
+	}
+	.__datepicker-wrap .form-control[readonly]{ 
+		background-color: #fff;
+	}
+	.__datepicker-wrap-noborder .calendar {
+		border-width: 0;
+	}
 
 /*
 	========================================================================================
 										spinner
 	========================================================================================
-*/
+	*/
 
-@keyframes spinner_spin {
-	100% {
-		-webkit-transform: rotate(360deg);
-		transform: rotate(360deg);
+	@keyframes spinner_spin {
+		100% {
+			-webkit-transform: rotate(360deg);
+			transform: rotate(360deg);
+		}
 	}
-}
-.spin {
-	animation: spinner_spin 2s linear infinite;
-	font-style: normal;
-	display: inline-block;
-}
-.spin:after {
-	font-family: 'Glyphicons Halflings';
-	content: "\e031";
-	vertical-align: middle;
-}
-.spin-lg {
-	padding: 3em 0;
-}
-.spin-lg:after {
-	font-size: 5em;
-}
-.spin-md {
-	padding: 2em 0;
-}
-.spin-md:after {
-	font-size: 3em;
-}
-.spin-sm:after {
-	font-size: 1.8em;
-}
-.spin-input {
-	float: right;
-	margin-left: -2em;
-	margin-top: 0.2em;
-	margin-right: .5em;
-	font-size: 1.5em;
-	padding: 0;
-	display: none;
-}
-.spin-input-parent .spin-input {
-	display: inline-block;
-}
-.spin-global {
-	position: absolute;
-	top: 35%;
-	z-index: 7;
-	left: 42%;
-}
+	.spin {
+		animation: spinner_spin 2s linear infinite;
+		font-style: normal;
+		display: inline-block;
+	}
+	.spin:after {
+		font-family: 'Glyphicons Halflings';
+		content: "\e031";
+		vertical-align: middle;
+	}
+	.spin-lg {
+		padding: 3em 0;
+	}
+	.spin-lg:after {
+		font-size: 5em;
+	}
+	.spin-md {
+		padding: 2em 0;
+	}
+	.spin-md:after {
+		font-size: 3em;
+	}
+	.spin-sm:after {
+		font-size: 1.8em;
+	}
+	.spin-input {
+		float: right;
+		margin-left: -2em;
+		margin-top: 0.2em;
+		margin-right: .5em;
+		font-size: 1.5em;
+		padding: 0;
+		display: none;
+	}
+	.spin-input-parent .spin-input {
+		display: inline-block;
+	}
+	.spin-global {
+		position: absolute;
+		top: 35%;
+		z-index: 7;
+		left: 42%;
+	}
 
 
 /*

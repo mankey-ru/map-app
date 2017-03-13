@@ -1,12 +1,13 @@
 import start from './vue-components/start.vue';
 
-import mapGoogle from './vue-components/map-google.vue';
+import mainpage from './vue-components/mainpage.vue';
 
 import eventNew from './vue-components/event-new.vue';
 import eventCard from './vue-components/event-card.vue';
 
 import user_profile from './vue-components/user-profile.vue';
 import user_register from './vue-components/user-register.vue';
+import user_login from './vue-components/user-login.vue';
 
 export default [
 	// Профайлы
@@ -18,28 +19,28 @@ export default [
 		name: 'user-profile-any',
 		path: '/user-profile/:user_id',
 		component: user_profile
-	},{
+	}, {
 		name: 'user-register',
 		path: '/register',
 		component: user_register
-	},
-	{
+	}, {
+		name: 'user-login',
+		path: '/login',
+		component: user_login
+	}, {
 		path: '/start',
 		name: 'start',
 		component: start
-	},
-	{
-		path: '/map-google',
+	}, {
+		path: '/mainpage',
 		alias: '/',
-		name: 'map-google',
-		component: mapGoogle
-	},
-	{
+		name: 'mainpage',
+		component: mainpage
+	}, {
 		path: '/event/new',
 		name: 'event-new',
 		component: eventNew
-	},
-	{
+	}, {
 		path: '/event/card/:event_id',
 		name: 'event-card',
 		component: eventCard

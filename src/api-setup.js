@@ -11,12 +11,8 @@ const apiUrl = require('./api-url.js');
 const _ = require('lodash');
 const waterfall = require('async/waterfall')
 
-const C_FORUM_GROUPS = "forum_groups";
-const C_FORUMS = "forums";
-const C_THEMES = "themes";
-const C_REPLIES = "replies";
+const C_EVENTS = "events";
 const C_USERS = "users";
-const C_VOTES = "rating_votes";
 
 module.exports = function (app) {
 	dbtools.connect();
@@ -67,7 +63,7 @@ function setupApi(app) {
 	});
 	/**		
 		-------------------------------------------------------------------
-									Темы
+									Events
 		-------------------------------------------------------------------
 	*/
 	/*	
@@ -75,7 +71,7 @@ function setupApi(app) {
 		POST создать новый
 	*/
 
-	app.get(apiUrl + 'themes', function (req, res) {
+	app.get(apiUrl + 'events', function (req, res) {
 		var aRules = [{
 			$lookup: {
 				from: C_USERS,
@@ -85,28 +81,9 @@ function setupApi(app) {
 			}
 		}, {
 			$unwind: '$author'
-		}, {
-			$lookup: {
-				from: C_REPLIES,
-				localField: 'last_reply_id',
-				foreignField: '_id',
-				as: 'last_reply'
-			}
-		}, {
-			$unwind: '$last_reply'
-		}, {
-			$lookup: {
-				from: C_USERS,
-				localField: 'last_reply_author_id',
-				foreignField: '_id',
-				as: 'last_reply_author'
-			}
-		}, {
-			$unwind: '$last_reply_author'
 		}];
-		dbtools.getDb().collection(C_THEMES).aggregate(aRules).toArray(function (err, docs) {
+		dbtools.getDb().collection(C_EVENTS).aggregate(aRules).toArray(function (err, docs) {
 			if (err) {
-				handleError(res, err, "Failed to get themes.");
 			}
 			else {
 				res.status(200).json(docs).end();
@@ -114,73 +91,24 @@ function setupApi(app) {
 		});
 	});
 
-	app.post(apiUrl + 'themes', function (req, res) {
-		var author_id = ObjectID(req.user._id);
-		var newTheme;
-
-		// Creating first reply
-		var newReply = {
-			text: req.body._TEMP_firstReply,
-			rating: 0,
-			author_id: author_id,
-			theme_id: null, // to be updated
-			date: new Date()
+	app.post(apiUrl + 'events', function (req, res) {
+		if (!req.user) {
+			handleError(res, "User not authed");
+			return
 		}
-		dbtools.getDb().collection(C_REPLIES)
-			.insertOne(newReply, function (err, insert) {
+
+		var newEvent = _.pick(req.body, ['name','date','descr','latLng']);
+		newEvent.author_id = ObjectID(req.user._id);
+
+		dbtools.getDb().collection(C_EVENTS)
+			.insertOne(newEvent, function (err, insert) {
 				if (err || !insert.result.ok) {
 					handleError(res, err, 'Failed to create first reply');
 				}
 				else {
-					newReply._id = ObjectID(insert.ops[0]._id);
-					createNewTheme() // TODO promise
+					res.status(200).json(insert).end();
 				}
 			});
-
-		function createNewTheme() {
-			newTheme = req.body;
-			newTheme.date = new Date();
-			newTheme.cnt_replies = 0;
-			newTheme.pinned = false;
-			newTheme.cnt_views = 0;
-			newTheme.author_id = author_id;
-			newTheme.last_reply_author_id = author_id;
-			newTheme.last_reply_id = newReply._id;
-
-			// Deleting temporary service params
-			for (let k in newTheme) {
-				if (k.indexOf('_TEMP_') === 0) {
-					delete newTheme[k];
-				}
-			}
-
-			dbtools.getDb().collection(C_THEMES)
-				.insertOne(newTheme, function (err, insert) {
-					if (err || !insert.result.ok) {
-						handleError(res, err, 'Failed to create new theme');
-					}
-					else {
-						newReply.theme_id = ObjectID(insert.ops[0]._id);
-						updateFirstReply() // TODO promise
-					}
-				});
-		}
-
-		function updateFirstReply() {
-			dbtools.getDb().collection(C_REPLIES).updateOne({
-				_id: newReply._id
-			}, newReply, function (err, doc) {
-				if (err) {
-					handleError(res, err, 'Failed to update first reply');
-				}
-				else {
-					res.status(201).json({
-						newTheme: newTheme,
-						newReply: newReply
-					}).end();
-				}
-			});
-		}
 	});
 	/**		
 		-------------------------------------------------------------------

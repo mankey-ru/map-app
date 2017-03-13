@@ -1,6 +1,11 @@
 <script>
-	import mapLib from './../map-lib.js'; 
-	import miniToastr from 'mini-toastr'; 
+	var apiUrl = require('./../api-url.js')
+	import mapLib from './../map-lib.js'
+	import mixins from './../vue-mixins.js'
+	import miniToastr from 'mini-toastr'
+	import request from 'superagent'
+	import Datepicker from 'vuejs-datepicker'
+
 	var _vm;
 	export default {
 		name: 'evt-new',
@@ -12,24 +17,35 @@
 					name: '',
 					descr: '',
 					latLng: false,
-					LOG: ''
-				}
+					date: new Date()
+				},
+				submit_pending: false
 			}
 		},
+		mixins: [mixins],
 		methods: {
 			nevt_submit: function(){
-				miniToastr.success('Успех');
-				// do things
-				this.nevt_discard();
+				var pos = this.mark_cur.getPosition()
+				this.nevt.latLng = [pos.lat(), pos.lng()]
+				this.submit_pending = true;
+				request
+					.post(apiUrl + 'events')
+					.send(this.nevt)
+					.end((err, res)=>{
+						if (err || !res.body) {
+							miniToastr.error(res.body.error || 'Ошибка создания события')
+						}
+						else {
+							console.log(res)
+							miniToastr.success('Успех');
+							this.nevt_discard();
+						}
+						this.submit_pending = false;
+					});
 			},
 			nevt_discard: function(){
 				this.mark_cur.setMap(null);
 				this.mark_cur = false;
-			},
-			log: function(txt){
-				if (txt) {
-					this.LOG += txt + '\n';
-				}
 			}
 		},
 		computed: {
@@ -39,39 +55,42 @@
 			},
 			genreList: function(){
 				return this.$root.$data.genreList;
-			},
-			currentUser: function(){
-				return this.$root.currentUser;
 			}
 		},
+		components: {
+			Datepicker
+		},
 		mounted: function(){
-			if (!this.currentUser) {this.$router.push('/'); return}
+			if (!this.currentUser) {
+				console.log('User not authed')
+				this.$router.push('/');
+				return
+			}
 			else 
-			if ((this.currentUser.role|0)<1) {this.$router.push('/user-profile')}
+				if ((this.currentUser.role|0)<1) {
+					console.log('User cannot create events')
+					this.$router.push('/user-profile')
+				}
 
-			_vm = this;
+				_vm = this;
 
-			mapLib.create((map, google)=>{
+				mapLib.create((map, google)=>{
 
 				placeMarker(map.getCenter()); // initial draggable marker
 
+				// This code is to prevent situation when mobile user 
+				// scrolls page above map and in the end of scroll click event fires
 				var touchmove = false;
-
-				document.body.addEventListener("touchmove", function(event) {
-					touchmove = true
+				document.body.addEventListener('touchmove', function(event) {
+					touchmove = true;
 				});
 				google.maps.event.addListener(map, 'mousedown', function(evt) {
-					touchmove = false
-					_vm.log('mousedown')
+					touchmove = false;
 				});
-				google.maps.event.addListener(map, 'mouseup', function(evt) {
-					_vm.log('touchmove between mouseup and down: ' + touchmove)
-					_vm.log('mouseup')
-				});
-
 				google.maps.event.addListener(map, 'click', function(evt) {
-					_vm.log('placeMarker!')
-					placeMarker(evt.latLng);
+					if (touchmove===false) {
+						placeMarker(evt.latLng);
+					}
 				});
 
 				function placeMarker(location) {
@@ -87,62 +106,76 @@
 					_vm.mark_cur = new google.maps.Marker(options);
 				}
 			})
+			}
 		}
-	}
-</script>
+	</script>
 
-<template>
-	<div class="row">
-		<form v-on:submit.prevent="nevt_submit" class="evt-form">
-			<div class="col-xs-24 col-md-16 col-md-offset-4">
-				<h2 class="form-group">{{title}}</h2>
+	<template>
+		<div class="row">
+			<form v-on:submit.prevent="nevt_submit" class="evt-form">
+				<h2 class="col-xs-24 form-group">{{title}}</h2>
 				<hr />
-				<div class="form-group">
-					<label>Название</label>
-					<input v-model="nevt.name" class="form-control" />
-				</div>
-				<div class="form-group">
-					<label>Описание</label>
-					<textarea v-model="nevt.descr" class="form-control"></textarea>
-				</div>
-				<div class="form-group">
-					<label>Жанр</label>
-					<select class="form-control">
-						<option v-for="gen in genreList">{{gen.name}}</option>
-					</select>
-				</div>
-				<div class="form-group">
-					<label>Место</label>
-					<pre v-html="LOG" v-if="LOG"></pre>
-					<div v-show="1">
-						<div class="hdn">
-							<div data-pos="TOP_LEFT" class="map-ctrl-wrap">
-								<input id="map-ctrl-search" class="form-control" style="width: 20em" placeholder="Поиск мест" />
+				<div class="col-xs-24 col-md-12">
+					<div class="form-group">
+						<label>Место</label>
+						<div v-show="1">
+							<div class="hdn">
+								<div data-pos="TOP_LEFT" class="map-ctrl-wrap">
+									<input id="map-ctrl-search" class="form-control" style="width: 20em" placeholder="Поиск мест" />
+								</div>
 							</div>
+							<div id="map-container"></div>
 						</div>
-						<div id="map-container"></div>
 					</div>
 				</div>
-				<hr />
-				<div class="row">
-					<div class="col-xs-12">
-						<a v-on:click="$router.push({name:'map-google'})" class="btn btn-default">
-							<i class="glyphicon glyphicon-chevron-left"></i> 
-							Вернуться
-						</a>
+				<div class="col-xs-24 col-md-12">
+					<div class="form-group">
+						<label>Название</label>
+						<input v-model="nevt.name" class="form-control" />
 					</div>
-					<div class="col-xs-12 text-right">
-						<button type="submit" v-bind:disabled="nevt_invalid" class="btn btn-success btn-lg">
-							<i class="glyphicon glyphicon-ok"></i> 
-							Создать
-						</button>
+					<div class="form-group __datepicker-wrap">
+						<label>Дата</label>
+						<div>
+							<datepicker 
+							:input-class="'form-control'" 
+							v-model="nevt.date"
+							:language="'ru'"
+							:monday-first="true"
+							:format="'dd.MM.yyyy'"
+							></datepicker>
+						</div>
+					</div>
+					<div class="form-group">
+						<label>Описание</label>
+						<textarea v-model="nevt.descr" class="form-control"></textarea>
+					</div>
+					<div class="form-group">
+						<label>Жанр</label>
+						<select class="form-control">
+							<option v-for="gen in genreList">{{gen.name}}</option>
+						</select>
+					</div>
+					<hr />
+					<div class="row">
+						<div class="col-xs-12">
+							<a v-on:click="$router.push({name:'map-google'})" class="btn btn-default">
+								<i class="glyphicon glyphicon-chevron-left"></i> 
+								Вернуться
+							</a>
+						</div>
+						<div class="col-xs-12 text-right">
+							<button type="submit" v-bind:disabled="nevt_invalid" class="btn btn-success btn-lg">
+								<i v-show="!submit_pending" class="glyphicon glyphicon-ok"></i> 
+								<i v-show="submit_pending" class="spin"></i> 
+								Создать
+							</button>
+						</div>
 					</div>
 				</div>
-			</div>
-		</form>
+			</form>
 
-	</div>
-</template>
+		</div>
+	</template>
 
-<style>
-</style>
+	<style>
+	</style>

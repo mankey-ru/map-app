@@ -3,132 +3,72 @@
 	import mixins from './../vue-mixins.js'
 	import routes from './../vue-routes.js'
 	import request from 'superagent'
-	import miniToastr from 'mini-toastr'
-
-	miniToastr.init();
 
 	export default {
 		name: 'AppRoot',
 		data: function () {
 			return {
 				routes: routes,
-				signIn: {
+				auth: {
 					email: '',
 					password: '',
 					pending: false
-				},
-				signOut_pending: false
-			}
-		},
-		methods: {
-			signIn_submit: function(){
-				if (!this.signIn_valid) {
-					return
-				}
-				this.signIn.pending = true;
-				request
-				.post(apiUrl + 'auth/in')
-				.send({
-					username: this.signIn.email,
-					password: this.signIn.password
-				})
-				.end((err, res)=>{
-					if (err || !res.body) {
-						miniToastr.error('Request error')
-					}
-					else if (!res.body.user) {
-						miniToastr.warn('Email/password combination not found. Please try again.')
-					}
-					else {
-						miniToastr.success('Success')
-						this.$root.currentUser = res.body.user;
-					}
-					this.signIn.pending = false;
-				});
-			},
-			signOut: function(){
-				this.signOut_pending = true;
-				request
-				.post(apiUrl + 'auth/out')
-				.end((err, res)=>{
-					if (err || !res.body) {
-						miniToastr.error('Request error' )
-					}
-					else if (res.body.user) {
-						miniToastr.warning('Signout failed')
-					}
-					else {
-						miniToastr.success('Success')
-						this.$root.currentUser = false;
-					}
-					this.signOut_pending = false;
-				});
-			}
-		},
-		mixins: [mixins],
-		watch: {
-			'$route' : function(to, from){
-				if (to.name.indexOf('mapzen')!==-1) {
-					window.location.reload();
 				}
 			}
 		},
-		computed: {
-			signIn_valid: function(){
-				return this.signIn.email && this.signIn.password
-			},
-			currentUser: function(){
-				return this.$root.currentUser
-			}
-		}
+		mixins: [mixins]
 	}
 </script>
 
 
 <template>
-	<div>
-		<div class="row header">
-			<div class="col-md-7 col-xs-24">
+	<div><!-- 
+		<div class="row header" v-show="$route.name !== 'mainpage'">
+			<div class="col-sm-4 col-xs-24 hidden-xs">
 				<span v-on:click="$router.push('/')" style="font-size: 4em;cursor: pointer;">
 					<i class="glyphicon glyphicon-picture"></i>
 				</span>
 			</div>
-			<div class="col-md-17 col-xs-24">
+			<div class="col-sm-20 col-xs-24">
+				<div class="visible-xs pull-left">
+					<span v-on:click="$router.push('/')" style="font-size: 2em;cursor: pointer;">
+						<i class="glyphicon glyphicon-picture"></i>
+					</span>
+				</div>
 				<div v-if="currentUser" class="text-right">
-					<a v-if="currentUser.role" v-on:click="gotoEventNew" class="btn btn-primary">
+					<a v-if="currentUser.role" v-on:click="gotoEventNew" class="btn btn-primary hidden-xs">
 						<i class="glyphicon glyphicon-plus"></i> Добавить событие
 					</a>
 					<button v-on:click="gotoProfile" class="btn btn-default">
 						<i class="glyphicon glyphicon-user"></i> {{currentUser.name}}
 					</button>
-					<button v-on:click="signOut" class="btn btn-default">
-						<i v-show="signOut_pending" class="spin"></i> 
-						<i v-show="!signOut_pending" class="glyphicon glyphicon-log-out"></i> 
-						Log out
+					<button v-on:click="LOG_OUT" class="btn btn-default">
+						<i v-show="auth.pending" class="spin"></i> 
+						<i v-show="!auth.pending" class="glyphicon glyphicon-log-out"></i> 
 					</button>
 				</div>
 				<div v-if="!currentUser">
-					<form v-on:submit.prevent="signIn_submit">
+					<form v-on:submit.prevent="LOG_IN">
 						<div class="row">
 							<div class="col-md-6 col-xs-24">
 								<label>Email</label>
-								<input name="email" type="email" class="form-control" v-model="signIn.email"/>
+								<input name="email" type="email" class="form-control" v-model="auth.email"/>
 							</div>
 							<div class="col-md-6 col-xs-24">
 								<label>Password</label>
-								<input name="password" class="form-control" v-model="signIn.password" type="password"/>
+								<input name="password" class="form-control" v-model="auth.password" type="password"/>
 							</div>
 							<div class="col-md-4 col-xs-12">
 								<div><label>&#160;</label></div>
-								<button class="btn btn-default" v-bind:disabled="signIn.pending" type="submit">
-									<i v-show="signIn.pending" class="spin"></i> 
-									<i v-show="!signIn.pending" class="glyphicon glyphicon-log-in"></i> 
+								<button class="btn btn-default" v-bind:disabled="auth.pending" type="submit">
+									<i v-show="auth.pending" class="spin"></i> 
+									<i v-show="!auth.pending" class="glyphicon glyphicon-log-in"></i> 
 									Вход
 								</button>
 							</div>
 							<div class="col-md-4 col-md-offset-4  col-xs-12 text-right">
 								<div><label>&#160;</label></div>
-								<button class="btn btn-default" v-on:click.prevent="gotoRegister" v-bind:disabled="signIn.pending" type="button">
+								<button class="btn btn-default" v-on:click.prevent="gotoRegister" v-bind:disabled="auth.pending" type="button">
 									Регистрация
 								</button>
 							</div>
@@ -136,35 +76,14 @@
 					</form>
 				</div>
 			</div>					
-		</div>
-		<router-view></router-view>
-		<!-- <div class="mynav">
-			<router-link class="btn btn-lg btn-default" active-class="active" to="/" exact>
-				Google
-			</router-link>  
-			<router-link class="btn btn-lg btn-default" active-class="active" to="/map-osm">
-				OSM
-			</router-link>  
-			<router-link class="btn btn-lg btn-default" active-class="active" to="/map-mapzen">
-				Mapzen with fancy 3D view
-			</router-link> 
-			<router-link class="btn btn-lg btn-default" active-class="active" to="/map-mapzen-v0">
-				Mapzen with default tiles
-			</router-link>
 		</div> -->
+		<router-view></router-view>
 	</div>
 </template>
 
 
 
 <style scoped>
-/*	.mynav {
-		margin: 2em 0;
-		text-align: center;
-	}
-	.mynav a {
-		margin-bottom: .3em;
-	}*/
 	.header {
 		margin-bottom: 2em;
 	}
