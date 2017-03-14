@@ -57,7 +57,7 @@ export default {
 					this.auth.pending = false;
 				});
 		},
-		gotoProfile: function (author) {
+		GOTO_PROFILE: function (author) {
 			var rt;
 			if (author && author._id) {
 				rt = {
@@ -74,7 +74,7 @@ export default {
 			}
 			this.$router.push(rt)
 		},
-		gotoRegister: function () {
+		GOTO_REGISTER: function () {
 			this.$router.push({
 				name: 'user-register'
 			})

@@ -10,8 +10,6 @@ const router = new VueRouter({
 	routes: routes
 });
 
-import './../node_modules/notie/dist/notie.min.css';
-
 request
 	.get(apiUrl + 'commondata')
 	.end((err, res) => {

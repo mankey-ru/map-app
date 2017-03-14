@@ -4,12 +4,17 @@ GoogleMapsLoader.LANGUAGE = 'ru';
 GoogleMapsLoader.LIBRARIES = ['places'];
 
 export default {
-	create: function (onloadCb) {
+	create: function (onloadCb, isFullscreen) {
 		var map;
+		var fsClass = '__fullscreen';
 		var mapContainer = document.getElementById('map-container');
 		if (!mapContainer) {
-			console.error('Element with id=map-container not found')
-			return
+			mapContainer = document.createElement('div');
+			mapContainer.className = fsClass;
+			document.body.appendChild(mapContainer)
+		}
+		if (mapContainer.className.indexOf(fsClass)!==-1) {
+			document.body.className += fsClass;
 		}
 		GoogleMapsLoader.load((google) => {
 			map = new google.maps.Map(mapContainer, {
@@ -20,7 +25,13 @@ export default {
 				clickableIcons: false,
 				zoom: 12,
 				mapTypeControl: false,
-				minZoom: 11
+				minZoom: 11,
+				zoomControlOptions: {
+					position: google.maps.ControlPosition.LEFT_BOTTOM
+				},
+				streetViewControlOptions: {
+					position: google.maps.ControlPosition.LEFT_BOTTOM
+				}
 			});
 			//window.map = map
 			/** Prevent empty map, see http://stackoverflow.com/q/19003291 */

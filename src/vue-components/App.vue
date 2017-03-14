@@ -39,7 +39,7 @@
 					<a v-if="currentUser.role" v-on:click="gotoEventNew" class="btn btn-primary hidden-xs">
 						<i class="glyphicon glyphicon-plus"></i> Добавить событие
 					</a>
-					<button v-on:click="gotoProfile" class="btn btn-default">
+					<button v-on:click="GOTO_PROFILE" class="btn btn-default">
 						<i class="glyphicon glyphicon-user"></i> {{currentUser.name}}
 					</button>
 					<button v-on:click="LOG_OUT" class="btn btn-default">
@@ -68,7 +68,7 @@
 							</div>
 							<div class="col-md-4 col-md-offset-4  col-xs-12 text-right">
 								<div><label>&#160;</label></div>
-								<button class="btn btn-default" v-on:click.prevent="gotoRegister" v-bind:disabled="auth.pending" type="button">
+								<button class="btn btn-default" v-on:click.prevent="GOTO_REGISTER" v-bind:disabled="auth.pending" type="button">
 									Регистрация
 								</button>
 							</div>

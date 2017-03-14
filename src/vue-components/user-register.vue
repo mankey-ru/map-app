@@ -130,7 +130,7 @@
 					else {
 						miniToastr.success('Registration succeeded');
 						this.$root.currentUser = res.body;
-						this.gotoProfile(); 
+						this.GOTO_PROFILE(); 
 					}
 					nu.submit_pending = false;
 				});

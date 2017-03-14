@@ -89,7 +89,7 @@
 							<tr>
 								<td>Автор</td>
 								<td>
-									<a href="#" v-on:click.prevent="gotoProfile(forum.last_msg.author)">
+									<a href="#" v-on:click.prevent="GOTO_PROFILE(forum.last_msg.author)">
 										{{forum.last_msg.author.name}}
 									</a>
 								</td>
