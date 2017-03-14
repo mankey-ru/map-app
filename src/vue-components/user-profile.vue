@@ -10,7 +10,6 @@
 				</div>
 				<div class="col-md-12 col-xs-24">
 					<h2 v-if="!own">{{user.name}}</h2>
-
 					<div v-if="own" class="form-group">
 						<label>Имя</label>
 						<input v-model="user.name" v-bind:readonly="!own" class="form-control" />

@@ -8,8 +8,6 @@
 	import request from 'superagent'
 	import miniToastr from 'mini-toastr'
 
-	import VueOffcanvas from './vue-offcanvas.vue' 
-
 	var _vm;
 	var map;
 
@@ -24,7 +22,8 @@
 				map_pending: true,
 				datepicker_visible: false,
 				sidebar_visible: false,
-				genres_visible: false
+				genres_visible: false,
+				evtList: []
 			}
 		},
 		methods: {
@@ -40,8 +39,7 @@
 		},
 		mixins: [mixins],
 		components: {
-			Datepicker,
-			VueOffcanvas
+			Datepicker
 		},
 		mounted: function () {
 			_vm = this;
@@ -70,13 +68,19 @@
 					}
 					else {
 						if (res.body instanceof Array) {
-
 							for (let evt of res.body) {
-								new google.maps.Marker({
-									position: {lat: evt.latLng[0], lng: evt.latLng[1]},
-									map: map
-										//animation: google.maps.Animation.DROP
-									})
+								var mark = new google.maps.Marker({
+									position: {
+										lat: evt.latLng[0], 
+										lng: evt.latLng[1]
+									},
+									map: map,
+									icon: 'pin.svg',
+									//animation: google.maps.Animation.DROP
+								})
+								mark.addListener('click', ()=>{showEvtInfo(evt)});		
+								evt.mark = mark;
+								this.evtList.push(evt);
 							}
 						}
 					}
@@ -90,7 +94,19 @@
 			}			
 		}
 	}
-	import './../../node_modules/hamburgers/dist/hamburgers.min.css' // TODO use particular single type
+	var infowindow;
+	function showEvtInfo(evt){
+		if (infowindow) {
+			infowindow.close();
+		}
+		infowindow = new google.maps.InfoWindow({
+    		content: `
+    		<h2>${evt.name}</h2>
+    		<pre>${evt.descr}</pre>
+    		<a href="#/event/card/${evt._id}">Подробнее</a>`
+		});
+		infowindow.open(map, evt.mark);
+	}
 </script>
 
 <template>
@@ -105,7 +121,7 @@
 				<!-- positions explained: https://google-developers.appspot.com/maps/documentation/javascript/examples/full/control-positioning-labels -->
 				<div data-pos="TOP" class="j-mapctrl" style="width: 100%; ">
 
-				<div class="side-wrap" v-bind:class="sidebar_visible?'side-wrap-visible':''">
+					<div class="side-wrap" v-bind:class="sidebar_visible?'side-wrap-visible':''">
 						<div class="side-content">
 							<h1 class="text-center">Меню</h1>
 							<br/><br/>
@@ -132,78 +148,72 @@
 						</div>
 					</div>
 					<div class="map-ctrl-wrap">
-						
-					
-					<div class="row">
-						<div class="col-md-18 col-sm-10 col-xs-8">
-							<form v-on:submit.prevent="evtSearch">
-								<div class="map-pane-main">
-									<!-- <i v-on:click="sidebar_visible = !sidebar_visible" class="glyphicon glyphicon-menu-hamburger" ></i>  -->
-									<a 
-									v-on:click.stop="sidebar_visible = !sidebar_visible;" 
-									class="hamburger hamburger--arrow" 
-									v-bind:class="sidebar_visible?'is-active':''">
-									<span class="hamburger-box">
-										<span class="hamburger-inner"></span>
-									</span></a>
-									<span class="hidden-xs hidden-sm">
-										<input v-model="search.text" />
-										<i class="glyphicon glyphicon-search" v-on:click="evtSearch"></i>
-										<i class="glyphicon glyphicon-tasks"></i>
-									</span>
-								</div>
-								<div class="map-pane__wrap">
-									<span class="hidden-xs hidden-sm">
-										<div class="map-pane__content map-pane-date" v-on:click="datepicker_visible = !datepicker_visible">
-											<span>{{search.date | dateFormatPretty}}</span> 
-											<i class="glyphicon glyphicon-calendar"></i>
-										</div>
-									</span>
-									<div class="map-pane__content" v-show="datepicker_visible">
-										<div class="__datepicker-wrap __datepicker-wrap-noborder">
-											<datepicker 
-											:input-class="'form-control'" 
-											v-model="search.date"
-											:language="'ru'"
-											:monday-first="true"
-											:format="'dd.MM.yyyy'"
-											:inline="true"
-											></datepicker>
-										</div>
-									</div>
-								</div>
-							</form>
-						</div>
-						<div class="col-md-6 col-sm-14 col-xs-16">
-							<div class="text-right">
-								<div class="visible-xs visible-sm">
-									<a class="btn btn-default btn-lg btn-map-standalone">
-										<i class="glyphicon glyphicon-calendar"></i>
-									</a>
-									<div style="margin-top:1em">
-										<a class="btn btn-default btn-lg btn-map-standalone">
+						<div class="row">
+							<div class="col-md-18 col-sm-10 col-xs-8">
+								<form v-on:submit.prevent="evtSearch">
+									<div class="map-pane-main">
+										<i v-on:click.stop="sidebar_visible = !sidebar_visible" class="glyphicon glyphicon-menu-hamburger" ></i>
+										<span class="hamburger-box">
+											<span class="hamburger-inner"></span>
+										</span></a>
+										<span class="hidden-xs hidden-sm">
+											<input v-model="search.text" />
 											<i class="glyphicon glyphicon-search" v-on:click="evtSearch"></i>
-										</a>
+											<i class="glyphicon glyphicon-tasks"></i>
+										</span>
 									</div>
-								</div>
-								<div class="hidden-xs hidden-sm">
-									<i v-if="currentUser"  v-on:click.prevent="GOTO_PROFILE" class="glyphicon glyphicon-user map-profile-icon"></i>
-									<div v-if="!currentUser">
-										<a class="btn btn-default btn-map-standalone" v-on:click="GOTO_LOGIN">
-											Вход
-										</a> &#160;
-										<a class="btn btn-default btn-map-standalone" v-on:click="GOTO_REGISTER">
-											Регистрация
+									<div class="map-pane__wrap">
+										<span class="hidden-xs hidden-sm">
+											<div class="map-pane__content map-pane-date" v-on:click="datepicker_visible = !datepicker_visible">
+												<span>{{search.date | dateFormatPretty}}</span> 
+												<i class="glyphicon glyphicon-calendar"></i>
+											</div>
+										</span>
+										<div class="map-pane__content" v-show="datepicker_visible">
+											<div class="__datepicker-wrap __datepicker-wrap-noborder">
+												<datepicker 
+												:input-class="'form-control'" 
+												v-model="search.date"
+												:language="'ru'"
+												:monday-first="true"
+												:format="'dd.MM.yyyy'"
+												:inline="true"
+												></datepicker>
+											</div>
+										</div>
+									</div>
+								</form>
+							</div>
+							<div class="col-md-6 col-sm-14 col-xs-16">
+								<div class="text-right">
+									<div class="visible-xs visible-sm">
+										<a class="btn btn-default btn-lg btn-map-standalone">
+											<i class="glyphicon glyphicon-calendar"></i>
 										</a>
+										<div style="margin-top:1em">
+											<a class="btn btn-default btn-lg btn-map-standalone">
+												<i class="glyphicon glyphicon-search" v-on:click="evtSearch"></i>
+											</a>
+										</div>
+									</div>
+									<div class="hidden-xs hidden-sm">
+										<i v-if="currentUser"  v-on:click.prevent="GOTO_PROFILE" class="glyphicon glyphicon-user map-profile-icon"></i>
+										<div v-if="!currentUser">
+											<a class="btn btn-default btn-map-standalone" v-on:click="GOTO_LOGIN">
+												Вход
+											</a> &#160;
+											<a class="btn btn-default btn-map-standalone" v-on:click="GOTO_REGISTER">
+												Регистрация
+											</a>
+										</div>
 									</div>
 								</div>
 							</div>
 						</div>
 					</div>
-					</div>
 				</div>
-				<div data-pos="BOTTOM_CENTER" class="j-mapctrl map-ctrl-wrap">
-					<div class="11111genre-teaser">
+				<div data-pos="BOTTOM_CENTER" class="j-mapctrl">
+					<div class="genre-teaser">
 						<a v-on:click="genres_visible = !genres_visible" class="btn btn-lg btn-default">Фильтр по жанрам</a>
 						<div v-show="genres_visible" class="map-pane__content">
 							<div>
@@ -322,13 +332,5 @@
 		}
 	}
 	.genre-teaser { // лапоть внизу
-		border-bottom: 50px solid #000;
-		border-left: 50px solid transparent;
-		border-right: 50px solid transparent;
-		height: 0;
-		width: 200px;
-		line-height: 2.5em;
-		font-size: 2em;
-		text-align: center;
 	}
 </style>

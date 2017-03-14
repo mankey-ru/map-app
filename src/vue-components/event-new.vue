@@ -98,6 +98,7 @@
 						position: location,
 						map: map,
 						draggable: true,
+						icon: 'pin.svg',
 						animation: google.maps.Animation.DROP
 					}
 					if (_vm.mark_cur) {

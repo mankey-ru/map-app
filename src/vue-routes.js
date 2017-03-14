@@ -4,6 +4,7 @@ import mainpage from './vue-components/mainpage.vue';
 
 import eventNew from './vue-components/event-new.vue';
 import eventCard from './vue-components/event-card.vue';
+import eventList from './vue-components/event-list.vue';
 
 import user_profile from './vue-components/user-profile.vue';
 import user_register from './vue-components/user-register.vue';
@@ -44,6 +45,10 @@ export default [
 		path: '/event/card/:event_id',
 		name: 'event-card',
 		component: eventCard
+	}, {
+		path: '/event/list/',
+		name: 'event-list',
+		component: eventList
 	},
 	// 404
 	{

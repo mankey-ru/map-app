@@ -58,7 +58,7 @@ textarea {
 	#map-container {
 		background-color: #eee;
 		border-radius: 3px;
-		min-height: 600px;
+		min-height: 400px;
 	}
 
 	.__fullscreen {

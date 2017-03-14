@@ -13,7 +13,7 @@ export default {
 			mapContainer.className = fsClass;
 			document.body.appendChild(mapContainer)
 		}
-		if (mapContainer.className.indexOf(fsClass)!==-1) {
+		if (mapContainer.className.indexOf(fsClass) !== -1) {
 			document.body.className += fsClass;
 		}
 		GoogleMapsLoader.load((google) => {

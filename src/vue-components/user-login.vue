@@ -14,11 +14,15 @@
 						<input name="password" class="form-control" v-model="auth.password" type="password"/>
 					</div>
 					<div class="row">
-						<div class="col-md-12">
+						<div class="col-xs-12">
 							<a class="btn btn-link">Напомнить</a>
 						</div>
-						<div class="col-md-12 text-right">
-							<button class="btn btn-primary" type="submit">Войти</button>
+						<div class="col-xs-12 text-right">
+							<button class="btn btn-primary" v-bind:disabled="auth.pending" type="submit">
+								<i v-show="auth.pending" class="spin"></i> 
+								<i v-show="!auth.pending" class="glyphicon glyphicon-log-in"></i>
+								&#160;Войти
+							</button>
 						</div>
 					</div>
 				</form>

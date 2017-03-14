@@ -22,7 +22,7 @@
 
 
 <template>
-	<div><!-- 
+	<div>
 		<div class="row header" v-show="$route.name !== 'mainpage'">
 			<div class="col-sm-4 col-xs-24 hidden-xs">
 				<span v-on:click="$router.push('/')" style="font-size: 4em;cursor: pointer;">
@@ -50,25 +50,11 @@
 				<div v-if="!currentUser">
 					<form v-on:submit.prevent="LOG_IN">
 						<div class="row">
-							<div class="col-md-6 col-xs-24">
-								<label>Email</label>
-								<input name="email" type="email" class="form-control" v-model="auth.email"/>
-							</div>
-							<div class="col-md-6 col-xs-24">
-								<label>Password</label>
-								<input name="password" class="form-control" v-model="auth.password" type="password"/>
-							</div>
-							<div class="col-md-4 col-xs-12">
-								<div><label>&#160;</label></div>
-								<button class="btn btn-default" v-bind:disabled="auth.pending" type="submit">
-									<i v-show="auth.pending" class="spin"></i> 
-									<i v-show="!auth.pending" class="glyphicon glyphicon-log-in"></i> 
+							<div class="col-xs-24 text-right">
+								<button class="btn btn-default" v-on:click.prevent="GOTO_LOGIN">
 									Вход
 								</button>
-							</div>
-							<div class="col-md-4 col-md-offset-4  col-xs-12 text-right">
-								<div><label>&#160;</label></div>
-								<button class="btn btn-default" v-on:click.prevent="GOTO_REGISTER" v-bind:disabled="auth.pending" type="button">
+								<button class="btn btn-default" v-on:click.prevent="GOTO_REGISTER" type="button">
 									Регистрация
 								</button>
 							</div>
@@ -76,7 +62,7 @@
 					</form>
 				</div>
 			</div>					
-		</div> -->
+		</div>
 		<router-view></router-view>
 	</div>
 </template>
