@@ -36,15 +36,6 @@
 			},
 			evtSearch: function () {
 				alert(JSON.stringify(this.$data.search, null, 2))
-			},
-			showSidebar: function(){
-				this.sidebar_visible = !this.sidebar_visible;
-				/*if (!this.sidebar_visible) {
-					console.log(document.body.style)
-					setTimeout(()=>{
-						document.body.style = '';
-					}, 400)
-				}*/
 			}
 		},
 		mixins: [mixins],
@@ -54,6 +45,19 @@
 		},
 		mounted: function () {
 			_vm = this;
+
+			var sidebar = document.querySelector('.side-wrap');
+			document.body.addEventListener('click', (evt)=>{
+				if (this.sidebar_visible===true && sidebar.contains(event.target)===false) {
+					this.sidebar_visible = false;
+				}
+			})
+			document.body.addEventListener('keyup', (evt)=>{
+				if (evt.keyCode===27) {
+					this.sidebar_visible = false;
+				}
+			})
+
 			mapLib.create((createdMap)=>{
 				this.map_pending = false;
 				map = createdMap;
@@ -97,42 +101,46 @@
 		</div>
 
 		<div v-show="!map_pending">
-			<vue-offcanvas v-model="sidebar_visible" :width="300" :duration=".4" effect="ease-in-out" class="side-wrap">
-				<div class="side-content">
-					<h1 class="text-center">Меню</h1>
-					<br/><br/>
-					<a v-on:click="GOTO_LOGIN" class="btn btn-block btn-primary btn-lg">
-						Вход
-					</a>
-					<a v-on:click="GOTO_REGISTER" class="btn btn-block btn-default btn-lg">
-						Регистрация
-					</a>
-					<hr />
-					<a v-on:click="GOTO_PROFILE" class="btn btn-block btn-default btn-lg">
-						Профиль
-					</a>
-					<a v-on:click="GOTO_PROFILE" class="btn btn-block btn-default btn-lg">
-						Мои мероприятия
-					</a>
-					<hr />
-					<a v-on:click="GOTO_REGISTER" class="btn btn-block btn-default btn-lg">
-						Как это работает
-					</a>
-					<a v-on:click="GOTO_REGISTER" class="btn btn-block btn-default btn-lg">
-						О нас
-					</a>
-				</div>
-			</vue-offcanvas>
 			<div class="hdn">
 				<!-- positions explained: https://google-developers.appspot.com/maps/documentation/javascript/examples/full/control-positioning-labels -->
-				<div data-pos="TOP" class="map-ctrl-wrap" style="width: 100%; ">
+				<div data-pos="TOP" class="j-mapctrl" style="width: 100%; ">
+
+				<div class="side-wrap" v-bind:class="sidebar_visible?'side-wrap-visible':''">
+						<div class="side-content">
+							<h1 class="text-center">Меню</h1>
+							<br/><br/>
+							<a v-on:click="GOTO_LOGIN" class="btn btn-block btn-primary btn-lg">
+								Вход
+							</a>
+							<a v-on:click="GOTO_REGISTER" class="btn btn-block btn-default btn-lg">
+								Регистрация
+							</a>
+							<hr />
+							<a v-on:click="GOTO_PROFILE" class="btn btn-block btn-default btn-lg">
+								Профиль
+							</a>
+							<a v-on:click="GOTO_PROFILE" class="btn btn-block btn-default btn-lg">
+								Мои мероприятия
+							</a>
+							<hr />
+							<a v-on:click="GOTO_REGISTER" class="btn btn-block btn-default btn-lg">
+								Как это работает
+							</a>
+							<a v-on:click="GOTO_REGISTER" class="btn btn-block btn-default btn-lg">
+								О нас
+							</a>
+						</div>
+					</div>
+					<div class="map-ctrl-wrap">
+						
+					
 					<div class="row">
 						<div class="col-md-18 col-sm-10 col-xs-8">
 							<form v-on:submit.prevent="evtSearch">
 								<div class="map-pane-main">
 									<!-- <i v-on:click="sidebar_visible = !sidebar_visible" class="glyphicon glyphicon-menu-hamburger" ></i>  -->
 									<a 
-									v-on:click="showSidebar" 
+									v-on:click.stop="sidebar_visible = !sidebar_visible;" 
 									class="hamburger hamburger--arrow" 
 									v-bind:class="sidebar_visible?'is-active':''">
 									<span class="hamburger-box">
@@ -192,8 +200,9 @@
 							</div>
 						</div>
 					</div>
+					</div>
 				</div>
-				<div data-pos="BOTTOM_CENTER" class="map-ctrl-wrap">
+				<div data-pos="BOTTOM_CENTER" class="j-mapctrl map-ctrl-wrap">
 					<div class="11111genre-teaser">
 						<a v-on:click="genres_visible = !genres_visible" class="btn btn-lg btn-default">Фильтр по жанрам</a>
 						<div v-show="genres_visible" class="map-pane__content">
@@ -210,7 +219,7 @@
 						</div>
 					</div>
 				</div>
-				<div data-pos="RIGHT_BOTTOM" class="map-ctrl-wrap">
+				<div data-pos="RIGHT_BOTTOM" class="j-mapctrl map-ctrl-wrap">
 					<a v-if="currentUser.role" v-on:click="gotoEventNew" class="btn btn-warning btn-lg hidden-xs btn-map-standalone" style="margin:3em">
 						Создать мероприятие
 					</a>
@@ -240,17 +249,27 @@
 		.-boxshad();
 		.-map-pane-fontsize();
 	}
-	.map-when-sidebar {
-		opacity: .3
-	}
 	.hamburger {
 		padding: 0;
 	}
 	.side-wrap {
-		box-shadow: #000 2px 2px 3px 11125px
+		margin-left:-300px;
+		position: fixed;
+		height: 100vh;
+		width: 300px;
+		overflow: hidden;
+		background-color: #fff;
+		transition: transform .2s ease-in-out;
+		transform: translateX(0);
+	}
+	.side-wrap-visible {
+		transform: translateX(300px);
+		box-shadow: rgba(0,0,0,0.8) 0px 0px 0px 9999px;
+		//transition: width .2s ease-in-out;
+		//display: block; 
 	}
 	.side-content {
-		margin: 1em;
+		padding: 1em;
 	}
 	.map-pane__wrap {
 		float:left;

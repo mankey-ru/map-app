@@ -2,7 +2,7 @@ import GoogleMapsLoader from 'google-maps';
 GoogleMapsLoader.KEY = 'AIzaSyAXcMXDuPCPgDe-HLOIYhyYVF7VvVvQyJ0'
 GoogleMapsLoader.LANGUAGE = 'ru';
 GoogleMapsLoader.LIBRARIES = ['places'];
-
+// positions explained: https://google-developers.appspot.com/maps/documentation/javascript/examples/full/control-positioning-labels
 export default {
 	create: function (onloadCb, isFullscreen) {
 		var map;
@@ -27,10 +27,10 @@ export default {
 				mapTypeControl: false,
 				minZoom: 11,
 				zoomControlOptions: {
-					position: google.maps.ControlPosition.LEFT_BOTTOM
+					position: google.maps.ControlPosition.RIGHT_CENTER
 				},
 				streetViewControlOptions: {
-					position: google.maps.ControlPosition.LEFT_BOTTOM
+					position: google.maps.ControlPosition.RIGHT_CENTER
 				}
 			});
 			//window.map = map
@@ -41,7 +41,7 @@ export default {
 				map.setCenter(cen);
 			});
 			/** Extra controls */
-			var ctrls = document.querySelectorAll('.map-ctrl-wrap');
+			var ctrls = document.querySelectorAll('.j-mapctrl');
 			for (let i = 0; i < ctrls.length; i++) {
 				let el = ctrls[i];
 				let pos = el.dataset.pos;
