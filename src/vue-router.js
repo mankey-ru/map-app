@@ -1,16 +1,16 @@
+import Vue from 'vue'
+import VueRouter from 'vue-router'
+
 import start from './vue-components/start.vue';
-
 import mainpage from './vue-components/mainpage.vue';
-
 import eventNew from './vue-components/event-new.vue';
 import eventCard from './vue-components/event-card.vue';
 import eventList from './vue-components/event-list.vue';
-
 import user_profile from './vue-components/user-profile.vue';
 import user_register from './vue-components/user-register.vue';
 import user_login from './vue-components/user-login.vue';
 
-export default [
+const routes = [
 	// Профайлы
 	{
 		name: 'user-profile-current',
@@ -60,4 +60,12 @@ export default [
 			`
 		}
 	}
-]
+];
+
+
+
+// -------------------------------------------------------------------------------
+Vue.use(VueRouter);
+export default new VueRouter({
+	routes
+});

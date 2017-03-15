@@ -83,8 +83,7 @@ function setupApi(app) {
 			$unwind: '$author'
 		}];
 		dbtools.getDb().collection(C_EVENTS).aggregate(aRules).toArray(function (err, docs) {
-			if (err) {
-			}
+			if (err) {}
 			else {
 				res.status(200).json(docs).end();
 			}
@@ -97,7 +96,7 @@ function setupApi(app) {
 			return
 		}
 
-		var newEvent = _.pick(req.body, ['name','date','descr','latLng']);
+		var newEvent = _.pick(req.body, ['name', 'date', 'descr', 'latLng']);
 		newEvent.author_id = ObjectID(req.user._id);
 
 		dbtools.getDb().collection(C_EVENTS)
@@ -491,9 +490,6 @@ function setupAuth(app) {
 		});
 	});
 
-	// Use application-level middleware for common functionality, including
-	// logging, parsing, and session handling.
-	//app.use(require('morgan')('combined'));
 	app.use(require('cookie-parser')());
 	app.use(require('body-parser').urlencoded({
 		extended: true
@@ -503,21 +499,23 @@ function setupAuth(app) {
 		resave: false,
 		saveUninitialized: false
 	}));
-
-	// Initialize Passport and restore authentication state, if any, from the
-	// session.
 	app.use(passport.initialize());
-	app.use(passport.session());
+	app.use(passport.session()); // restore auth state, if any, from the session
 
 	var resultUrl = apiUrl + 'auth/result';
 
+	/**
+		Log in
+	*/
 	app.post(apiUrl + 'auth/in',
 		passport.authenticate('local', {
 			successRedirect: resultUrl,
 			failureRedirect: resultUrl
 		})
 	);
-
+	/**
+		Log out
+	*/
 	app.post(apiUrl + 'auth/out', function (req, res) {
 		req.logout();
 		res.redirect(resultUrl);
@@ -528,10 +526,12 @@ function setupAuth(app) {
 			req.user.pwd = '<NO>';
 		}
 		res.json({
-			user: req.user
+			currentUser: req.user
 		});
 	});
-
+	/**
+		Edit profile
+	*/
 	app.post(apiUrl + 'auth/edit', function (req, res) {
 		if (!req.user) {
 			handleError(res, 'User not authed');
@@ -541,7 +541,7 @@ function setupAuth(app) {
 			handleError(res, 'Attempt to edit not own account');
 			return
 		}
-		var userUpd = _.pick(req.body, ['email', 'name', 'bdate', 'password', 'role','descr'])
+		var userUpd = _.pick(req.body, ['email', 'name', 'bdate', 'password', 'role', 'descr'])
 		userUpd.role = Math.abs(req.body.role | 0); // -1 is Admin, 0 is listener, 1 is musician
 
 		dbtools.getDb().collection(C_USERS)
@@ -554,7 +554,9 @@ function setupAuth(app) {
 					handleError(res, err || cmdres, 'User update failed');
 				}
 				else {
-					res.status(201).json({ok: 1}).end();
+					res.status(201).json({
+						ok: 1
+					}).end();
 				}
 			});
 	});

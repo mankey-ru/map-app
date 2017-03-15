@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <widget id="com.vue.cordova.demo" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
-    <name>Vanilla Forum SPA</name>
+    <name>MappApp</name>
     <description>Demo app</description>
     <author email="monkee68@gmail.com">mankey</author>
     <content src="index.html" />

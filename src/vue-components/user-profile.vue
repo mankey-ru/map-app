@@ -57,6 +57,7 @@
 	import request from 'superagent'
 	import Datepicker from 'vuejs-datepicker'
 	import miniToastr from 'mini-toastr'
+	import mixins from './../vue-mixins.js'
 
 	var Comp = {
 		name: 'user-profile',
@@ -67,6 +68,7 @@
 				submit_pending: false
 			}
 		},
+		mixins: [mixins],
 		methods: {
 			getUser: function(){
 				var user_id = this.$router.currentRoute.params.user_id;
@@ -85,12 +87,23 @@
 							})
 				}
 				else {
-					this.user = this.currentUser;
-					this.own = true;
+					this.$nextTick(()=>{
+						// nextTick to let store update first
+						// when loading page from scratch (without commondata)
+						if (this.currentUser) {
+							this.user = this.currentUser;
+							this.own = true;
+						}
+						else {
+							console.log('User not authorized')
+							this.$router.push('/')
+						}
+					})
+						
+					
 				}
 			},
 			userEdit: function(){
-
 				this.submit_pending = true;
 				request
 					.post(apiUrl + 'auth/edit')
@@ -102,7 +115,7 @@
 							}
 							else {
 								miniToastr.success('Успех');
-								this.$root.currentUser = this.user;
+								vm.$store.dispatch('updateUser', this.user);
 							}
 							this.submit_pending = false;
 						});
@@ -110,11 +123,6 @@
 		},
 		mounted: function(){
 			this.getUser();
-		},
-		computed: {
-			currentUser: function(){
-				return this.$root.$data.currentUser
-			}
 		},
 		components: {
 			Datepicker

@@ -4,9 +4,28 @@ moment.locale('ru');
 const apiUrl = require('./api-url.js')
 import pager from './vue-components/_pager.vue'
 import request from 'superagent'
+import _ from 'lodash'
 
 import miniToastr from 'mini-toastr'
+_.extend(miniToastr.config.style['.mini-toastr'], {
+	'top': 'initial',
+	'bottom': '1em',
+	'right': '1em'
+})
+_.extend(miniToastr.config.style['.mini-toastr__notification'], {
+	'opacity': 1,
+	'box-shadow': 'none'
+})
 miniToastr.init();
+
+/*
+TODO add store mixins if needed
+import { mapGetters, mapActions } from 'vuex'
+{
+  computed: mapGetters(['getterName']),
+  methods: mapActions(['actionName'])
+}
+*/
 
 export default {
 	methods: {
@@ -26,14 +45,17 @@ export default {
 					if (err || !res.body) {
 						miniToastr.error('Request error')
 					}
-					else if (!res.body.user) {
-						miniToastr.warn('Email/password combination not found. Please try again.')
-					}
 					else {
-						miniToastr.success('Success');
-						this.$root.currentUser = res.body.user;
-						if (this.$route.name==='user-login') {
-							this.$router.push('/')
+						var user = res.body.currentUser;
+						if (!user) {
+							miniToastr.warn('Email/password combination not found. Please try again.')
+						}
+						else {
+							miniToastr.success('Success');
+							this.$store.dispatch('updateUser', user);
+							if (this.$route.name === 'user-login') {
+								this.$router.push('/')
+							}
 						}
 					}
 					this.auth.pending = false;
@@ -52,7 +74,8 @@ export default {
 					}
 					else {
 						miniToastr.success('Success')
-						this.$root.currentUser = false;
+						this.$store.dispatch('updateUser', false);
+						//this.$router.push('/')
 					}
 					this.auth.pending = false;
 				});
@@ -92,7 +115,7 @@ export default {
 				name: 'event-new'
 			})
 		},
-		GOTO_LOGIN: function(){
+		GOTO_LOGIN: function () {
 			this.$router.push({
 				name: 'user-login'
 			})
@@ -115,7 +138,7 @@ export default {
 	},
 	computed: {
 		currentUser: function () {
-			return this.$root.currentUser
+			return this.$store.getters.currentUser
 		}
 	}
 }

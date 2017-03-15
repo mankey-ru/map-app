@@ -23,7 +23,8 @@
 				datepicker_visible: false,
 				sidebar_visible: false,
 				genres_visible: false,
-				evtList: []
+				evtList: [],
+				apiUrl: apiUrl
 			}
 		},
 		methods: {
@@ -46,7 +47,7 @@
 
 			var sidebar = document.querySelector('.side-wrap');
 			document.body.addEventListener('click', (evt)=>{
-				if (this.sidebar_visible===true && sidebar.contains(event.target)===false) {
+				if (this.sidebar_visible===true && sidebar.contains(evt.target)===false) {
 					this.sidebar_visible = false;
 				}
 			})
@@ -55,6 +56,11 @@
 					this.sidebar_visible = false;
 				}
 			})
+			document.addEventListener("backbutton", ()=>{ // cordova-provided evt
+				if (this.sidebar_visible===true) {
+					this.sidebar_visible = false;
+				}
+			}, false);
 
 			mapLib.create((createdMap)=>{
 				this.map_pending = false;
@@ -90,7 +96,7 @@
 		},
 		computed: {
 			genreList: function(){
-				return this.$root.$data.genreList
+				return this.$store.state.genreList
 			}			
 		}
 	}
@@ -101,7 +107,7 @@
 		}
 		infowindow = new google.maps.InfoWindow({
     		content: `
-    		<h2>${evt.name}</h2>
+    		<h3>${evt.name}</h3>
     		<pre>${evt.descr}</pre>
     		<a href="#/event/card/${evt._id}">Подробнее</a>`
 		});

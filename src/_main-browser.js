@@ -1,15 +1,12 @@
-import Vue from 'vue';
-import VueRouter from 'vue-router';
-import routes from './vue-routes.js';
-import App from './vue-components/App.vue';
-import request from 'superagent';
+import Vue from 'vue'
+import router from './vue-router.js'
+import store from './vue-store.js'
+import App from './vue-components/App.vue'
+import request from 'superagent'
+// --------------------------------------------------------------------------------
 const apiUrl = require('./api-url.js');
 
-Vue.use(VueRouter);
-const router = new VueRouter({
-	routes: routes
-});
-
+// Getting initial page data (since page itself contains nothing)
 request
 	.get(apiUrl + 'commondata')
 	.end((err, res) => {
@@ -18,21 +15,19 @@ request
 			window.setTimeout(window.location.reload, 3000)
 		}
 		else {
-			new Vue({
-				el: '#vue-app',
-				router: router,
-				render: function (h) {
-					return h(App)
-				},
-				mounted: function () {},
-				methods: {},
-				data: {
-					currentUser: res.body.currentUser ? res.body.currentUser : false,
-					genreList: res.body.genreList ? res.body.genreList : []
-				}
-			})
+			vueInit(res)
 		}
 	});
+
+function vueInit(res) {
+	var vm = new Vue({
+		el: '#vue-app',
+		router,
+		store,
+		render: (h) => h(App)
+	})
+	vm.$store.dispatch('loadCommonData', res.body)
+}
 
 /*
 	import VueCordova from 'vue-cordova';

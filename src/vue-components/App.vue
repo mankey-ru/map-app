@@ -1,14 +1,12 @@
 <script>
 	const apiUrl = require('./../api-url.js')
 	import mixins from './../vue-mixins.js'
-	import routes from './../vue-routes.js'
 	import request from 'superagent'
 
 	export default {
 		name: 'AppRoot',
 		data: function () {
 			return {
-				routes: routes,
 				auth: {
 					email: '',
 					password: '',

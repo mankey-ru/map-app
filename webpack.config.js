@@ -2,6 +2,7 @@ var path = require('path');
 var webpack = require('webpack');
 var apiSetup = require('./src/api-setup.js');
 var CompressionPlugin = require('compression-webpack-plugin');
+var WebpackCleanPlugin = require('webpack-clean');
 
 var conf_browser = {
 	// I used babel-regenerator-runtime instead of bundle babel-polyfill
@@ -94,7 +95,14 @@ if (process.env.NODE_ENV === 'production') {
 			test: /\.js$|\.css$|\.html$/,
 			threshold: 10240,
 			minRatio: 0.8
-		})
+		}),
+
+		new WebpackCleanPlugin([
+			// deleting js result after gzip
+			// because of cordova's «Execution failed for task ':mergeDebugAssets'»
+			// js and js.gz looks like duplicated for cordova
+            'www/build-browser.js' 
+        ])
 
 	])
 }
