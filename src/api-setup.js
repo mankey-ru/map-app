@@ -44,6 +44,15 @@ function setupApi(app) {
 			}, {
 				name: 'Дарк-фолк',
 				selected: true
+			}, {
+				name: 'Ультра-шансон',
+				selected: true
+			}, {
+				name: 'Фуллон',
+				selected: true
+			}, {
+				name: 'Шугейз',
+				selected: true
 			}]
 		}).end();
 	});
@@ -82,12 +91,16 @@ function setupApi(app) {
 		}, {
 			$unwind: '$author'
 		}];
-		dbtools.getDb().collection(C_EVENTS).aggregate(aRules).toArray(function (err, docs) {
-			if (err) {}
-			else {
-				res.status(200).json(docs).end();
-			}
-		});
+		dbtools.getDb().collection(C_EVENTS)
+			.aggregate(aRules)
+			.toArray(function (err, docs) {
+				if (err) {
+					handleError(res, err, 'Failed to get events');
+				}
+				else {
+					res.status(200).json(docs).end();
+				}
+			});
 	});
 
 	app.post(apiUrl + 'events', function (req, res) {
@@ -109,46 +122,15 @@ function setupApi(app) {
 				}
 			});
 	});
-	/**		
-		-------------------------------------------------------------------
-							Ответы (сообщения тем)
-		-------------------------------------------------------------------
-	*/
-	/*	
-		GET получить все
-		POST создать новый
-	*/
 
-	app.get(apiUrl + 'theme/:theme_id', function (req, res) {
-		dbtools.getDb().collection(C_THEMES).findOne({
-			_id: new ObjectID(req.params.theme_id)
-		}, function (err, doc) {
-			if (err) {
-				handleError(res, err, "Failed to get contact");
-			}
-			else {
-				var data = {
-					theme: doc
-				}
-				getReplies(req, res, data); // request ends inside getReplies
-			}
-		});
-	});
-
-	app.get(apiUrl + 'theme/:theme_id/replies', function (req, res) {
-		getReplies(req, res)
-	});
-
-	function getReplies(req, res, data) {
-		data = data || {};
-		var pageSize = 20;
-		var pageNum = req.query.pageNum | 0 || 1;
-		var skipSize = pageSize * (pageNum - 1);
-		var findCriteria = {
-			theme_id: ObjectID(req.params.theme_id)
-		};
+	app.get(apiUrl + 'events/:event_id', function (req, res) {
+		if (!req.params.event_id) {
+			handleError(res, err, 'Missing required parameter: event_id');
+		}
 		var aRules = [{
-			$match: findCriteria
+			$match: {
+				_id: ObjectID(req.params.event_id)
+			}
 		}, {
 			$lookup: {
 				from: C_USERS,
@@ -158,293 +140,17 @@ function setupApi(app) {
 			}
 		}, {
 			$unwind: '$author'
-		}, {
-			$sort: {
-				'date': 1
-			}
-		}, {
-			$skip: skipSize // yup, Shlemiel The Painter
-		}, {
-			$limit: pageSize
 		}];
-
-		dbtools.getDb().collection(C_REPLIES)
+		dbtools.getDb().collection(C_EVENTS)
 			.aggregate(aRules)
 			.toArray(function (err, docs) {
-				if (err || !docs) {
-					handleError(res, err, 'Failed to get theme replies');
+				if (err || !docs || !docs.length) {
+					handleError(res, err, 'Failed to find event');
 				}
 				else {
-					data.replies = docs;
-					// mongodb v.3.4 supports $count stage in aggregation
-					// so theres no need to make an additional count request
-					// but now I have only v.3.2, so...
-					dbtools.getDb().collection(C_REPLIES)
-						.count(findCriteria, function (err, count) {
-							data.pager = {
-								total: count,
-								current: pageNum,
-								last: Math.ceil(count / pageSize)
-							}
-							res.status(200).json(data).end();
-						});
-
+					res.status(200).json(docs[0]).end();
 				}
 			});
-	}
-
-	app.post(apiUrl + 'replies', function (req, res) {
-		var author_id = ObjectID(req.user._id);
-		delete req.body._TEMP_UID4DEL;
-
-
-		var reqd = ['theme_id', 'text'];
-		for (let k of reqd) {
-			if (typeof req.body[k] === 'undefined') {
-				handleError(res, err, 'Not enough data (' + k + ')');
-				return;
-			}
-		}
-
-		var newReply = req.body;
-		newReply.date = new Date();
-		newReply.rating = 0;
-		newReply.theme_id = ObjectID(newReply.theme_id);
-		newReply.author_id = author_id;
-
-		// todo upd theme.last_reply_id and theme.last_reply_author_id
-
-		dbtools.getDb().collection(C_REPLIES)
-			.insertOne(newReply, function (err, insert) {
-				if (err) {
-					handleError(res, err, 'Failed to create reply');
-				}
-				else {
-					res.status(201).json(insert.ops[0]).end();
-				}
-			});
-	});
-
-	app.post(apiUrl + 'vote', function (req, res) {
-		req.body.author_id = ObjectID(req.user._id);
-		req.body.reply_id = ObjectID(req.body.reply_id);
-		req.body.date = new Date();
-		req.body.value = req.body.value | 0;
-
-		var newVote = _.pick(req.body, ['author_id', 'reply_id', 'date', 'value']); // prevent sending bloating requests. 
-		// TODO make it api-wide
-		// TODO validate types also
-		// TODO make that stuff in a module
-
-		// TODO think about rollback
-		// TODO check if author votes for his own reply (send HTTP 400)
-		var db = dbtools.getDb();
-
-		var rating_total = 0;
-		var reply_rating = 0;
-		var reply_author_id;
-
-		// next() callback is using without transferring args down the waterfall
-		// instead of it, vars (i.e. reply_rating) is function-wide 
-		// and args is using for error handling
-		// arguments of next:
-		// 	1. db err object OR boolean (empty response). Both of them are works as an error flag
-		//	2. human-readable error text
-		waterfall([
-				// 1. Create|Update vote document
-				function (next) {
-					db.collection(C_VOTES)
-						.update({
-							author_id: newVote.author_id,
-							reply_id: newVote.reply_id
-						}, newVote, {
-							upsert: true // insert if not exists, updates if exist
-						}, function (err, doc, upserted) {
-							next(err || !doc, 'Failed to ' + (upserted ? 'create' : 'update') + ' vote');
-						});
-				},
-				// 2. Find all votes for current reply and recalculate its rating
-				function (next) {
-					// sure it could be done incremental way
-					// but lets check first if full recalculation is fast enough
-					// because of lack of multi transaction rollback in mongo
-					db.collection(C_VOTES)
-						.find({
-							reply_id: newVote.reply_id
-						})
-						.toArray(function (err, votes) {
-							votes = votes || [];
-							for (let i = 0; i < votes.length; i++) {
-								reply_rating += votes[i].value | 0;
-							}
-							next(err || votes.length, 'Failed to find all votes for current reply');
-						});
-				},
-				// 3. Update rating of a current reply
-				function (next) {
-					db.collection(C_REPLIES)
-						.update({
-							_id: newVote.reply_id
-						}, {
-							$set: {
-								rating: reply_rating
-							}
-						}, function (err, doc) {
-							next(err || !doc, 'Failed to update rating of voted reply');
-						});
-				},
-				// 4. Find author of voted reply
-				function (next) {
-					db.collection(C_REPLIES)
-						.findOne({
-							_id: newVote.reply_id
-						}, function (err, doc) {
-							reply_author_id = ObjectID(doc.author_id);
-							next(err || !doc, 'Failed to find author of voted reply')
-						});
-				},
-				// 5. Find all replies of author of voted reply and recalculate his rating
-				function (next) {
-					db.collection(C_REPLIES)
-						.find({
-							author_id: reply_author_id
-						})
-						.toArray(function (err, docs) {
-							docs = docs || [];
-							for (let i = 0; i < docs.length; i++) {
-								rating_total += docs[i].rating | 0;
-							}
-							next(err || docs.length, 'Failed to find all replies of author of voted reply')
-						});
-				},
-				// 6. Update rating of author of voted reply
-				function (next) {
-					// sure it could be done incremental way
-					// but lets check first if full recalculation is fast enough
-					// because of lack of multi transaction rollback in mongo
-					db.collection(C_USERS)
-						.update({
-							_id: reply_author_id
-						}, {
-							$set: {
-								rating_total: rating_total
-							}
-						}, function (err, doc) {
-							next(err || !doc, 'Failed to update rating_total of author of voted reply');
-						});
-				}
-			],
-			// 
-			function (err, humanErr) {
-				if (err) {
-					handleError(res, err, humanErr);
-				}
-				else {
-					res.status(201).json({
-						author_rating_total: rating_total,
-						reply_rating: reply_rating
-					}).end();
-				}
-			})
-
-	});
-
-	/*	
-		GET		find contact by id
-		PUT		update contact by id
-		DELETE	deletes contact by id
-	 */
-
-	app.put(apiUrl + 'themes/:id', function (req, res) {
-		var updateDoc = req.body;
-		delete updateDoc._id;
-
-		dbtools.getDb().collection(C_THEMES).updateOne({
-			_id: new ObjectID(req.params.id)
-		}, updateDoc, function (err, doc) {
-			if (err) {
-				handleError(res, err, "Failed to update contact");
-			}
-			else {
-				res.status(204).end();
-			}
-		});
-	});
-
-	/**		
-		-------------------------------------------------------------------
-									Форумы
-		-------------------------------------------------------------------
-	*/
-
-	/*	
-		GET		получить все
-		POST	создать новый
-	*/
-
-	app.get(apiUrl + 'forums', function (req, res) {
-		var aRules = [{
-			$lookup: {
-				from: C_THEMES,
-				localField: 'last_reply_theme_id',
-				foreignField: '_id',
-				as: 'last_reply_theme'
-			}
-		}, {
-			$unwind: '$last_reply_theme'
-		}, {
-			$lookup: {
-				from: C_REPLIES,
-				localField: 'last_reply_id',
-				foreignField: '_id',
-				as: 'last_reply'
-			}
-		}, {
-			$unwind: '$last_reply'
-		}, {
-			$lookup: {
-				from: C_THEMES,
-				localField: 'last_reply_author_id',
-				foreignField: '_id',
-				as: 'last_reply_author'
-			}
-		}, {
-			$unwind: '$last_reply_author'
-		}];
-		dbtools.getDb().collection(C_FORUMS).aggregate(aRules).toArray(function (err, docs) {
-			if (err) {
-				handleError(res, err, "Failed to get forums.");
-			}
-			else {
-				res.status(200).json(docs).end();
-			}
-		});
-	});
-
-	/*app.delete("/contacts/:id", function (req, res) {
-		dbtools.getDb().collection(C_THEMES).deleteOne({
-			_id: new ObjectID(req.params.id)
-		}, function (err, result) {
-			if (err) {
-				handleError(res, err, "Failed to delete contact");
-			}
-			else {
-				res.status(204).end();
-			}
-		});
-	});*/
-
-
-
-	app.get(apiUrl + 'test', function (req, res) {
-		dbtools.getDb().collection('trash').find({}).toArray(function (err, docs) {
-			if (err) {
-				handleError(res, err, "Failed to get users.");
-			}
-			else {
-				res.status(200).json(docs).end();
-			}
-		});
 	});
 
 	// TODO NOT WORKING!11

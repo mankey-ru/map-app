@@ -18,6 +18,9 @@ body {
 .nwr {
 	white-space: nowrap;
 }
+.pntr {
+	cursor: pointer;
+}
 
 .link-dotted{
 	cursor: pointer;
@@ -78,7 +81,9 @@ textarea {
 
 	.map-when-sidebar .map-ctrl-wrap, 
 	.map-when-sidebar .gm-bundled-control,
-	.map-when-sidebar .gm-style-cc	{
+	.map-when-sidebar .gm-style-cc,
+	.map-when-sidebar .genre-teaser,
+	.map-when-sidebar img[src*="images/google"]	{
 		display: none;
 	}
 

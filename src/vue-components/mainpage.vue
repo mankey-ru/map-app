@@ -56,7 +56,9 @@
 					this.sidebar_visible = false;
 				}
 			})
-			document.addEventListener("backbutton", ()=>{ // cordova-provided evt
+			document.addEventListener('backbutton', (evt)=>{ // cordova-provided evt
+				evt.preventDefault();
+				alert('back!')
 				if (this.sidebar_visible===true) {
 					this.sidebar_visible = false;
 				}
@@ -106,10 +108,12 @@
 			infowindow.close();
 		}
 		infowindow = new google.maps.InfoWindow({
-    		content: `
-    		<h3>${evt.name}</h3>
-    		<pre>${evt.descr}</pre>
-    		<a href="#/event/card/${evt._id}">Подробнее</a>`
+			content: `
+			<h3>${evt.name}</h3>
+			<pre>${evt.descr}</pre>
+			<div class="text-right">
+			<a class="btn btn-info" href="#/event/card/${evt._id}">Подробнее</a>
+			</div>`
 		});
 		infowindow.open(map, evt.mark);
 	}
@@ -220,11 +224,25 @@
 				</div>
 				<div data-pos="BOTTOM_CENTER" class="j-mapctrl">
 					<div class="genre-teaser">
-						<a v-on:click="genres_visible = !genres_visible" class="btn btn-lg btn-default">Фильтр по жанрам</a>
-						<div v-show="genres_visible" class="map-pane__content">
-							<div>
-								<a v-on:click="genresCheckAll(1)" class="link-dotted">Все</a> &#160;
-								<a v-on:click="genresCheckAll(0)" class="link-dotted">Ничего</a>
+						<a 
+						class="btn btn-lg btn-info" 
+						v-show="!genres_visible" 
+						v-on:click="genres_visible = !genres_visible">
+						Фильтр по жанрам</a>
+						<div v-show="genres_visible" class="genre-wrap map-pane__content">
+							<div class="row form-group">
+								<div class="col-xs-20">
+									<a v-on:click="genresCheckAll(1)" class="link-dotted">
+										Все
+									</a> 
+									&#160;
+									<a v-on:click="genresCheckAll(0)" class="link-dotted">
+										Ничего
+									</a>
+								</div>
+								<div class="col-xs-4 text-right">
+									<i v-on:click="genres_visible = !genres_visible" class="glyphicon glyphicon-remove-circle pntr"></i>
+								</div>
 							</div>
 							<div>
 								<label v-for="gen in genreList" class="genre btn btn-default" v-bind:class="gen.selected?'active':''">
@@ -236,17 +254,20 @@
 					</div>
 				</div>
 				<div data-pos="RIGHT_BOTTOM" class="j-mapctrl map-ctrl-wrap">
-					<a v-if="currentUser.role" v-on:click="gotoEventNew" class="btn btn-warning btn-lg hidden-xs btn-map-standalone" style="margin:3em">
+					<div v-if="currentUser">
+						<a v-if="currentUser.role" v-on:click="gotoEventNew" 
+						class="btn btn-warning btn-lg hidden-xs btn-map-newevt">
 						Создать мероприятие
 					</a>
 					<a v-if="currentUser.role" v-on:click="gotoEventNew" class="btn btn-warning visible-sm-inline-block btn-material">+</a>
 					<!-- <input id="map-ctrl-search" class="form-control" style="width: 20em" placeholder="Поиск мест" /> -->
 				</div>
 			</div>
-			<div id="map-container" class="__fullscreen" v-bind:class="sidebar_visible?'map-when-sidebar':''"></div>
 		</div>
-
+		<div id="map-container" class="__fullscreen" v-bind:class="sidebar_visible?'map-when-sidebar':''"></div>
 	</div>
+
+</div>
 </template>
 
 <style scoped lang="less">
@@ -261,25 +282,30 @@
 		margin-right:.5em;
 		cursor: pointer;
 	}
+	.btn-map-newevt {
+		margin:3em;
+		.btn-map-standalone();
+	}
 	.btn-map-standalone {
 		.-boxshad();
 		.-map-pane-fontsize();
+		border: none;
 	}
 	.hamburger {
 		padding: 0;
 	}
 	.side-wrap {
-		margin-left:-300px;
+		margin-left:-250px;
 		position: fixed;
 		height: 100vh;
-		width: 300px;
+		width: 250px;
 		overflow: hidden;
 		background-color: #fff;
 		transition: transform .2s ease-in-out;
 		transform: translateX(0);
 	}
 	.side-wrap-visible {
-		transform: translateX(300px);
+		transform: translateX(250px);
 		box-shadow: rgba(0,0,0,0.8) 0px 0px 0px 9999px;
 		//transition: width .2s ease-in-out;
 		//display: block; 
@@ -336,6 +362,10 @@
 		&>input {
 			display: none;
 		}
+	}
+	.genre-wrap {
+		padding: .5em;
+		margin-bottom: 1em;
 	}
 	.genre-teaser { // лапоть внизу
 	}
