@@ -12,10 +12,3 @@ new Vue({
 		store.dispatch('loadCommonData')
 	}
 })
-
-
-
-
-
-//import VueCordova from 'vue-cordova';
-//Vue.use(VueCordova);

@@ -1,11 +1,9 @@
 .DS_Store
 node_modules/
-dist/
-scripts/
+_scripts/
 npm-debug.log
 platforms
 plugins
-platforms/
 build-server.js
 build-server.js.map
 www/build-browser.js

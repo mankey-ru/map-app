@@ -49,20 +49,35 @@
 			document.body.addEventListener('click', (evt)=>{
 				if (this.sidebar_visible===true && sidebar.contains(evt.target)===false) {
 					this.sidebar_visible = false;
-				}
+				} 
 			})
-			document.body.addEventListener('keyup', (evt)=>{
-				if (evt.keyCode===27) {
-					this.sidebar_visible = false;
-				}
-			})
-			document.addEventListener('backbutton', (evt)=>{ // cordova-provided evt
-				evt.preventDefault();
-				alert('back!')
-				if (this.sidebar_visible===true) {
-					this.sidebar_visible = false;
-				}
-			}, false);
+			if (window.cordova) {
+				var backPressedOnce = false;
+				document.addEventListener('backbutton', (evt) => {
+					if (this.sidebar_visible === true) {
+						evt.preventDefault();
+						this.sidebar_visible = false;
+					}
+					else {
+						if (backPressedOnce === true) {
+							navigator.app.exitApp();
+						}
+						else {
+							backPressedOnce = true;
+							setTimeout(() => {
+								backPressedOnce = false
+							}, 1000)
+						}
+					}
+				}, false);
+			}
+			else {
+				document.body.addEventListener('keyup', (evt)=>{
+					if (evt.keyCode===27) {
+						this.sidebar_visible = false;
+					}
+				})
+			}
 
 			mapLib.create((createdMap)=>{
 				this.map_pending = false;
