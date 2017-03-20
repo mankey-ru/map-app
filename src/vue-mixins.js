@@ -1,7 +1,7 @@
 const moment = require('moment')
 moment.locale('ru');
 
-const apiUrl = require('./api-url.js')
+const apiUrl = require('./api-url.js').def;
 import pager from './vue-components/_pager.vue'
 import request from 'superagent'
 import _ from 'lodash'
@@ -27,19 +27,17 @@ import { mapGetters, mapActions } from 'vuex'
 }
 */
 
+
 export default {
 	methods: {
 		LOG_IN: function () {
-			var credentials = {
+			var credentials = this.auth ? {
 				username: this.auth.email,
 				password: this.auth.password
-			};
-			if (!credentials.username || !credentials.password) {
-				return
-			}
+			} : {};
 			this.auth.pending = true;
 			request
-				.post(apiUrl + 'auth/in')
+				.post(`${apiUrl}auth/in/${this.auth.method}`)
 				.send(credentials)
 				.end((err, res) => {
 					if (err || !res.body) {
@@ -51,15 +49,26 @@ export default {
 							miniToastr.warn('Email/password combination not found. Please try again.')
 						}
 						else {
-							miniToastr.success('Success');
-							this.$store.dispatch('updateUser', user);
-							if (this.$route.name === 'user-login') {
-								this.$router.push('/')
-							}
+							this.LOG_IN_SUCCESS(user);
 						}
 					}
 					this.auth.pending = false;
 				});
+		},
+		LOG_IN_EXT: function (provider) {
+			window._handleLogonSuccess = (user) => {
+				this.LOG_IN_SUCCESS(user);
+				delete window._handleLogonSuccess;
+			}
+			var wo = window.open(`${apiUrl}auth/in?provider=${provider}`, '_blank') // , 'height=500,width=700'
+		},
+		LOG_IN_SUCCESS: function (user) {
+			console.log(user)
+			miniToastr.success('Success');
+			this.$store.dispatch('updateUser', user);
+			if (this.$route.name === 'user-login') {
+				this.$router.push('/')
+			}
 		},
 		LOG_OUT: function () {
 			this.auth.pending = true;
@@ -138,7 +147,7 @@ export default {
 	},
 	computed: {
 		currentUser: function () {
-			return this.$store.getters.currentUser
+			return this.$store.state.currentUser
 		}
 	}
 }

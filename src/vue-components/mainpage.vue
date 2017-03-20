@@ -1,5 +1,5 @@
 <script>
-	var apiUrl = require('./../api-url.js')
+	var apiUrl = require('./../api-url.js').def;
 	// try https://www.npmjs.com/package/vue-material-datepicker
 	import Datepicker from 'vuejs-datepicker'
 	import _ from 'lodash'

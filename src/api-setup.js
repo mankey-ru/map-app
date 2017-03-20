@@ -1,22 +1,26 @@
+// MongoDB stuff
 const mongodb = require("mongodb");
 const ObjectID = mongodb.ObjectID;
-const bodyParser = require("body-parser");
-
-const passport = require('passport')
-const LocalStrategy = require('passport-local').Strategy;
-
-const dbtools = require('./dbtools.js');
-const apiUrl = require('./api-url.js');
-
-const _ = require('lodash');
-const waterfall = require('async/waterfall')
-
 const C_EVENTS = "events";
 const C_USERS = "users";
+// Auth strategies
+const passport = require('passport')
+const LocalStrategy = require('passport-local').Strategy;
+const VKontakteStrategy = require('passport-vkontakte').Strategy;
+const TwitterStrategy = require('passport-twitter').Strategy;
+const FacebookStrategy = require('passport-facebook').Strategy;
+// Helper libs
+const _ = require('lodash');
+const waterfall = require('async/waterfall')
+	// Homebrew stuff
+const CONF = require('./conf/conf.js');
+const dbtools = require('./dbtools.js');
+const _api = require('./api-url.js');
+const apiUrl = _api.path;
 
 module.exports = function (app) {
 	dbtools.connect();
-	app.use(bodyParser.json());
+	app.use(require("body-parser").json());
 	setupAuth(app);
 	setupApi(app);
 }
@@ -160,8 +164,90 @@ function setupApi(app) {
 }
 
 function setupAuth(app) {
-	// Local auth
-	// http://passportjs.org/docs/username-password
+	/**
+		Basic setup
+	*/
+	app.use(require('cookie-parser')());
+	app.use(require('body-parser').urlencoded({
+		extended: true
+	}));
+	app.use(require('express-session')({
+		secret: 't0psecret',
+		resave: false,
+		saveUninitialized: false
+	}));
+	app.use(passport.initialize());
+	app.use(passport.session()); // restore auth state, if any, from the session
+
+	passport.serializeUser(function (user, cb) {
+		cb(null, user._id);
+	});
+	passport.deserializeUser(function (_id, cb) {
+		dbtools.getDb().collection(C_USERS).findOne({
+			_id: ObjectID(_id)
+		}, function (err, user) {
+			if (err) {
+				return cb(err);
+			}
+			cb(null, user);
+		});
+	});
+	/**
+		Universal handlers for external auth
+	*/
+	// Primary auth request
+	app.get(apiUrl + 'auth/in',
+		function (req, res, next) {
+			passport.authenticate(req.query.provider)(req, res, next);
+			// здесь можно передать объект с доп. permissions
+			// пример для vkontakte:
+			// { scope: ['status', 'email', 'friends', 'notify'] }
+			// см. https://www.npmjs.com/package/passport-vkontakte#extended-permissions
+			// и https://vk.com/dev/permissions
+		});
+
+	// Secondary (callback) auth request
+	var extLoginCb = _api.path + 'auth/external-callback';
+	var extLoginCb_full = _api.domain + extLoginCb;
+	app.get(extLoginCb,
+		function (req, res, next) {
+			passport.authenticate(req.query.provider, {
+				failureFlash: true
+			})(req, res, next);
+		},
+		function (req, res) {
+			var usr = JSON.stringify(req.user);
+			res
+				.status(200)
+				.send(`<script>
+					window.opener._handleLogonSuccess(${usr});
+					window.close();
+					</script>`)
+				.end();
+		});
+
+	/** 
+		Local auth
+		http://passportjs.org/docs/username-password
+	*/
+
+	var resultUrl = apiUrl + 'auth/result';
+	// local login: same url but different method (POST instead of GET)
+	app.post(apiUrl + 'auth/in',
+		passport.authenticate('local', {
+			successRedirect: resultUrl,
+			failureRedirect: resultUrl
+		})
+	);
+	app.get(resultUrl, function (req, res) {
+		if (req.user) {
+			req.user.pwd = '<NO>';
+		}
+		res.json({
+			currentUser: req.user
+		});
+	});
+
 	passport.use(new LocalStrategy(
 		function (email, password, done) {
 			dbtools.getDb().collection(C_USERS).findOne({
@@ -180,60 +266,143 @@ function setupAuth(app) {
 		}
 	));
 
-	// Configure Passport authenticated session persistence.
-	passport.serializeUser(function (user, cb) {
-		cb(null, user._id);
-	});
-
-	passport.deserializeUser(function (_id, cb) {
-		dbtools.getDb().collection(C_USERS).findOne({
-			_id: ObjectID(_id)
-		}, function (err, user) {
-			if (err) {
-				return cb(err);
-			}
-			cb(null, user);
-		});
-	});
-
-	app.use(require('cookie-parser')());
-	app.use(require('body-parser').urlencoded({
-		extended: true
-	}));
-	app.use(require('express-session')({
-		secret: 't0psecret',
-		resave: false,
-		saveUninitialized: false
-	}));
-	app.use(passport.initialize());
-	app.use(passport.session()); // restore auth state, if any, from the session
-
-	var resultUrl = apiUrl + 'auth/result';
 
 	/**
-		Log in
+		Twitter auth
+		https://www.npmjs.com/package/passport-twitter
 	*/
-	app.post(apiUrl + 'auth/in',
-		passport.authenticate('local', {
-			successRedirect: resultUrl,
-			failureRedirect: resultUrl
-		})
-	);
+	passport.use(new TwitterStrategy({
+			consumerKey: CONF.get().twitter_consumer_key,
+			consumerSecret: CONF.get().twitter_consumer_secret,
+			callbackURL: extLoginCb_full + '?provider=twitter',
+		},
+		function (token, tokenSecret, profile, done) {
+			var newUser = {
+				twitter_id: profile.id,
+				name: profile.name,
+				pic: vkUser.profile_image_url
+			};
+			dbtools.getDb().collection(C_USERS).findAndModify({
+					twitter_id: profile.id
+				}, [] // sort				
+				, {
+					$setOnInsert: newUser
+				}, {
+					new: true, // return new doc if one is upserted
+					upsert: true // insert the document if it does not exist
+				},
+				function (err, dbres) {
+					return done(err, dbres.value);
+				})
+		}
+	));
+	/**
+		Facebook auth
+		https://www.npmjs.com/package/passport-facebook
+	*/
+	passport.use(new FacebookStrategy({
+			clientID: CONF.get().facebook_app_id,
+			clientSecret: CONF.get().facebook_app_secret,
+			callbackURL: extLoginCb_full + '?provider=facebook',
+			profileFields: ['id', 'displayName', 'name', 'picture.type(large)']
+		},
+		function (accessToken, refreshToken, profile, done) {
+			var newUser = {
+				facebook_id: profile.id,
+				name: profile.displayName,
+				pic: profile.photos[0].value
+			};
+			dbtools.getDb().collection(C_USERS).findAndModify({
+					facebook_id: profile.id
+				}, [] // sort
+				, {
+					$setOnInsert: newUser
+				}, {
+					new: true, // return new doc if one is upserted
+					upsert: true // insert the document if it does not exist
+				},
+				function (err, dbres) {
+					return done(err, dbres.value);
+				})
+		}
+	));
+	passport.use(new TwitterStrategy({
+			consumerKey: CONF.get().twitter_consumer_key,
+			consumerSecret: CONF.get().twitter_consumer_secret,
+			callbackURL: extLoginCb_full + '?provider=twitter',
+		},
+		function (token, tokenSecret, profile, done) {
+			console.log(profile);
+			return done(1);
+
+			var newUser = {
+				twitter_id: profile.id,
+				name: profile.displayName,
+				pic: vkUser.photo_max || vkUser.photo
+			};
+			dbtools.getDb().collection(C_USERS).findAndModify({
+					twitter_id: profile.id
+				}, [] // sort
+				, {
+					$setOnInsert: newUser
+				}, {
+					new: true, // return new doc if one is upserted
+					upsert: true // insert the document if it does not exist
+				},
+				function (err, dbres) {
+					return done(err, dbres.value);
+				})
+		}
+	));
+	/**
+		Vkontakte auth
+		https://www.npmjs.com/package/passport-vkontakte
+	*/
+	passport.use(new VKontakteStrategy({
+			clientID: CONF.get().vkontakte_app_id,
+			clientSecret: CONF.get().vkontakte_app_secret,
+			callbackURL: extLoginCb_full + '?provider=vkontakte',
+			profileFields: ['photo_max', 'bdate']
+				// https://vk.com/dev/objects/user
+				// https://vk.com/dev/objects/user_2
+		},
+		function (accessToken, refreshToken, params, profile, done) {
+			var vkUser = profile._json;
+			var newUser = {
+				vk_id: profile.id,
+				name: profile.displayName,
+				pic: vkUser.photo_max || vkUser.photo
+			};
+
+			if (typeof profile.birthday === 'string') {
+				// new Date('1961-04-12') !== new Date(1961,03,12)
+				// difference is timezone
+				var bd = profile.birthday.split('-');
+				if (bd.length === 3) {
+					var month = (bd[1] | 0) - 1;
+					newUser.bdate = new Date(bd[0], month, bd[2]);
+				}
+			}
+			//console.log(profile)
+			dbtools.getDb().collection(C_USERS).findAndModify({
+					vk_id: profile.id
+				}, [] // sort
+				, {
+					$setOnInsert: newUser
+				}, {
+					new: true, // return new doc if one is upserted
+					upsert: true // insert the document if it does not exist
+				},
+				function (err, dbres) {
+					return done(err, dbres.value);
+				})
+		}));
 	/**
 		Log out
 	*/
 	app.post(apiUrl + 'auth/out', function (req, res) {
 		req.logout();
 		res.redirect(resultUrl);
-	});
-
-	app.get(resultUrl, function (req, res) {
-		if (req.user) {
-			req.user.pwd = '<NO>';
-		}
-		res.json({
-			currentUser: req.user
-		});
 	});
 	/**
 		Edit profile
@@ -353,7 +522,7 @@ function handleError(res, errObjOrStr, message, code) {
 	var reason = !!errObjOrStr && errObjOrStr.message ? errObjOrStr.message : errObjOrStr; // sweet jesus
 	console.log('API ERROR: ' + JSON.stringify(reason));
 	res.status(code || 500).json({
-		"error": message
+		error: message
 	}).end();
 }
 

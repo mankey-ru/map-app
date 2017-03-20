@@ -1,7 +1,5 @@
 <script>
-	const apiUrl = require('./../api-url.js')
 	import mixins from './../vue-mixins.js'
-	import request from 'superagent'
 
 	export default {
 		name: 'AppRoot',
@@ -21,7 +19,7 @@
 
 <template>
 	<div>
-		<div class="row header" v-show="$route.name !== 'mainpage'">
+		<div class="row header" v-show="$route.meta.showHeader">
 			<div class="col-sm-4 col-xs-24 hidden-xs">
 				<span v-on:click="$router.push('/')" style="font-size: 4em;cursor: pointer;">
 					<i class="glyphicon glyphicon-picture"></i>

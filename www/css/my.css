@@ -52,6 +52,13 @@ textarea {
 	
 	z-index: 777;
 }
+.btn.btn-round {
+	border-radius: 11em;
+	height: 2em;
+	width: 2em;
+	line-height: 1.6em;
+	font-size: 2em;
+}
 
 /*
 	========================================================================================
@@ -110,60 +117,105 @@ textarea {
 	}
 
 /*
-	========================================================================================
-										spinner
-	========================================================================================
-	*/
+========================================================================================
+							Social icons
+=======================================================================================
+*/
 
-	@keyframes spinner_spin {
-		100% {
-			-webkit-transform: rotate(360deg);
-			transform: rotate(360deg);
-		}
+@font-face {
+	font-family: 'Socicon';
+	src:  url('/fonts/Socicon.eot?3i0ff0');
+	src:  url('/fonts/Socicon.eot?3i0ff0#iefix') format('embedded-opentype'),
+	url('/fonts/Socicon.woff2?3i0ff0') format('woff2'),
+	url('/fonts/Socicon.ttf?3i0ff0') format('truetype'),
+	url('/fonts/Socicon.woff?3i0ff0') format('woff'),
+	url('/fonts/Socicon.svg?3i0ff0#Socicon') format('svg');
+	font-weight: normal;
+	font-style: normal;
+}
+
+.socicon {
+	font-family: 'Socicon' !important;
+	speak: none;
+	font-style: normal;
+	font-weight: normal;
+	font-variant: normal;
+	text-transform: none;
+	line-height: 1;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+.socicon-vkontakte:before {
+	content: "\e095";
+}
+.socicon-facebook:before {
+	content: "\e028";
+}
+.socicon-youtube:before {
+	content: "\e0a5";
+}
+.socicon-twitter:before {
+	content: "\e08d";
+}
+.socicon-instagram:before {
+	content: "\e044";
+}
+
+/*
+========================================================================================
+							spinner
+=======================================================================================
+*/
+
+@keyframes spinner_spin {
+	100% {
+		-webkit-transform: rotate(360deg);
+		transform: rotate(360deg);
 	}
-	.spin {
-		animation: spinner_spin 2s linear infinite;
-		font-style: normal;
-		display: inline-block;
-	}
-	.spin:after {
-		font-family: 'Glyphicons Halflings';
-		content: "\e031";
-		vertical-align: middle;
-	}
-	.spin-lg {
-		padding: 3em 0;
-	}
-	.spin-lg:after {
-		font-size: 5em;
-	}
-	.spin-md {
-		padding: 2em 0;
-	}
-	.spin-md:after {
-		font-size: 3em;
-	}
-	.spin-sm:after {
-		font-size: 1.8em;
-	}
-	.spin-input {
-		float: right;
-		margin-left: -2em;
-		margin-top: 0.2em;
-		margin-right: .5em;
-		font-size: 1.5em;
-		padding: 0;
-		display: none;
-	}
-	.spin-input-parent .spin-input {
-		display: inline-block;
-	}
-	.spin-global {
-		position: absolute;
-		top: 35%;
-		z-index: 7;
-		left: 42%;
-	}
+}
+.spin {
+	animation: spinner_spin 2s linear infinite;
+	font-style: normal;
+	display: inline-block;
+}
+.spin:after {
+	font-family: 'Glyphicons Halflings';
+	content: "\e031";
+	vertical-align: middle;
+}
+.spin-lg {
+	padding: 3em 0;
+}
+.spin-lg:after {
+	font-size: 5em;
+}
+.spin-md {
+	padding: 2em 0;
+}
+.spin-md:after {
+	font-size: 3em;
+}
+.spin-sm:after {
+	font-size: 1.8em;
+}
+.spin-input {
+	float: right;
+	margin-left: -2em;
+	margin-top: 0.2em;
+	margin-right: .5em;
+	font-size: 1.5em;
+	padding: 0;
+	display: none;
+}
+.spin-input-parent .spin-input {
+	display: inline-block;
+}
+.spin-global {
+	position: absolute;
+	top: 35%;
+	z-index: 7;
+	left: 42%;
+}
 
 
 /*

@@ -92,7 +92,7 @@
 	import mixins from './../vue-mixins.js';
 	import miniToastr from 'mini-toastr';
 
-	var apiUrl = require('./../api-url.js');
+	var apiUrl = require('./../api-url.js').def;
 	var emailRe = new RegExp("^([0-9a-zA-Z_]([-.\\w]*[0-9a-zA-Z_-])*@([0-9a-zA-Z][-\\w]*[0-9a-zA-Z]\\.)+[a-zA-Z]{2,9})$");
 
 	var Comp = {

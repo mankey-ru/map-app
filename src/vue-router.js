@@ -15,7 +15,10 @@ const routes = [
 	{
 		name: 'user-profile-current',
 		path: '/user-profile',
-		component: user_profile
+		component: user_profile,
+		meta: {
+			showHeader: true
+		}
 	}, {
 		name: 'user-profile-any',
 		path: '/user-profile/:user_id',

@@ -1,16 +1,16 @@
 const mongodb = require("mongodb");
+const CONF = require('./conf/conf.js');
+const db_uri = CONF.get().db_uri;
 
-const MONGODB_URI_ENV_KEY = 'MAP_APP_MONGODB_URI';
-const mongoUri = process.env[MONGODB_URI_ENV_KEY];
-if (!mongoUri) {
-	console.log('\n\n   ERROR! App can not be initialized without environment variable ' + MONGODB_URI_ENV_KEY + ', which should be a standard URI with "mongo" protocol and, if needed, access credentials\n\n\n');
+if (!db_uri) {
+	throw new Error(`\n\n\n\n   App initialization failed. Please specify db_uri in ${CONF.path_blank} then re-run app again\n\n\n\n`)
 	process.exit(1);
 }
 
 var _db;
 module.exports =  {
 	connect: function (callback) {
-		mongodb.MongoClient.connect(mongoUri, function (err, database) {
+		mongodb.MongoClient.connect(db_uri, function (err, database) {
 			if (err) {
 				console.log(err);
 				process.exit(1);

@@ -1,5 +1,5 @@
 <script>
-	var apiUrl = require('./../api-url.js')
+	var apiUrl = require('./../api-url.js').def;
 	import mapLib from './../map-lib.js'
 	import mixins from './../vue-mixins.js'
 	import miniToastr from 'mini-toastr'

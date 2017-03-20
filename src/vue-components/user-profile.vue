@@ -5,10 +5,10 @@
 				<i class="spin spin-lg"></i>
 			</div>
 			<div v-show="user">
-				<div class="col-md-12 col-xs-24 text-center">
-					<img v-bind:src="user.pic" class="f-userpic"/>
+				<div class="col-md-5 col-xs-24">
+					<img v-bind:src="user.pic" class="f-userpic" />
 				</div>
-				<div class="col-md-12 col-xs-24">
+				<div class="col-md-19 col-xs-24">
 					<h2 v-if="!own">{{user.name}}</h2>
 					<div v-if="own" class="form-group">
 						<label>Имя</label>
@@ -52,7 +52,7 @@
 </template>
 
 <script>
-	var apiUrl = require('./../api-url.js')
+	var apiUrl = require('./../api-url.js').def;
 
 	import request from 'superagent'
 	import Datepicker from 'vuejs-datepicker'
@@ -115,7 +115,7 @@
 							}
 							else {
 								miniToastr.success('Успех');
-								vm.$store.dispatch('updateUser', this.user);
+								this.$store.dispatch('updateUser', this.user);
 							}
 							this.submit_pending = false;
 						});
@@ -139,7 +139,8 @@
 
 <style scoped>
 	.f-userpic {
-		max-width:100%;
+		max-width:200px;
+		border-radius: .5em;
 
 	}
 </style>

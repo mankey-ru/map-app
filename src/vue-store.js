@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import request from 'superagent'
-const apiUrl = require('./api-url.js')
+const apiUrl = require('./api-url.js').def;
 
 const state = {}
 const mutations = {
