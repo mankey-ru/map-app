@@ -230,7 +230,6 @@ function setupAuth(app) {
 		Local auth
 		http://passportjs.org/docs/username-password
 	*/
-
 	var resultUrl = apiUrl + 'auth/result';
 	// local login: same url but different method (POST instead of GET)
 	app.post(apiUrl + 'auth/in',
@@ -247,7 +246,6 @@ function setupAuth(app) {
 			currentUser: req.user
 		});
 	});
-
 	passport.use(new LocalStrategy(
 		function (email, password, done) {
 			dbtools.getDb().collection(C_USERS).findOne({
@@ -265,8 +263,6 @@ function setupAuth(app) {
 			});
 		}
 	));
-
-
 	/**
 		Twitter auth
 		https://www.npmjs.com/package/passport-twitter
@@ -279,8 +275,8 @@ function setupAuth(app) {
 		function (token, tokenSecret, profile, done) {
 			var newUser = {
 				twitter_id: profile.id,
-				name: profile.name,
-				pic: vkUser.profile_image_url
+				name: profile.displayName,
+				pic: profile.photos[0].value
 			};
 			dbtools.getDb().collection(C_USERS).findAndModify({
 					twitter_id: profile.id
@@ -326,34 +322,6 @@ function setupAuth(app) {
 				})
 		}
 	));
-	passport.use(new TwitterStrategy({
-			consumerKey: CONF.get().twitter_consumer_key,
-			consumerSecret: CONF.get().twitter_consumer_secret,
-			callbackURL: extLoginCb_full + '?provider=twitter',
-		},
-		function (token, tokenSecret, profile, done) {
-			console.log(profile);
-			return done(1);
-
-			var newUser = {
-				twitter_id: profile.id,
-				name: profile.displayName,
-				pic: vkUser.photo_max || vkUser.photo
-			};
-			dbtools.getDb().collection(C_USERS).findAndModify({
-					twitter_id: profile.id
-				}, [] // sort
-				, {
-					$setOnInsert: newUser
-				}, {
-					new: true, // return new doc if one is upserted
-					upsert: true // insert the document if it does not exist
-				},
-				function (err, dbres) {
-					return done(err, dbres.value);
-				})
-		}
-	));
 	/**
 		Vkontakte auth
 		https://www.npmjs.com/package/passport-vkontakte
@@ -369,7 +337,7 @@ function setupAuth(app) {
 		function (accessToken, refreshToken, params, profile, done) {
 			var vkUser = profile._json;
 			var newUser = {
-				vk_id: profile.id,
+				vkontakte_id: profile.id,
 				name: profile.displayName,
 				pic: vkUser.photo_max || vkUser.photo
 			};

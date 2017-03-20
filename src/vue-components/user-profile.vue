@@ -5,7 +5,7 @@
 				<i class="spin spin-lg"></i>
 			</div>
 			<div v-show="user">
-				<div class="col-md-5 col-xs-24">
+				<div class="col-md-5 col-xs-24 text-right">
 					<img v-bind:src="user.pic" class="f-userpic" />
 				</div>
 				<div class="col-md-19 col-xs-24">
