@@ -17,7 +17,8 @@
 					name: '',
 					descr: '',
 					latLng: false,
-					date: new Date()
+					date: new Date(),
+					genre_id: ''
 				},
 				submit_pending: false
 			}
@@ -54,7 +55,7 @@
 				return !valid;
 			},
 			genreList: function(){
-				return this.$root.$data.genreList;
+				return this.$store.state.genreList;
 			}
 		},
 		components: {
@@ -152,16 +153,16 @@
 					</div>
 					<div class="form-group">
 						<label>Жанр</label>
-						<select class="form-control">
-							<option v-for="gen in genreList">{{gen.name}}</option>
+						<select class="form-control" v-model="nevt.genre_id">
+							<option v-for="gen in genreList" v-bind:value="gen._id">{{gen.name}}</option>
 						</select>
 					</div>
 					<hr />
 					<div class="row">
 						<div class="col-xs-12">
-							<a v-on:click="$router.push({name:'map-google'})" class="btn btn-default">
+							<a v-on:click="$router.push({name:'mainpage'})" class="btn btn-default">
 								<i class="glyphicon glyphicon-chevron-left"></i> 
-								Вернуться
+								Вернуться к карте
 							</a>
 						</div>
 						<div class="col-xs-12 text-right">

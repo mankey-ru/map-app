@@ -3,6 +3,7 @@ const mongodb = require("mongodb");
 const ObjectID = mongodb.ObjectID;
 const C_EVENTS = "events";
 const C_USERS = "users";
+const C_GENRES = "genres";
 // Auth strategies
 const passport = require('passport')
 const LocalStrategy = require('passport-local').Strategy;
@@ -34,31 +35,19 @@ function setupApi(app) {
 		if (currentUser) {
 			currentUser.pwd = '<NO>';
 		}
-		res.status(200).json({
-			currentUser: currentUser,
-			genreList: [{
-				name: 'Клауд реп',
-				selected: true
-			}, {
-				name: 'Вич хаус',
-				selected: true
-			}, {
-				name: 'Вепорвейв',
-				selected: true
-			}, {
-				name: 'Дарк-фолк',
-				selected: true
-			}, {
-				name: 'Ультра-шансон',
-				selected: true
-			}, {
-				name: 'Фуллон',
-				selected: true
-			}, {
-				name: 'Шугейз',
-				selected: true
-			}]
-		}).end();
+
+		dbtools.getDb().collection(C_GENRES).find().toArray(
+			function (err, docs) {
+				if (err) {
+					handleError(res, err, 'Failed to get common data');
+				}
+				else {
+					res.status(200).json({
+						currentUser: currentUser,
+						genreList: docs
+					}).end();
+				}
+			});
 	});
 
 	app.get(apiUrl + 'user/:user_id', function (req, res) {
@@ -113,7 +102,7 @@ function setupApi(app) {
 			return
 		}
 
-		var newEvent = _.pick(req.body, ['name', 'date', 'descr', 'latLng']);
+		var newEvent = _.pick(req.body, ['name', 'date', 'descr', 'latLng', 'genre_id']);
 		newEvent.author_id = ObjectID(req.user._id);
 
 		dbtools.getDb().collection(C_EVENTS)
@@ -163,6 +152,20 @@ function setupApi(app) {
 	})*/
 }
 
+
+/**
+	======================================================================================
+	======================================================================================
+	======================================================================================	
+	         AUTH
+	======================================================================================
+	======================================================================================
+	======================================================================================
+
+*/
+
+
+
 function setupAuth(app) {
 	/**
 		Basic setup
@@ -211,6 +214,9 @@ function setupAuth(app) {
 	var extLoginCb_full = _api.domain + extLoginCb;
 	app.get(extLoginCb,
 		function (req, res, next) {
+			/*if (req.user) {
+				req.logout();
+			}*/
 			passport.authenticate(req.query.provider, {
 				failureFlash: true
 			})(req, res, next);

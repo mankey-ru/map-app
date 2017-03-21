@@ -54,7 +54,10 @@
 				{{evt.author.name}}
 			</h3>
 			<pre>{{evt.descr}}</pre>
-
+			<a v-on:click="$router.push({name:'mainpage'})" class="btn btn-default">
+				<i class="glyphicon glyphicon-chevron-left"></i> 
+				Вернуться к карте
+			</a>
 		</div>
 	</div>
 </template>

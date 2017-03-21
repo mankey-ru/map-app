@@ -63,7 +63,7 @@ export default {
 			var wo = window.open(`${apiUrl}auth/in?provider=${provider}`, '_blank') // , 'height=500,width=700'
 		},
 		LOG_IN_SUCCESS: function (user) {
-			console.log(user)
+			//console.log(user)
 			miniToastr.success('Success');
 			this.$store.dispatch('updateUser', user);
 			if (this.$route.name === 'user-login') {
@@ -132,6 +132,9 @@ export default {
 	},
 	filters: {
 		dateTimeFormat: function (val) {
+			if (!val) {
+				return ''
+			}
 			var date = new Date(val);
 			if (date.toLocaleString) {
 				return date.toLocaleString()
@@ -139,6 +142,9 @@ export default {
 			return moment(val).format('MM.DD.YYYY hh:mm');
 		},
 		dateFormatPretty: function (val) {
+			if (!val) {
+				return ''
+			}
 			return moment(val).format('D MMMM, dddd');
 		}
 	},

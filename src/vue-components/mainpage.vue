@@ -16,21 +16,52 @@
 		data: function () {
 			return {
 				search: {
-					date: new Date(2016, 9, 16),
+					date: null,
 					text: ''
 				},
 				map_pending: true,
 				datepicker_visible: false,
 				sidebar_visible: false,
 				genres_visible: false,
+				genres: [],
 				evtList: [],
-				apiUrl: apiUrl
+				evtHiddenQty: 0
 			}
 		},
+		computed: {
+		},
 		methods: {
-			genresCheckAll: function (boo) {
+			showAll: function(){
+				for (var i=0, len=this.$data.evtList.length; i<len; i++) {
+					this.$data.evtList[i].mark.setVisible(true)
+					this.evtHiddenQty = 0;
+					this.genres_checkAll(1);
+				}
+			},
+			genres_check: function(gen){
+				gen.selected = !gen.selected;			
+				var selected_ids = this.$data.genres
+					.filter(function(_gen){
+						return _gen.selected===true
+					})
+					.map(function(_gen){
+						return _gen._id
+					})
+				var hiddenQty = 0;
+				for (var i=0, len=this.$data.evtList.length; i<len; i++) {
+					var evt = this.$data.evtList[i];
+					var evtMatch = selected_ids.indexOf(evt.genre_id) !== -1;
+					evt.mark.setVisible(evtMatch)
+					if (evtMatch===false) {
+						hiddenQty++
+					}
+				}
+				this.evtHiddenQty = hiddenQty;
+
+			},
+			genres_checkAll: function (boo) {
 				boo = !!boo;
-				for (let gen of this.genreList) {
+				for (let gen of this.genres) {
 					gen.selected = !!boo;
 				}
 			},
@@ -44,7 +75,31 @@
 		},
 		mounted: function () {
 			_vm = this;
-
+			/**
+				Handling genre list
+			*/
+			// If store have genres right now, they are copied to $data right now
+			if (this.$store.state.genreList) {
+				setGenres(this.$store.state.genreList)
+			}
+			// Otherwise it happens after store mutation
+			else {
+				this.$store.subscribe(function(mutation, state){
+					if (mutation.type==='m_loadCommonData') {
+						setGenres(state.genreList)
+					}
+				})
+			}
+			function setGenres(state_genreList) {
+				var mapped = state_genreList.map((v) => {
+					_vm.$set(v, 'selected', true)
+					return v
+				});
+				_vm.$data.genres = mapped;
+			}
+			/**
+				Handling sidebar behavior
+			*/
 			var sidebar = document.querySelector('.side-wrap');
 			document.body.addEventListener('click', (evt)=>{
 				if (this.sidebar_visible===true && sidebar.contains(evt.target)===false) {
@@ -78,7 +133,9 @@
 					}
 				})
 			}
-
+			/**
+				Creating map
+			*/
 			mapLib.create((createdMap)=>{
 				this.map_pending = false;
 				map = createdMap;
@@ -110,11 +167,6 @@
 				})
 
 			});
-		},
-		computed: {
-			genreList: function(){
-				return this.$store.state.genreList
-			}			
 		}
 	}
 	var infowindow;
@@ -127,7 +179,7 @@
 			<h3>${evt.name}</h3>
 			<pre>${evt.descr}</pre>
 			<div class="text-right">
-			<a class="btn btn-info" href="#/event/card/${evt._id}">Подробнее</a>
+				<a class="btn btn-info" href="#/event/card/${evt._id}">Подробнее</a>
 			</div>`
 		});
 		infowindow.open(map, evt.mark);
@@ -195,7 +247,10 @@
 											</div>
 										</span>
 										<div class="map-pane__content" v-show="datepicker_visible">
-											<div class="__datepicker-wrap __datepicker-wrap-noborder">
+											<div>
+												<a class="btn btn-block btn-default">Любая дата</a>
+											</div>
+											<div class="__datepicker-wrap __datepicker-wrap-noborder __datepicker-wrap-center">
 												<datepicker 
 												:input-class="'form-control'" 
 												v-model="search.date"
@@ -237,46 +292,63 @@
 						</div>
 					</div>
 				</div>
-				<div data-pos="BOTTOM_CENTER" class="j-mapctrl">
-					<div class="genre-teaser">
-						<a 
-						class="btn btn-lg btn-info" 
-						v-show="!genres_visible" 
-						v-on:click="genres_visible = !genres_visible">
-						Фильтр по жанрам</a>
-						<div v-show="genres_visible" class="genre-wrap map-pane__content">
-							<div class="row form-group">
-								<div class="col-xs-20">
-									<a v-on:click="genresCheckAll(1)" class="link-dotted">
-										Все
-									</a> 
-									&#160;
-									<a v-on:click="genresCheckAll(0)" class="link-dotted">
-										Ничего
-									</a>
-								</div>
-								<div class="col-xs-4 text-right">
-									<i v-on:click="genres_visible = !genres_visible" class="glyphicon glyphicon-remove-circle pntr"></i>
+				<div data-pos="LEFT_BOTTOM" class="j-mapctrl genre-wrap">
+
+					<div v-if="currentUser" class="row">
+						<div class="col-md-10 col-xs-24">
+							<div v-show="evtHiddenQty!==0" class="map-pane__content">
+								<div class="row">
+									<div class="col-xs-12">
+										Скрыто {{evtHiddenQty}} из {{evtList.length}}.
+									</div>
+									<div class="col-xs-12 text-right">
+										<a class="link-dotted" v-on:click="showAll">Показать все</a>
+									</div>
 								</div>
 							</div>
-							<div>
-								<label v-for="gen in genreList" class="genre btn btn-default" v-bind:class="gen.selected?'active':''">
-									<input type="checkbox" v-model="gen.selected" />
-									<span>{{gen.name}}</span>
-								</label>
+						</div>
+						<div class="col-md-14 col-xs-24 text-right">
+							<a class="btn btn-warning btn-lg hidden-sm btn-map-newevt" 
+							v-if="currentUser.role"
+							v-on:click="gotoEventNew">Создать мероприятие</a>
+							<a class="btn btn-warning visible-sm-inline-block btn-material"
+							v-if="currentUser.role" 
+							v-on:click="gotoEventNew">+</a>
+						</div>
+					</div>
+
+					<div v-show="!genres_visible" class="text-center">
+						<a class="btn btn-lg btn-info genre-teaser" v-on:click="genres_visible = !genres_visible">
+							Фильтр по жанрам
+						</a>
+					</div>
+					<div v-show="genres_visible" class="genre-list-wrap map-pane__content">
+						<div class="row form-group">
+							<div class="col-xs-20">
+								<a v-on:click="genres_checkAll(1)" class="link-dotted">
+									Все
+								</a> 
+								&#160;
+								<a v-on:click="genres_checkAll(0)" class="link-dotted">
+									Ничего
+								</a>
 							</div>
+							<div class="col-xs-4 text-right">
+								<i v-on:click="genres_visible = !genres_visible" class="glyphicon glyphicon-remove-circle pntr"></i>
+							</div>
+						</div>
+						<div>
+							<label 
+							v-for="gen in genres" 
+							class="genre btn" 
+							v-bind:class="gen.selected?'btn-primary':'btn-default'" 
+							v-on:click="genres_check(gen)"><span>{{gen.name}}</span></label>
 						</div>
 					</div>
 				</div>
-				<div data-pos="RIGHT_BOTTOM" class="j-mapctrl map-ctrl-wrap">
-					<div v-if="currentUser">
-						<a v-if="currentUser.role" v-on:click="gotoEventNew" 
-						class="btn btn-warning btn-lg hidden-xs btn-map-newevt">
-						Создать мероприятие
-					</a>
-					<a v-if="currentUser.role" v-on:click="gotoEventNew" class="btn btn-warning visible-sm-inline-block btn-material">+</a>
-					<!-- <input id="map-ctrl-search" class="form-control" style="width: 20em" placeholder="Поиск мест" /> -->
-				</div>
+				<!-- <div data-pos="RIGHT_BOTTOM" class="j-mapctrl map-ctrl-wrap">
+					<input id="map-ctrl-search" class="form-control" style="width: 20em" placeholder="Поиск мест" />
+				</div> -->
 			</div>
 		</div>
 		<div id="map-container" class="__fullscreen" v-bind:class="sidebar_visible?'map-when-sidebar':''"></div>
@@ -296,9 +368,19 @@
 		font-size:4em;
 		margin-right:.5em;
 		cursor: pointer;
+		border-radius: 11em;
+		border: 2px solid;
+		width: 1.7em;
+		height: 1.7em;
+		line-height: 1.7em;
+		text-align: center;
+		&:hover{
+			box-shadow: #000 0 0 8px 0px;
+		}
 	}
 	.btn-map-newevt {
-		margin:3em;
+		margin-right:1em;
+		margin-bottom:1em;
 		.btn-map-standalone();
 	}
 	.btn-map-standalone {
@@ -365,23 +447,21 @@
 		}
 	}
 	.genre {
-		cursor: pointer;
+		font-size: 1em;
 		margin-top: .1em;
 		margin-right: 1em;
 		font-weight: normal;
-		font-size: 1em;
-		opacity: .7;
-		&.active {
-			opacity: 1;
-		}
 		&>input {
 			display: none;
 		}
 	}
-	.genre-wrap {
+	.genre-list-wrap {
 		padding: .5em;
-		margin-bottom: 1em;
+		//margin-bottom: 1em;
 	}
-	.genre-teaser { // лапоть внизу
+	.genre-wrap { // лапоть внизу
+		width: 100%;
+		padding-left: 2em;
+		padding-right: 2em;
 	}
 </style>

@@ -115,6 +115,13 @@ textarea {
 	.__datepicker-wrap-noborder .calendar {
 		border-width: 0;
 	}
+	.__datepicker-wrap-center {
+		text-align: center;
+	}
+	.__datepicker-wrap-center .datepicker {
+		display: inline-block;
+    	text-align: left;
+	}
 
 /*
 ========================================================================================
