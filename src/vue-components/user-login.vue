@@ -23,13 +23,13 @@
 						</div>
 					</div>
 					<div class="row">
-						<div class="col-xs-5 text-right">
-							<i v-show="auth.pending" class="spin"></i> 
-						</div>
-						<div class="col-xs-14">
+						<div class="col-xs-14 col-xs-offset-5">
 							<button class="btn btn-primary btn-block" v-bind:disabled="auth.pending" type="submit">
 								&#160;Войти
 							</button>
+						</div>
+						<div class="col-xs-5">
+							<i v-show="auth.pending" class="spin spin-sm"></i> 
 						</div>
 					</div>
 					<div class="row social-login-wrap">
@@ -54,11 +54,11 @@
 					</div>
 					<div class="row text-center">
 						<div class="col-xs-24">
-							<a href="/" class="btn btn-link">
+							<a href="#/" class="btn btn-link">
 								Перейти к карте
 							</a>
 							<br/>
-							<a href="/" class="btn btn-primary btn-round">
+							<a href="#/" class="btn btn-primary btn-round">
 								<i class="glyphicon glyphicon-map-marker"></i>
 							</a>
 						</div>

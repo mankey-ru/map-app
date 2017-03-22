@@ -61,7 +61,7 @@ export default {
 				this.LOG_IN_SUCCESS(user);
 				delete window._handleLogonSuccess;
 			}
-			var wo = window.open(`${apiUrl}auth/in?provider=${provider}`, '_blank') // , 'height=500,width=700'
+			var wo = window.open(`${apiUrl}auth/in?provider=${provider}`, '_blank', 'height=500,width=700,location=no,status=no,titlebar=no,toolbar=no')
 		},
 		LOG_IN_SUCCESS: function (user) {
 			//console.log(user)
@@ -72,7 +72,9 @@ export default {
 			}
 		},
 		LOG_OUT: function () {
-			this.auth.pending = true;
+			if (this.auth) {
+				this.auth.pending = true;
+			}
 			request
 				.post(apiUrl + 'auth/out')
 				.end((err, res) => {
@@ -87,7 +89,9 @@ export default {
 						this.$store.dispatch('updateUser', false);
 						//this.$router.push('/')
 					}
-					this.auth.pending = false;
+					if (this.auth) {
+						this.auth.pending = false;
+					}
 				});
 		},
 		GOTO_PROFILE: function (author) {
@@ -112,15 +116,7 @@ export default {
 				name: 'user-register'
 			})
 		},
-		gotoTheme: function (th) {
-			this.$router.push({
-				name: 'reply_list',
-				params: {
-					theme_id: th._id
-				}
-			})
-		},
-		gotoEventNew: function () {
+		GOTO_EVT_NEW: function () {
 			this.$router.push({
 				name: 'event-new'
 			})

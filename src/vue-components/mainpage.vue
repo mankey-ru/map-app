@@ -41,12 +41,12 @@
 			genres_check: function(gen){
 				gen.selected = !gen.selected;			
 				var selected_ids = this.$data.genres
-					.filter(function(_gen){
-						return _gen.selected===true
-					})
-					.map(function(_gen){
-						return _gen._id
-					})
+				.filter(function(_gen){
+					return _gen.selected===true
+				})
+				.map(function(_gen){
+					return _gen._id
+				})
 				var hiddenQty = 0;
 				for (var i=0, len=this.$data.evtList.length; i<len; i++) {
 					var evt = this.$data.evtList[i];
@@ -77,7 +77,7 @@
 			_vm = this;
 			/**
 				Handling genre list
-			*/
+				*/
 			// If store have genres right now, they are copied to $data right now
 			if (this.$store.state.genreList) {
 				setGenres(this.$store.state.genreList)
@@ -99,253 +99,286 @@
 			}
 			/**
 				Handling sidebar behavior
-			*/
-			var sidebar = document.querySelector('.side-wrap');
-			document.body.addEventListener('click', (evt)=>{
-				if (this.sidebar_visible===true && sidebar.contains(evt.target)===false) {
-					this.sidebar_visible = false;
-				} 
-			})
-			if (window.cordova) {
-				var backPressedOnce = false;
-				document.addEventListener('backbutton', (evt) => {
-					if (this.sidebar_visible === true) {
-						evt.preventDefault();
+				*/
+				var sidebar = document.querySelector('.side-wrap');
+				document.body.addEventListener('click', (evt)=>{
+					if (this.sidebar_visible===true && sidebar.contains(evt.target)===false) {
 						this.sidebar_visible = false;
-					}
-					else {
-						if (backPressedOnce === true) {
-							navigator.app.exitApp();
+					} 
+				})
+				if (window.cordova) {
+					var backPressedOnce = false;
+					document.addEventListener('backbutton', (evt) => {
+						if (this.sidebar_visible === true) {
+							evt.preventDefault();
+							this.sidebar_visible = false;
 						}
 						else {
-							backPressedOnce = true;
-							setTimeout(() => {
-								backPressedOnce = false
-							}, 1000)
-						}
-					}
-				}, false);
-			}
-			else {
-				document.body.addEventListener('keyup', (evt)=>{
-					if (evt.keyCode===27) {
-						this.sidebar_visible = false;
-					}
-				})
-			}
-			/**
-				Creating map
-			*/
-			mapLib.create((createdMap)=>{
-				this.map_pending = false;
-				map = createdMap;
-
-				request
-				.get(apiUrl + 'events')
-				.end((err,res)=>{
-					if (err) {
-						miniToastr.error(err || 'Failed to get events')
-					}
-					else {
-						if (res.body instanceof Array) {
-							for (let evt of res.body) {
-								var mark = new google.maps.Marker({
-									position: {
-										lat: evt.latLng[0], 
-										lng: evt.latLng[1]
-									},
-									map: map,
-									icon: 'pin.svg',
-									//animation: google.maps.Animation.DROP
-								})
-								mark.addListener('click', ()=>{showEvtInfo(evt)});		
-								evt.mark = mark;
-								this.evtList.push(evt);
+							if (backPressedOnce === true) {
+								navigator.app.exitApp();
+							}
+							else {
+								backPressedOnce = true;
+								setTimeout(() => {
+									backPressedOnce = false
+								}, 1000)
 							}
 						}
-					}
-				})
+					}, false);
+				}
+				else {
+					document.body.addEventListener('keyup', (evt)=>{
+						if (evt.keyCode===27) {
+							this.sidebar_visible = false;
+						}
+					})
+				}
+			/**
+				Creating map
+				*/
+				mapLib.create((createdMap)=>{
+					this.map_pending = false;
+					map = createdMap;
 
+					request
+					.get(apiUrl + 'events')
+					.end((err,res)=>{
+						if (err) {
+							miniToastr.error(err || 'Failed to get events')
+						}
+						else {
+							if (res.body instanceof Array) {
+								for (let evt of res.body) {
+									var mark = new google.maps.Marker({
+										position: {
+											lat: evt.latLng[0], 
+											lng: evt.latLng[1]
+										},
+										map: map,
+										icon: 'pin.svg',
+									//animation: google.maps.Animation.DROP
+								})
+									mark.addListener('click', ()=>{showEvtInfo(evt)});		
+									evt.mark = mark;
+									this.evtList.push(evt);
+								}
+							}
+						}
+					})
+
+				});
+			}
+		}
+		var infowindow;
+		function showEvtInfo(evt){
+			if (infowindow) {
+				infowindow.close();
+			}
+			infowindow = new google.maps.InfoWindow({
+				content: `
+				<h3>${evt.name}</h3>
+				<pre>${evt.descr}</pre>
+				<div class="text-right">
+					<a class="btn btn-info" href="#/event/card/${evt._id}">Подробнее</a>
+				</div>`
 			});
+			infowindow.open(map, evt.mark);
 		}
-	}
-	var infowindow;
-	function showEvtInfo(evt){
-		if (infowindow) {
-			infowindow.close();
-		}
-		infowindow = new google.maps.InfoWindow({
-			content: `
-			<h3>${evt.name}</h3>
-			<pre>${evt.descr}</pre>
-			<div class="text-right">
-				<a class="btn btn-info" href="#/event/card/${evt._id}">Подробнее</a>
-			</div>`
-		});
-		infowindow.open(map, evt.mark);
-	}
-</script>
+	</script>
 
-<template>
-	<!-- TODO use https://www.npmjs.com/package/v-media-query instead of bootstrap media queries like visible-xs -->
-	<div>
-		<div v-show="map_pending" class="text-center">
-			<i class="spin spin-lg spin-global"></i>
-		</div>
+	<template>
+		<!-- TODO use https://www.npmjs.com/package/v-media-query instead of bootstrap media queries like visible-xs -->
+		<div>
+			<div v-show="map_pending" class="text-center">
+				<i class="spin spin-lg spin-global"></i>
+			</div>
 
-		<div v-show="!map_pending">
-			<div class="hdn">
-				<!-- positions explained: https://google-developers.appspot.com/maps/documentation/javascript/examples/full/control-positioning-labels -->
-				<div data-pos="TOP" class="j-mapctrl" style="width: 100%; ">
+			<div v-show="!map_pending">
+				<div class="hdn">
+					<!-- positions explained: https://google-developers.appspot.com/maps/documentation/javascript/examples/full/control-positioning-labels -->
+					<div data-pos="TOP" class="j-mapctrl" style="width: 100%; ">
 
-					<div class="side-wrap" v-bind:class="sidebar_visible?'side-wrap-visible':''">
-						<div class="side-content">
-							<h1 class="text-center">Меню</h1>
-							<br/><br/>
-							<a v-on:click="GOTO_LOGIN" class="btn btn-block btn-primary btn-lg">
-								Вход
-							</a>
-							<a v-on:click="GOTO_REGISTER" class="btn btn-block btn-default btn-lg">
-								Регистрация
-							</a>
-							<hr />
-							<a v-on:click="GOTO_PROFILE" class="btn btn-block btn-default btn-lg">
-								Профиль
-							</a>
-							<a v-on:click="GOTO_PROFILE" class="btn btn-block btn-default btn-lg">
-								Мои мероприятия
-							</a>
-							<hr />
-							<a v-on:click="GOTO_REGISTER" class="btn btn-block btn-default btn-lg">
-								Как это работает
-							</a>
-							<a v-on:click="GOTO_REGISTER" class="btn btn-block btn-default btn-lg">
-								О нас
-							</a>
-						</div>
-					</div>
-					<div class="map-ctrl-wrap">
-						<div class="row">
-							<div class="col-md-18 col-sm-10 col-xs-8">
-								<form v-on:submit.prevent="evtSearch">
-									<div class="map-pane-main">
-										<i v-on:click.stop="sidebar_visible = !sidebar_visible" class="glyphicon glyphicon-menu-hamburger" ></i>
-										<span class="hamburger-box">
-											<span class="hamburger-inner"></span>
-										</span></a>
-										<span class="hidden-xs hidden-sm">
-											<input v-model="search.text" />
-											<i class="glyphicon glyphicon-search" v-on:click="evtSearch"></i>
-											<i class="glyphicon glyphicon-tasks"></i>
-										</span>
-									</div>
-									<div class="map-pane__wrap">
-										<span class="hidden-xs hidden-sm">
-											<div class="map-pane__content map-pane-date" v-on:click="datepicker_visible = !datepicker_visible">
-												<span>{{search.date | dateFormatPretty}}</span> 
-												<i class="glyphicon glyphicon-calendar"></i>
-											</div>
-										</span>
-										<div class="map-pane__content" v-show="datepicker_visible">
-											<div>
-												<a class="btn btn-block btn-default">Любая дата</a>
-											</div>
-											<div class="__datepicker-wrap __datepicker-wrap-noborder __datepicker-wrap-center">
-												<datepicker 
-												:input-class="'form-control'" 
-												v-model="search.date"
-												:language="'ru'"
-												:monday-first="true"
-												:format="'dd.MM.yyyy'"
-												:inline="true"
-												></datepicker>
-											</div>
-										</div>
-									</div>
-								</form>
-							</div>
-							<div class="col-md-6 col-sm-14 col-xs-16">
-								<div class="text-right">
-									<div class="visible-xs visible-sm">
-										<a class="btn btn-default btn-lg btn-map-standalone">
-											<i class="glyphicon glyphicon-calendar"></i>
-										</a>
-										<div style="margin-top:1em">
-											<a class="btn btn-default btn-lg btn-map-standalone">
-												<i class="glyphicon glyphicon-search" v-on:click="evtSearch"></i>
-											</a>
-										</div>
-									</div>
-									<div class="hidden-xs hidden-sm">
-										<i v-if="currentUser"  v-on:click.prevent="GOTO_PROFILE" class="glyphicon glyphicon-user map-profile-icon"></i>
-										<div v-if="!currentUser">
-											<a class="btn btn-default btn-map-standalone" v-on:click="GOTO_LOGIN">
-												Вход
-											</a> &#160;
-											<a class="btn btn-default btn-map-standalone" v-on:click="GOTO_REGISTER">
-												Регистрация
-											</a>
-										</div>
-									</div>
+						<div class="side-wrap" v-bind:class="sidebar_visible?'side-wrap-visible':''">
+							<div class="side-content">
+								<h1 class="text-center">Меню</h1>
+								<br/><br/>
+								<div v-if="!currentUser">
+									<a v-on:click="GOTO_LOGIN" class="btn btn-block btn-primary btn-lg">
+										Вход
+									</a>
+									<a v-on:click="GOTO_REGISTER" class="btn btn-block btn-default btn-lg">
+										Регистрация
+									</a>
 								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-				<div data-pos="LEFT_BOTTOM" class="j-mapctrl genre-wrap">
+								<div v-if="currentUser">
+									<a v-on:click="GOTO_PROFILE" class="btn btn-block btn-primary btn-lg">
+										Профиль
+									</a>
+									<a v-on:click="LOG_OUT" class="btn btn-block btn-default btn-lg">
+										Выход
+									</a>
 
-					<div v-if="currentUser" class="row">
-						<div class="col-md-10 col-xs-24">
-							<div v-show="evtHiddenQty!==0" class="map-pane__content">
-								<div class="row">
-									<div class="col-xs-12">
-										Скрыто {{evtHiddenQty}} из {{evtList.length}}.
-									</div>
-									<div class="col-xs-12 text-right">
-										<a class="link-dotted" v-on:click="showAll">Показать все</a>
-									</div>
+									<hr />
+									<a v-on:click="GOTO_EVT_NEW" class="btn btn-block btn-default btn-lg">
+										Создать мероприятие
+									</a>
+									<a v-on:click="GOTO_PROFILE" class="btn btn-block btn-default btn-lg">
+										Мои мероприятия
+									</a>
 								</div>
-							</div>
-						</div>
-						<div class="col-md-14 col-xs-24 text-right">
-							<a class="btn btn-warning btn-lg hidden-sm btn-map-newevt" 
-							v-if="currentUser.role"
-							v-on:click="gotoEventNew">Создать мероприятие</a>
-							<a class="btn btn-warning visible-sm-inline-block btn-material"
-							v-if="currentUser.role" 
-							v-on:click="gotoEventNew">+</a>
-						</div>
-					</div>
-
-					<div v-show="!genres_visible" class="text-center">
-						<a class="btn btn-lg btn-info genre-teaser" v-on:click="genres_visible = !genres_visible">
-							Фильтр по жанрам
-						</a>
-					</div>
-					<div v-show="genres_visible" class="genre-list-wrap map-pane__content">
-						<div class="row form-group">
-							<div class="col-xs-20">
-								<a v-on:click="genres_checkAll(1)" class="link-dotted">
-									Все
-								</a> 
-								&#160;
-								<a v-on:click="genres_checkAll(0)" class="link-dotted">
-									Ничего
+								<hr />
+								<a v-on:click="GOTO_REGISTER" class="btn btn-block btn-default btn-lg">
+									Как это работает
+								</a>
+								<a v-on:click="GOTO_REGISTER" class="btn btn-block btn-default btn-lg">
+									О нас
 								</a>
 							</div>
-							<div class="col-xs-4 text-right">
-								<i v-on:click="genres_visible = !genres_visible" class="glyphicon glyphicon-remove-circle pntr"></i>
+						</div>
+						<div class="map-ctrl-wrap">
+							<div class="row">
+								<div class="col-md-18 col-sm-8 col-xs-4">
+									<form v-on:submit.prevent="evtSearch">
+										<div class="map-pane-main">
+											<i v-on:click.stop="sidebar_visible = !sidebar_visible" class="glyphicon glyphicon-menu-hamburger" ></i>
+											<span class="hamburger-box">
+												<span class="hamburger-inner"></span>
+											</span></a>
+											<span class="hidden-xs hidden-sm">
+												<input v-model="search.text" />
+												<i class="glyphicon glyphicon-search" v-on:click="evtSearch"></i>
+												<i class="glyphicon glyphicon-tasks"></i>
+											</span>
+										</div>
+										<div class="map-pane__wrap hidden-xs hidden-sm">
+											<span class="">
+												<div class="map-pane__content map-pane-date" v-on:click="datepicker_visible = !datepicker_visible">
+													<span>{{search.date | dateFormatPretty}}</span> 
+													<i class="glyphicon glyphicon-calendar"></i>
+												</div>
+											</span>
+											<div class="map-pane__content" v-show="datepicker_visible">
+												<div class="row">
+													<div class="col-xs-20">
+														<a v-on:click="search.date = null" class="btn btn-block btn-default">
+															Любая дата
+														</a>
+													</div>
+													<div class="col-xs-4 text-right">
+														<i v-on:click="datepicker_visible = false" class="glyphicon glyphicon-remove-circle pntr"></i>
+													</div>
+												</div>
+												<!-- календарь для десктопов -->
+												<div class="__datepicker-wrap __datepicker-wrap-noborder __datepicker-wrap-center">
+													<datepicker 
+													:input-class="'form-control'" 
+													v-model="search.date"
+													:language="'ru'"
+													:monday-first="true"
+													:format="'dd.MM.yyyy'"
+													:inline="true"
+													></datepicker>
+												</div>
+											</div>
+										</div>
+									</form>
+								</div>
+								<div class="col-md-6 col-sm-16 col-xs-20">
+									<div class="text-right">
+										<!-- календарь для мобил -->
+										<div class="visible-xs visible-sm">
+											<div>
+												
+												<div style="margin-top:.5em;float:left;"v-show="datepicker_visible" class="__datepicker-wrap __datepicker-wrap-noborder __datepicker-wrap-center">
+													<datepicker 
+													:input-class="'form-control'" 
+													v-model="search.date"
+													:language="'ru'"
+													:monday-first="true"
+													:format="'dd.MM.yyyy'"
+													:inline="true"
+													></datepicker>
+												</div>
+												<a class="btn btn-default btn-lg btn-map-standalone"
+												v-on:click="datepicker_visible = !datepicker_visible"><i class="glyphicon glyphicon-calendar"></i></a>
+											</div>
+											<br/>
+											<div>
+												<a class="btn btn-default btn-lg btn-map-standalone">
+													<i class="glyphicon glyphicon-search" v-on:click="evtSearch"></i>
+												</a>
+											</div>
+										</div>
+										<div class="hidden-xs hidden-sm">
+											<i v-if="currentUser"  v-on:click.prevent="GOTO_PROFILE" class="glyphicon glyphicon-user map-profile-icon"></i>
+											<div v-if="!currentUser">
+												<a class="btn btn-default btn-map-standalone" v-on:click="GOTO_LOGIN">
+													Вход
+												</a> &#160;
+												<a class="btn btn-default btn-map-standalone" v-on:click="GOTO_REGISTER">
+													Регистрация
+												</a>
+											</div>
+										</div>
+									</div>
+								</div>
 							</div>
 						</div>
-						<div>
-							<label 
-							v-for="gen in genres" 
-							class="genre btn" 
-							v-bind:class="gen.selected?'btn-primary':'btn-default'" 
-							v-on:click="genres_check(gen)"><span>{{gen.name}}</span></label>
+					</div>
+					<div data-pos="LEFT_BOTTOM" class="j-mapctrl genre-wrap">
+
+						<div v-if="currentUser" class="row">
+							<div class="col-md-10 col-xs-24">
+								<div v-show="evtHiddenQty!==0" class="map-pane__content">
+									<div class="row">
+										<div class="col-xs-12">
+											Скрыто {{evtHiddenQty}} из {{evtList.length}}.
+										</div>
+										<div class="col-xs-12 text-right">
+											<a class="link-dotted" v-on:click="showAll">Показать все</a>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="col-md-14 col-xs-24 text-right">
+								<a class="btn btn-warning btn-lg hidden-sm btn-map-newevt" 
+								v-if="currentUser.role"
+								v-on:click="GOTO_EVT_NEW">Создать мероприятие</a>
+								<a class="btn btn-warning visible-sm-inline-block btn-material"
+								v-if="currentUser.role" 
+								v-on:click="GOTO_EVT_NEW">+</a>
+							</div>
+						</div>
+
+						<div v-show="!genres_visible" class="text-center">
+							<a class="btn btn-lg btn-info genre-teaser" v-on:click="genres_visible = !genres_visible">
+								Фильтр по жанрам
+							</a>
+						</div>
+						<div v-show="genres_visible" class="genre-list-wrap map-pane__content">
+							<div class="row form-group">
+								<div class="col-xs-20">
+									<a v-on:click="genres_checkAll(1)" class="link-dotted">
+										Все
+									</a> 
+									&#160;
+									<a v-on:click="genres_checkAll(0)" class="link-dotted">
+										Ничего
+									</a>
+								</div>
+								<div class="col-xs-4 text-right">
+									<i v-on:click="genres_visible = !genres_visible" class="glyphicon glyphicon-remove-circle pntr"></i>
+								</div>
+							</div>
+							<div>
+								<label 
+								v-for="gen in genres" 
+								class="genre btn" 
+								v-bind:class="gen.selected?'btn-primary':'btn-default'" 
+								v-on:click="genres_check(gen)"><span>{{gen.name}}</span></label>
+							</div>
 						</div>
 					</div>
-				</div>
 				<!-- <div data-pos="RIGHT_BOTTOM" class="j-mapctrl map-ctrl-wrap">
 					<input id="map-ctrl-search" class="form-control" style="width: 20em" placeholder="Поиск мест" />
 				</div> -->
