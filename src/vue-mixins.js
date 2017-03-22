@@ -36,8 +36,9 @@ export default {
 				password: this.auth.password
 			} : {};
 			this.auth.pending = true;
+			var meth = this.auth.method || ''
 			request
-				.post(`${apiUrl}auth/in/${this.auth.method}`)
+				.post(`${apiUrl}auth/in/${meth}`)
 				.send(credentials)
 				.end((err, res) => {
 					if (err || !res.body) {
