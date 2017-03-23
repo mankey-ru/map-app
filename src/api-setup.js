@@ -74,7 +74,22 @@ function setupApi(app) {
 	*/
 
 	app.get(apiUrl + 'events', function (req, res) {
+		var match = {};
+		if (req.query.own) {
+			if (req.user) {
+				match = {
+					author_id: ObjectID(req.user._id)
+				}
+			}
+			else {
+				handleError(res, 'Unauthorized', 'Unauthorized', 403);
+				return
+			}
+		}
+		console.log(match)
 		var aRules = [{
+			$match: match
+		}, {
 			$lookup: {
 				from: C_USERS,
 				localField: 'author_id',
@@ -91,7 +106,9 @@ function setupApi(app) {
 					handleError(res, err, 'Failed to get events');
 				}
 				else {
-					res.status(200).json(docs).end();
+					res.status(200).json({
+						evtList: docs
+					}).end();
 				}
 			});
 	});
@@ -493,6 +510,10 @@ function setupAuth(app) {
 
 
 function handleError(res, errObjOrStr, message, code) {
+	/*
+		errObjOrStr - error to display in server console
+		message - error to return in response
+	*/
 	var reason = !!errObjOrStr && errObjOrStr.message ? errObjOrStr.message : errObjOrStr; // sweet jesus
 	console.log('API ERROR: ' + JSON.stringify(reason));
 	res.status(code || 500).json({

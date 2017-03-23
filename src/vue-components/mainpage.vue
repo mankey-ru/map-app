@@ -147,8 +147,8 @@
 							miniToastr.error(err || 'Failed to get events')
 						}
 						else {
-							if (res.body instanceof Array) {
-								for (let evt of res.body) {
+							if (res.body.evtList instanceof Array) {
+								for (let evt of res.body.evtList) {
 									var mark = new google.maps.Marker({
 										position: {
 											lat: evt.latLng[0], 
@@ -217,14 +217,16 @@
 									<a v-on:click="LOG_OUT" class="btn btn-block btn-default btn-lg">
 										Выход
 									</a>
-
-									<hr />
-									<a v-on:click="GOTO_EVT_NEW" class="btn btn-block btn-default btn-lg">
-										Создать мероприятие
-									</a>
-									<a v-on:click="GOTO_PROFILE" class="btn btn-block btn-default btn-lg">
-										Мои мероприятия
-									</a>
+									
+									<div v-show="currentUser.role">
+										<hr />
+										<a v-on:click="GOTO_EVT_NEW" class="btn btn-block btn-default btn-lg">
+											Создать мероприятие
+										</a>
+										<a href="#/event/list" class="btn btn-block btn-default btn-lg">
+											Мои мероприятия
+										</a>
+									</div>
 								</div>
 								<hr />
 								<a v-on:click="GOTO_REGISTER" class="btn btn-block btn-default btn-lg">
@@ -299,12 +301,12 @@
 													:inline="true"
 													></datepicker>
 												</div>
-												<a class="btn btn-default btn-lg btn-map-standalone"
+												<a class="btn btn-default btn-map-standalone"
 												v-on:click="datepicker_visible = !datepicker_visible"><i class="glyphicon glyphicon-calendar"></i></a>
 											</div>
 											<br/>
 											<div>
-												<a class="btn btn-default btn-lg btn-map-standalone">
+												<a class="btn btn-default btn-map-standalone">
 													<i class="glyphicon glyphicon-search" v-on:click="evtSearch"></i>
 												</a>
 											</div>
@@ -395,7 +397,7 @@
 		box-shadow: #000 1px 2px 4px 0px;
 	}
 	.-map-pane-fontsize {
-		font-size: 2.4em;
+		font-size: 2.2em;
 	}
 	.map-profile-icon {
 		font-size:4em;
@@ -433,6 +435,7 @@
 		background-color: #fff;
 		transition: transform .2s ease-in-out;
 		transform: translateX(0);
+		z-index: 999;
 	}
 	.side-wrap-visible {
 		transform: translateX(250px);
@@ -451,17 +454,17 @@
 		.-map-pane-fontsize();
 		border-radius: 3px;
 		background: #fff;
-		padding: .4em .6em;
+		padding: .3em .5em;
 	}
 	.map-pane-date {
 		cursor:pointer;
 		display: inline-block;
-		margin-bottom: .5em;
+		margin-bottom: .4em;
 	}
 	.map-pane-main {
 		.map-pane__wrap();
 		.map-pane__content();
-		margin-right: .5em;
+		margin-right: .4em;
 		input{
 			margin-left: 1em;
 			border: none;

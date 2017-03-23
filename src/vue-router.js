@@ -43,15 +43,24 @@ const routes = [
 	}, {
 		path: '/event/new',
 		name: 'event-new',
-		component: eventNew
+		component: eventNew,
+		meta: {
+			showHeader: true
+		}
 	}, {
 		path: '/event/card/:event_id',
 		name: 'event-card',
-		component: eventCard
+		component: eventCard,
+		meta: {
+			showHeader: true
+		}
 	}, {
 		path: '/event/list/',
 		name: 'event-list',
-		component: eventList
+		component: eventList,
+		meta: {
+			showHeader: true
+		}
 	},
 	// 404
 	{

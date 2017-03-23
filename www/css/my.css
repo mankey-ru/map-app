@@ -9,7 +9,7 @@ body {
 .main-container {
 	font-family: Tahoma;
 	padding-bottom: 8em;
-	padding-top: 2em;
+	padding-top: 1em;
 }
 .opa {
 	opacity: .5;
@@ -90,8 +90,11 @@ textarea {
 	.map-when-sidebar .gm-bundled-control,
 	.map-when-sidebar .gm-style-cc,
 	.map-when-sidebar .genre-teaser,
-	.map-when-sidebar img[src*="images/google"]	{
+	.map-when-sidebar img[src*="images/google"],
+	.map-when-sidebar .btn-map-newevt {
 		display: none;
+		/*opacity: .1;
+		transition: opacity .2s ease-out;*/
 	}
 
 /*
@@ -120,7 +123,7 @@ textarea {
 	}
 	.__datepicker-wrap-center .datepicker {
 		display: inline-block;
-    	text-align: left;
+		text-align: left;
 	}
 
 /*

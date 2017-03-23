@@ -43,7 +43,7 @@
 		<div v-show="!evt" class="text-center">
 			<i class="spin spin-lg"></i>
 		</div>
-		<div v-show="evt">
+		<div v-if="evt">
 			<h2>{{evt.name}}</h2>
 			<h3>
 				<i class="glyphicon glyphicon-calendar"></i>&#160;

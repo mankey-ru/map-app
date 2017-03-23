@@ -1,43 +1,51 @@
 
 
 <script>
-	import _ from 'lodash';
-	import mixins from './../vue-mixins.js';
+	import request from 'superagent'
+	import mixins from './../vue-mixins.js'
+	import miniToastr from 'mini-toastr'
+
+	var apiUrl = require('./../api-url.js').def;
+
 	export default {
-		name: 'forum-card',
+		name: 'evt-list',
 		data: function () {
 			return {
+				pageTitle: this.$route.query.all ? 'Мероприятия' : 'Мои мероприятия',
 				evtList: [],
-				evtList_loading: true
+				evtList_loading: true,
+				status: ''
 			}
 		},
 		methods: {
 			evt_fetch: function() {
-				this.forumList_loading = true;
+				this.evtList_loading = true;
 				var url = Math.random()>.1 ? 'backend-emu/forum-list.json' : '';
-				$.getJSON(url, {})
-				.done((data)=>{
-					this.forumList_loading = false;
-					if (data instanceof Array) {
-						for (let forum of data) {
-							this.forumList.push(getForum(forum));
+
+				request
+				.get(apiUrl + 'events?own=1')
+				.end((err, res)=>{
+					this.evtList_loading = false;
+					if (err) {
+						miniToastr.error(err || 'Ошибка запроса')
+					}
+					else if (res.body.evtList instanceof Array) {
+						if (res.body.evtList.length > 0) {
+							for (let evt of res.body.evtList) {
+								this.evtList.push(evt);
+							}
+						}
+						else {
+							this.status = 'Не найдено ни одного вашего мероприятия'
 						}
 					}
 				})
-				.fail(()=>{
-					console.warn('Рандомная (10%) неудача отправки. Ждём секунду и пробуем ещё раз.');
-					setTimeout(this.forum_fetch, 1000);
-				})
-				.always(()=>{})
 			}
 		},
 		mixins: [mixins],
 		mounted: function(){
-			this.forum_fetch();
-		},
-		destroyed: function () {},		
-		beforeUpdate: function() {},
-		created: function(){}
+			this.evt_fetch();
+		}
 	}
 
 	function getForum(arg) {
@@ -47,57 +55,34 @@
 
 <template>
 	<div>
-		<h2>{{title}}</h2>
-		<div v-show="forumList_loading" class="text-center">
+		<h2>{{pageTitle}}</h2>
+		<div v-show="evtList_loading" class="text-center">
 			<i class="spin spin-lg"></i>
 		</div>
-		<table v-show="!forumList_loading" class="table table-striped">
-			<thead>
-				<tr>
-					<td></td>
-					<td></td>
-					<td>Последнее сообщение</td>
-				</tr>
-			</thead>
-			<tbody>
-				<tr v-for="forum in forumList" v-bind:class="{'info':forum.pinned}">
-					<td>
-						<a href="#" v-on:click.prevent="gotoForum(forum)">{{forum.title}}</a>
-					</td>
-					<td>
-						<span class="label label-primary" v-if="forum.pinned" style="margin-right:.5em">
-							<i class="glyphicon glyphicon-pushpin" ></i> Прикреплён
-						</span>
-						<span class="label label-primary" v-if="forum.premoderation">
-							<i class="glyphicon glyphicon-eye-open"></i> Премодерация
-						</span>
-					</td>
-					<td style="font-size:.8em;">
-						<table>
-							<tr>
-								<td colspan="2">{{forum.last_msg.date}}</td>
-							</tr>
-							<tr>
-								<td>Тема</td>
-								<td>
-									<a href="#" v-on:click.prevent="gotoTheme(forum.last_msg.theme)">
-										{{forum.last_msg.theme.name}}
-									</a>
-								</td>
-							</tr>
-							<tr>
-								<td>Автор</td>
-								<td>
-									<a href="#" v-on:click.prevent="GOTO_PROFILE(forum.last_msg.author)">
-										{{forum.last_msg.author.name}}
-									</a>
-								</td>
-							</tr>
-						</table>
-					</td>
-				</tr>
-			</tbody>
-		</table>
+		<div v-show="!evtList_loading">
+			<div v-if="status">
+				<h2 >
+					<div class="label label-warning">
+						{{status}}
+					</div>
+				</h2>
+			</div>
+			<table  class="table table-striped">
+				<tbody>
+					<tr v-for="evt in evtList">
+						<td>
+							<a v-bind:href="'#/event/card/'+evt._id">{{evt.name}}</a>
+						</td>
+						<td>
+							{{evt.descr}}
+						</td>
+						<td>
+							{{evt.date | dateTimeFormat}}
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
 	</div>
 </template>
 

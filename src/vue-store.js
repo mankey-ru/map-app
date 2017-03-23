@@ -11,7 +11,7 @@ const mutations = {
 		}
 	},
 	m_updateUser: function (state, user) {
-		state.currentUser = user;
+		Vue.set(state, 'currentUser', user);
 	}
 }
 const actions = {
