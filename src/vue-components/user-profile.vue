@@ -127,9 +127,9 @@
 		components: {
 			Datepicker
 		},
-		watch: {
-		    '$route': 'getUser' // чтобы при смене /#/user-profile/1 на /#/user-profile обовлялся пользователь
-		},
+		/*watch: {
+			'$route': 'getUser' // чтобы при смене /#/user-profile/1 на /#/user-profile обовлялся пользователь
+		},*/
 		destroyed: function () {},		
 		beforeUpdate: function() {},
 		created: function(){}

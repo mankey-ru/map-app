@@ -188,7 +188,7 @@
 
 	<template>
 		<!-- TODO use https://www.npmjs.com/package/v-media-query instead of bootstrap media queries like visible-xs -->
-		<div>
+		<f7-page>
 			<div v-show="map_pending" class="text-center">
 				<i class="spin spin-lg spin-global"></i>
 			</div>
@@ -220,9 +220,9 @@
 									
 									<div v-show="currentUser.role">
 										<hr />
-										<a v-on:click="GOTO_EVT_NEW" class="btn btn-block btn-default btn-lg">
+										<f7-button v-on:click="GOTO_EVT_NEW">
 											Создать мероприятие
-										</a>
+										</f7-button>
 										<a href="#/event/list" class="btn btn-block btn-default btn-lg">
 											Мои мероприятия
 										</a>
@@ -254,9 +254,9 @@
 										</div>
 										<div class="map-pane__wrap hidden-xs hidden-sm">
 											<span class="">
-												<div class="map-pane__content map-pane-date" v-on:click="datepicker_visible = !datepicker_visible">
+												<div class="map-pane__content map-pane-date" >
 													<span>{{search.date | dateFormatPretty}}</span> 
-													<i class="glyphicon glyphicon-calendar"></i>
+													<f7-button v-on:click="datepicker_visible = true" icon-fa="calendar"></f7-button>
 												</div>
 											</span>
 											<div class="map-pane__content" v-show="datepicker_visible">
@@ -267,6 +267,7 @@
 														</a>
 													</div>
 													<div class="col-xs-4 text-right">
+														<!--  -->
 														<i v-on:click="datepicker_visible = false" class="glyphicon glyphicon-remove-circle pntr"></i>
 													</div>
 												</div>
@@ -342,13 +343,7 @@
 									</div>
 								</div>
 							</div>
-							<div class="col-md-14 col-xs-24 text-right">
-								<a class="btn btn-warning btn-lg hidden-sm btn-map-newevt" 
-								v-if="currentUser.role"
-								v-on:click="GOTO_EVT_NEW">Создать мероприятие</a>
-								<a class="btn btn-warning visible-sm-inline-block btn-material"
-								v-if="currentUser.role" 
-								v-on:click="GOTO_EVT_NEW">+</a>
+							<div class="col-md-14 col-xs-24 text-right" style="height:5em">
 							</div>
 						</div>
 
@@ -387,9 +382,12 @@
 			</div>
 		</div>
 		<div id="map-container" class="__fullscreen" v-bind:class="sidebar_visible?'map-when-sidebar':''"></div>
+		<f7-fab v-if="currentUser && currentUser.role" color="pink" v-on:click="GOTO_EVT_NEW">
+			<f7-icon icon="icon-plus"></f7-icon>
+		</f7-fab>
 	</div>
 
-</div>
+</f7-page>
 </template>
 
 <style scoped lang="less">
