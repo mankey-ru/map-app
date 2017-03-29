@@ -1,12 +1,25 @@
 <?xml version="1.0" standalone="no"?> 
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd" >
 <svg xmlns="http://www.w3.org/2000/svg">
-<defs>
-  <font id="DummyFont" horiz-adv-x="24">
-    <font-face font-family="DummyFont"
-      units-per-em="512" ascent="448"
-      descent="64" />
-    <missing-glyph horiz-adv-x="0" />
-  </font>
-</defs>
-</svg>
+	<defs>
+		<font id="DummyFont" horiz-adv-x="24">
+			<font-face font-family="DummyFont" 
+				font-weight="900"
+				font-stretch="normal"
+				units-per-em="2048"
+				panose-1="2 0 0 0 0 0 0 0 0 0"
+				ascent="1536"
+				descent="-512"
+				x-height="1082"
+				cap-height="1456"
+				bbox="-1476 -555 2482 2163"
+				underline-thickness="100"
+				underline-position="-100"
+				unicode-range="U+0002-FFFD"
+				/>
+				<missing-glyph horiz-adv-x="0" />
+
+				<glyph glyph-name="uniFB01" unicode="fi" horiz-adv-x="1302" d="M173 0v848h-157v234h157v36q3 216 142 331q132 108 369 108q149 0 352 -58l-46 -266l-56 15q-109 29 -230 29q-193 0 -193 -176v-19h212v-234h-212v-848h-338zM1191 0h-339v1082h339v-1082z" />
+			</font>
+		</defs>
+	</svg>

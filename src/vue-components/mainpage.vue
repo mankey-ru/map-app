@@ -188,7 +188,7 @@
 						</div>
 					</div>
 					<div class="group">
-						<span v-for="gen in genres" class="chip label cursor-pointer" v-bind:class="gen.selected?'bg-amber':'bg-grey-4'" v-on:click="genres_check(gen)">
+						<span v-for="gen in genres" class="chip label cursor-pointer" v-bind:class="gen.selected?'bg-orange':'bg-grey-4'" v-on:click="genres_check(gen)">
 							{{gen.name}}
 						</span>
 					</div>
@@ -201,10 +201,10 @@
 			<div v-show="!map_pending">
 				<div v-if="currentUser && currentUser.role" >
 					<div class="newEvtWrap absolute-bottom-right">
-						<button class="gt-sm glossy amber round big" v-on:click="GOTO_EVT_NEW">
+						<button class="gt-sm glossy orange round big" v-on:click="GOTO_EVT_NEW">
 							Создать мероприятие
 						</button>
-						<button class="lt-md glossy amber circular big" v-on:click="GOTO_EVT_NEW">
+						<button class="lt-md glossy orange circular big" v-on:click="GOTO_EVT_NEW">
 							<i>add</i>
 						</button>
 					</div>
@@ -217,7 +217,7 @@
 								<div class="width-2of3">
 									<div class="map-pane-main row inline"><!-- hide-on-drawer-visible -->
 										<i v-on:click="$parent.$refs.drawer_left.open()" class="mdi mdi-menu"></i>
-										<form class="inline" v-on:submit="evtSearch">
+										<form class="inline" v-on:submit.prevent="evtSearch">
 											<span class="gt-sm">
 												<input v-model="search.text" placeholder="Поиск" />
 												<i class="glyphicon glyphicon-search" v-on:click="evtSearch"></i>
@@ -274,7 +274,7 @@
 								Скрыто {{evtHiddenQty}} из {{evtList.length}}. 
 								<a class="link-dotted" v-on:click="showAll">Показать все</a>
 							</span>
-							<button class="amber push" v-on:click="$refs.modal_genres.open()">
+							<button class="orange push" v-on:click="$refs.modal_genres.open()">
 								Фильтр по жанрам
 							</button>
 						</div>

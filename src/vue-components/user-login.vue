@@ -20,7 +20,7 @@
 					</div>
 					<div class="row">
 						<div class="width-2of3">
-							<button class="primary clear" type="button">Регистрация</button> 
+							<button class="primary clear" v-link="'register'" type="button">Регистрация</button> 
 							<button class="primary clear" type="button">Забыли пароль?</button>
 						</div>
 						<div class="width-1of3 text-right">
