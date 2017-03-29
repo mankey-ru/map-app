@@ -15,10 +15,7 @@ const routes = [
 	{
 		name: 'user-profile-current',
 		path: '/user-profile',
-		component: user_profile,
-		meta: {
-			showHeader: true
-		}
+		component: user_profile
 	}, {
 		name: 'user-profile-any',
 		path: '/user-profile/:user_id',
@@ -45,7 +42,7 @@ const routes = [
 		name: 'event-new',
 		component: eventNew,
 		meta: {
-			showHeader: true
+			needAuth: true
 		}
 	}, {
 		path: '/event/card/:event_id',
@@ -74,10 +71,22 @@ const routes = [
 	}
 ];
 
-
-
-// -------------------------------------------------------------------------------
 Vue.use(VueRouter);
-export default new VueRouter({
+var router = new VueRouter({
 	routes
 });
+
+// https://router.vuejs.org/en/advanced/navigation-guards.html
+router.beforeEach((to, from, next) => {
+	var store = this.a.app.$store;
+	if (store && !store.getters.currentUser && to.meta.needAuth === true) {
+		console.warn('vue-router.js: this page needs auth')
+		next({
+			name: 'user-login'
+		})
+	}
+	else {
+		next()
+	}
+})
+export default router;

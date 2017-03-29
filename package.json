@@ -6,10 +6,11 @@
   "private": true,
   "scripts": {
     "start": "node src/_main-server.js",
-    "dev0": "nodemon --watch src/api-setup.js --exec \"cross-env NODE_ENV=development webpack-dev-server --hot --port 8082\"",
     "dev": "cross-env NODE_ENV=development webpack-dev-server --hot --port 8082",
-    "devo": "cross-env NODE_ENV=development webpack-dev-server --hot --port 8082 --open ",
-    "build": "cross-env NODE_ENV=production webpack --progress --hide-modules"
+    "dev0": "nodemon --watch src/api-setup.js --exec \"npm run dev\"",
+    "build": "cross-env NODE_ENV=production webpack --progress --hide-modules",
+    "analyze": "cross-env NODE_ENV=analyze webpack --progress --hide-modules",
+    "my": "webpack --profile --json > stats.json"
   },
   "dependencies": {
     "async": "^2.1.5",
@@ -18,6 +19,7 @@
     "cookie-parser": "^1.4.3",
     "express": "^4.14.1",
     "express-session": "^1.15.1",
+    "fastclick": "^1.0.6",
     "lodash": "^4.17.4",
     "mongodb": "^2.2.24",
     "passport": "^0.3.2",
@@ -35,12 +37,14 @@
     "cross-env": "^3.1.4",
     "css-loader": "^0.25.0",
     "file-loader": "^0.9.0",
+    "friendly-errors-webpack-plugin": "^1.6.1",
     "google-maps": "^3.2.1",
     "less": "^2.7.2",
     "less-loader": "^3.0.0",
-    "lodash": "*",
     "mini-toastr": "^0.6.3",
     "moment": "^2.17.1",
+    "quasar-framework": "^0.13.6",
+    "roboto-fontface": "^0.7.0",
     "scroll": "^2.0.0",
     "scroll-doc": "^0.1.3",
     "style-loader": "^0.13.2",
@@ -52,6 +56,7 @@
     "vuejs-datepicker": "^0.6.2",
     "vuex": "^2.2.1",
     "webpack": "^2.2.0",
+    "webpack-bundle-analyzer": "^2.3.1",
     "webpack-clean": "^1.0.0",
     "webpack-dev-server": "^2.2.0"
   },

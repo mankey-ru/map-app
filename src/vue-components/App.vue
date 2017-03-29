@@ -1,5 +1,6 @@
 <script>
 	import mixins from './../vue-mixins.js'
+	import lilink from './_lilink.vue'
 
 	export default {
 		name: 'AppRoot',
@@ -8,68 +9,74 @@
 				auth: {
 					email: '',
 					password: '',
-					pending: false
+					pending: 0
 				}
 			}
 		},
-		mixins: [mixins]
+		mixins: [mixins],
+		components: {lilink}
 	}
 </script>
 
 
 <template>
 	<div>
-		<div class="row header" v-show="$route.meta.showHeader">
-			<div class="col-sm-4 hidden-xs">
-				<span v-on:click="$router.push('/')" style="font-size: 4em;cursor: pointer;">
-					<i class="glyphicon glyphicon-picture"></i>
-				</span>
+		<q-drawer ref="drawer_left"> <!-- Left Sidebar -->
+			<div class="list platform-delimiter">
+				<div v-if="currentUser">
+					<lilink to="user-profile-current" icon="account-box">
+						{{currentUser.name}}
+					</lilink>
+					<div v-if="currentUser.role">
+						<lilink to="event-new" icon="new-box">
+							Добавить событие
+						</lilink>
+
+						<lilink to="event-list" icon="format-list-bulleted-type">
+							Мои мероприятия
+						</lilink>
+					</div>
+					<q-progress-button indeterminate class="tertiary full-width" v-bind:percentage="auth.pending" v-on:click.native="LOG_OUT">
+						Выйти
+					</q-progress-button>
+				</div>
+				<div v-if="!currentUser">
+					<lilink to="user-login" icon="login-variant">
+						Вход
+					</lilink>
+					<lilink to="user-register" icon="account-card-details">
+						Регистрация
+					</lilink>
+				</div>
+				<hr />
+				<div>
+					<lilink to="event-list" icon="chevron-right">
+						Как это работает
+					</lilink>
+
+					<lilink to="event-list" icon="chevron-right">
+						О нас
+					</lilink>
+				</div>
 			</div>
-			<div class="col-sm-20 col-xs-24">
-				<div class="visible-xs pull-left">
-					<span v-on:click="$router.push('/')" style="font-size: 2em;cursor: pointer;">
-						<i class="glyphicon glyphicon-picture"></i>
-					</span>
+		</q-drawer>
+
+		<router-view class="layout-view"></router-view>
+
+		<q-drawer ref="drawer_right" right-side><!-- Right Sidebar -->
+			<div class="list platform-delimiter">
+				<div class="list-header">
+					Right Side Drawer
 				</div>
-				<div class="pull-right">
-					<div v-if="currentUser">
-						<a v-if="currentUser.role" v-on:click="GOTO_EVT_NEW" class="btn btn-primary hidden-xs">
-							<i class="glyphicon glyphicon-plus"></i> Добавить событие
-						</a>
-						<button v-on:click="GOTO_PROFILE" class="btn btn-default">
-							<i class="glyphicon glyphicon-user"></i> {{currentUser.name}}
-						</button>
-						<button v-on:click="LOG_OUT" class="btn btn-default">
-							<i v-show="auth.pending" class="spin"></i> 
-							<i v-show="!auth.pending" class="glyphicon glyphicon-log-out"></i> 
-						</button>
-					</div>
-					<div v-if="!currentUser">
-						<form v-on:submit.prevent="LOG_IN">
-							<div class="row">
-								<div class="col-xs-24 text-right">
-									<button class="btn btn-default" v-on:click.prevent="GOTO_LOGIN">
-										Вход
-									</button>
-									<button class="btn btn-default" v-on:click.prevent="GOTO_REGISTER" type="button">
-										Регистрация
-									</button>
-								</div>
-							</div>
-						</form>
-					</div>
-				</div>
-			</div>					
-		</div>
-		<router-view></router-view>
+				<q-drawer-link icon="mail" to="/shopping-cart">Shopping Cart</q-drawer-link>
+				<q-drawer-link icon="mail" to="/weather">Weather</q-drawer-link>
+			</div>
+		</q-drawer>
 	</div>
 </template>
 
 
 
 <style scoped>
-	.header {
-		margin-bottom: 2em;
-	}
 </style>
 

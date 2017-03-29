@@ -6,22 +6,23 @@ blockquote {
 body {
 	overflow: scroll;
 }
-.main-container {
+/*.main-container {
 	font-family: Tahoma;
 	padding-bottom: 8em;
 	padding-top: 1em;
-}
+}*/
 .opa {
 	opacity: .5;
 }
-
 .nwr {
 	white-space: nowrap;
 }
 .pntr {
 	cursor: pointer;
 }
-
+.hdn {
+	display: none;
+}
 .link-dotted{
 	cursor: pointer;
 	border-bottom: 1px dotted;
@@ -29,35 +30,11 @@ body {
 .link-dotted:hover {
 	text-decoration: none;
 }
-
 textarea {
 	resize: none;
 }
-
-.hdn {
-	display: none;
-}
-
-.btn.btn-material {
-	/*position: fixed;
-	bottom: 1em;
-	right: 1em;*/
-	border-radius: 50%;
-	width: 2em;
-	height: 2em;
-	line-height: 1.8em;
-	font-size: 2em;
-	font-weight: bold;
-	padding: 0;
-	
-	z-index: 777;
-}
-.btn.btn-round {
-	border-radius: 11em;
-	height: 2em;
-	width: 2em;
-	line-height: 1.6em;
-	font-size: 2em;
+input:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0px 1000px white inset;
 }
 
 /*
@@ -126,50 +103,7 @@ textarea {
 		text-align: left;
 	}
 
-/*
-========================================================================================
-							Social icons
-=======================================================================================
-*/
 
-@font-face {
-	font-family: 'Socicon';
-	src:  url('/fonts/Socicon.eot?3i0ff0');
-	src:  url('/fonts/Socicon.eot?3i0ff0#iefix') format('embedded-opentype'),
-	url('/fonts/Socicon.woff2?3i0ff0') format('woff2'),
-	url('/fonts/Socicon.ttf?3i0ff0') format('truetype'),
-	url('/fonts/Socicon.woff?3i0ff0') format('woff'),
-	url('/fonts/Socicon.svg?3i0ff0#Socicon') format('svg');
-	font-weight: normal;
-	font-style: normal;
-}
-
-.socicon {
-	font-family: 'Socicon' !important;
-	speak: none;
-	font-style: normal;
-	font-weight: normal;
-	font-variant: normal;
-	text-transform: none;
-	line-height: 1;
-	-webkit-font-smoothing: antialiased;
-	-moz-osx-font-smoothing: grayscale;
-}
-.socicon-vkontakte:before {
-	content: "\e095";
-}
-.socicon-facebook:before {
-	content: "\e028";
-}
-.socicon-youtube:before {
-	content: "\e0a5";
-}
-.socicon-twitter:before {
-	content: "\e08d";
-}
-.socicon-instagram:before {
-	content: "\e044";
-}
 
 /*
 ========================================================================================

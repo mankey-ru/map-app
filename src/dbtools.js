@@ -12,6 +12,7 @@ module.exports =  {
 	connect: function (callback) {
 		mongodb.MongoClient.connect(db_uri, function (err, database) {
 			if (err) {
+				console.log('DBERRRRRRR')
 				console.log(err);
 				process.exit(1);
 			}

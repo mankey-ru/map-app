@@ -86,7 +86,7 @@ function setupApi(app) {
 				return
 			}
 		}
-		console.log(match)
+		//console.log(match)
 		var aRules = [{
 			$match: match
 		}, {

@@ -2,7 +2,6 @@ const moment = require('moment')
 moment.locale('ru');
 
 const apiUrl = require('./api-url.js').def;
-import pager from './vue-components/_pager.vue'
 import request from 'superagent'
 import _ from 'lodash'
 
@@ -35,7 +34,7 @@ export default {
 				username: this.auth.email,
 				password: this.auth.password
 			} : {};
-			this.auth.pending = true;
+			this.auth.pending = 1;
 			var meth = this.auth.method || ''
 			request
 				.post(`${apiUrl}auth/in/${meth}`)
@@ -53,7 +52,7 @@ export default {
 							this.LOG_IN_SUCCESS(user);
 						}
 					}
-					this.auth.pending = false;
+					this.auth.pending = 0;
 				});
 		},
 		LOG_IN_EXT: function (provider) {
@@ -65,7 +64,7 @@ export default {
 		},
 		LOG_IN_SUCCESS: function (user) {
 			//console.log(user)
-			miniToastr.success('Success');
+			//miniToastr.success('Success');
 			this.$store.dispatch('updateUser', user);
 			if (this.$route.name === 'user-login') {
 				this.$router.push('/')
@@ -73,7 +72,7 @@ export default {
 		},
 		LOG_OUT: function () {
 			if (this.auth) {
-				this.auth.pending = true;
+				this.auth.pending = 1;
 			}
 			request
 				.post(apiUrl + 'auth/out')
@@ -90,7 +89,7 @@ export default {
 						//this.$router.push('/')
 					}
 					if (this.auth) {
-						this.auth.pending = false;
+						this.auth.pending = 0;
 					}
 				});
 		},
@@ -111,20 +110,30 @@ export default {
 			}
 			this.$router.push(rt)
 		},
-		GOTO_REGISTER: function () {
-			this.$router.push({
+		GOTO_REGISTER: function (drawer) {
+			this.GOTO__ABSTRACT({
 				name: 'user-register'
-			})
+			}, drawer)
 		},
-		GOTO_EVT_NEW: function () {
-			this.$router.push({
+		GOTO_EVT_NEW: function (drawer) {
+			this.GOTO__ABSTRACT({
 				name: 'event-new'
-			})
+			}, drawer)
 		},
-		GOTO_LOGIN: function () {
-			this.$router.push({
+		GOTO_LOGIN: function (drawer) {
+			this.GOTO__ABSTRACT({
 				name: 'user-login'
-			})
+			}, drawer)
+		},
+		GOTO__ABSTRACT: function(to, drawer){
+			if (drawer && drawer.close) {
+				drawer.setState(false, () => {
+					this.$router.push(to)
+				});
+			}
+			else {
+				this.$router.push(to)
+			}
 		}
 	},
 	filters: {
@@ -145,9 +154,7 @@ export default {
 			return moment(val).format('D MMMM, dddd');
 		}
 	},
-	components: {
-		pager: pager
-	},
+	components: {},
 	computed: {
 		currentUser: function () {
 			return this.$store.state.currentUser
