@@ -13,9 +13,9 @@ export default {
 			mapContainer.className = fsClass;
 			document.body.appendChild(mapContainer)
 		}
-		if (mapContainer.className.indexOf(fsClass) !== -1) {
-			document.body.className += fsClass;
-		}
+		var bFullscreen = mapContainer.className.indexOf(fsClass) !== -1;
+		_toggleClass(document.body, fsClass, bFullscreen);
+
 		GoogleMapsLoader.load((google) => {
 			map = new google.maps.Map(mapContainer, {
 				center: {
@@ -105,4 +105,17 @@ export default {
 
 		// GoogleMapsLoader.onLoad((google) => {});
 	}
+}
+
+function _toggleClass(el, theClass, boo) { // classList.toggle second argument support isnt good so...
+	var hasClass = el.className.indexOf(theClass) !== -1;
+	var conditionToRemove = typeof boo === 'undefined' ? hasClass : hasClass && !boo;
+	var conditionToAdd = typeof boo === 'undefined' ? true : boo;
+	if (conditionToRemove) {
+		el.className = el.className.split(theClass).join('')
+	}
+	else if (conditionToAdd) {
+		el.className += ' ' + theClass;
+	}
+
 }

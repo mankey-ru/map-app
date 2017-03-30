@@ -154,7 +154,14 @@ export default {
 			return moment(val).format('D MMMM, dddd');
 		}
 	},
-	components: {},
+	components: {
+		homebtn: {
+			template: `
+			<button v-on:click="$router.push({name:'mainpage'})" class="orange outline" type="button">
+				<i class="mdi mdi-google-maps"></i> Вернуться на карту
+			</button>`
+		}
+	},
 	computed: {
 		currentUser: function () {
 			return this.$store.state.currentUser

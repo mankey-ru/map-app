@@ -1,16 +1,18 @@
 <template>
 	<div>
 		<div class="row">
-			<form v-on:submit.prevent="register_submit"  class="width-1of3 offset-1of3 group">
+			<form v-on:submit.prevent="register_submit"  class="width-2of4 offset-1of4 lt-bg-width-1of1 lt-bg-offset-0 group">
 				<div>
 					<h2>Регистрация</h2>
 				</div>
 				<div class="row">
 					<div class="width-3of4">
 						<label>
-							<q-checkbox class="orange" v-model="nu.role"></q-checkbox>
+							<!-- <q-checkbox class="orange" v-model="nu.role"></q-checkbox> -->
+							<q-toggle class="orange" v-model="nu.role"></q-toggle>
 							Я музыкант
 						</label>
+
 					</div>
 				</div>
 				<div class="row">
@@ -80,7 +82,7 @@
 					<div class="width-3of4">
 						<div class="row">
 							<div class="width-1of2">
-								<button class="orange outline" onclick="location='#/'">Вернуться</button>
+								<homebtn></homebtn>
 							</div>
 							<div class="width-1of2 text-right">
 								<q-progress-button indeterminate class="orange full-width" v-bind:disabled="form_invalid" v-bind:percentage="nu.submit_pending" type="submit">

@@ -1,7 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 
-import start from './vue-components/start.vue';
 import mainpage from './vue-components/mainpage.vue';
 import eventNew from './vue-components/event-new.vue';
 import eventCard from './vue-components/event-card.vue';
@@ -9,30 +8,10 @@ import eventList from './vue-components/event-list.vue';
 import user_profile from './vue-components/user-profile.vue';
 import user_register from './vue-components/user-register.vue';
 import user_login from './vue-components/user-login.vue';
+import page_how from './vue-components/page-how.vue';
+import page_about from './vue-components/page-about.vue';
 
-const routes = [
-	// Профайлы
-	{
-		name: 'user-profile-current',
-		path: '/user-profile',
-		component: user_profile
-	}, {
-		name: 'user-profile-any',
-		path: '/user-profile/:user_id',
-		component: user_profile
-	}, {
-		name: 'user-register',
-		path: '/register',
-		component: user_register
-	}, {
-		name: 'user-login',
-		path: '/login',
-		component: user_login
-	}, {
-		path: '/start',
-		name: 'start',
-		component: start
-	}, {
+const routes = [{
 		path: '/mainpage',
 		alias: '/',
 		name: 'mainpage',
@@ -58,6 +37,30 @@ const routes = [
 		meta: {
 			showHeader: true
 		}
+	}, {
+		name: 'user-profile-current',
+		path: '/user-profile',
+		component: user_profile
+	}, {
+		name: 'user-profile-any',
+		path: '/user-profile/:user_id',
+		component: user_profile
+	}, {
+		name: 'user-register',
+		path: '/register',
+		component: user_register
+	}, {
+		name: 'user-login',
+		path: '/login',
+		component: user_login
+	}, {
+		path: '/about',
+		name: 'page-about',
+		component: page_about
+	}, {
+		path: '/how-it-works',
+		name: 'page-how',
+		component: page_how
 	},
 	// 404
 	{

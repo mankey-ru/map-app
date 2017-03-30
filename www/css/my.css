@@ -89,8 +89,9 @@ input:-webkit-autofill {
 	.__datepicker-wrap {
 		position:relative
 	}
-	.__datepicker-wrap .form-control[readonly]{ 
-		background-color: #fff;
+	.__datepicker-wrap input[readonly]{ 
+		/*background-color: #fff;*/
+		cursor: pointer;
 	}
 	.__datepicker-wrap-noborder .calendar {
 		border-width: 0;

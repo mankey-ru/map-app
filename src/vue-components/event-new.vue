@@ -20,7 +20,7 @@
 					date: new Date(),
 					genre_id: ''
 				},
-				submit_pending: false
+				submit_pending: 0
 			}
 		},
 		mixins: [mixins],
@@ -28,21 +28,21 @@
 			nevt_submit: function(){
 				var pos = this.mark_cur.getPosition()
 				this.nevt.latLng = [pos.lat(), pos.lng()]
-				this.submit_pending = true;
+				this.submit_pending = 1;
 				request
-					.post(apiUrl + 'events')
-					.send(this.nevt)
-					.end((err, res)=>{
-						if (err || !res.body) {
-							miniToastr.error(res.body.error || 'Ошибка создания события')
-						}
-						else {
-							console.log(res)
-							miniToastr.success('Успех');
-							this.nevt_discard();
-						}
-						this.submit_pending = false;
-					});
+				.post(apiUrl + 'events')
+				.send(this.nevt)
+				.end((err, res)=>{
+					if (err || !res.body) {
+						miniToastr.error(res.body.error || 'Ошибка создания события')
+					}
+					else {
+						console.log(res)
+						miniToastr.success('Успех');
+						this.nevt_discard();
+					}
+					this.submit_pending = 0;
+				});
 			},
 			nevt_discard: function(){
 				this.mark_cur.setMap(null);
@@ -55,41 +55,41 @@
 				return !valid;
 			},
 			genreList: function(){
-				return this.$store.state.genreList;
+				var glist = this.$store.state.genreList || [];
+				return glist.map(function(el){
+					return {
+						label: el.name,
+						value: el._id
+					}
+				});
 			}
 		},
 		components: {
 			Datepicker
 		},
-		mounted: function(){
-			if (!this.currentUser) {
-				console.log('User not authed')
-				this.$router.push('/');
-				return
+		mounted: function () {
+			if (this.currentUser && (this.currentUser.role | 0) < 1) {
+				console.log('User cannot create events')
+				this.$router.push('/user-profile')
 			}
-			else 
-				if ((this.currentUser.role|0)<1) {
-					console.log('User cannot create events')
-					this.$router.push('/user-profile')
-				}
 
-				_vm = this;
+			_vm = this;
 
-				mapLib.create((map, google)=>{
+			mapLib.create((map, google) => {
 
 				placeMarker(map.getCenter()); // initial draggable marker
 
 				// This code is to prevent situation when mobile user 
 				// scrolls page above map and in the end of scroll click event fires
 				var touchmove = false;
-				document.body.addEventListener('touchmove', function(event) {
+				document.body.addEventListener('touchmove', function (event) {
 					touchmove = true;
 				});
-				google.maps.event.addListener(map, 'mousedown', function(evt) {
+				google.maps.event.addListener(map, 'mousedown', function (evt) {
 					touchmove = false;
 				});
-				google.maps.event.addListener(map, 'click', function(evt) {
-					if (touchmove===false) {
+				google.maps.event.addListener(map, 'click', function (evt) {
+					if (touchmove === false) {
 						placeMarker(evt.latLng);
 					}
 				});
@@ -108,76 +108,70 @@
 					_vm.mark_cur = new google.maps.Marker(options);
 				}
 			})
-			}
 		}
-	</script>
+	}
+</script>
 
-	<template>
-		<div class="row">
-			<form v-on:submit.prevent="nevt_submit" class="evt-form">
-				<h2 class="col-xs-24 form-group">{{title}}</h2>
-				<hr />
-				<div class="col-xs-24 col-md-12">
-					<div class="form-group">
-						<label>Место</label>
-						<div v-show="1">
-							<div class="hdn">
-								<div data-pos="TOP_LEFT" class="map-ctrl-wrap">
-									<input id="map-ctrl-search" class="form-control" style="width: 20em" placeholder="Поиск мест" />
-								</div>
+<template>
+	<div class="row">
+		<form v-on:submit.prevent="nevt_submit" class="width-2of4 offset-1of4 lt-bg-width-1of1 lt-bg-offset-0">
+			<h2 class="">{{title}}</h2>
+			<br />
+			<div class="group">
+				<div>
+					<label>Место</label>
+					<div v-show="1">
+						<div class="hdn">
+							<div data-pos="TOP_LEFT" class="map-ctrl-wrap">
+								<input id="map-ctrl-search" style="width: 20em" placeholder="Поиск мест" />
 							</div>
-							<div id="map-container"></div>
 						</div>
+						<div id="map-container"></div>
 					</div>
 				</div>
-				<div class="col-xs-24 col-md-12">
-					<div class="form-group">
-						<label>Название</label>
-						<input v-model="nevt.name" class="form-control" />
+				<div class="floating-label">
+					<input v-model="nevt.name" required class="full-width" />
+					<label>Название</label>
+				</div>
+				<div class="stacked-label __datepicker-wrap">
+					<datepicker 
+					v-bind:input-class="'full-width'" 
+					v-model="nevt.date"
+					v-bind:language="'ru'"
+					v-bind:monday-first="true"
+					v-bind:format="'dd.MM.yyyy'"
+					></datepicker>
+					<label>Дата</label>
+				</div>
+				<div class="floating-label">
+					<textarea v-model="nevt.descr" required class="full-width"></textarea>
+					<label>Описание</label>
+				</div>
+				<div>
+					<q-dialog-select type="radio" required class="full-width"
+					v-model="nevt.genre_id" 
+					v-bind:options="genreList" 
+					ok-label="Выбрать" cancel-label="Отмена" 
+					title="Жанр мероприятия" label="Жанр"></q-dialog-select>
+				</div>
+				<br />
+				<br />
+				<br />
+				<div class="row">
+					<div class="width-1of2">
+						<homebtn></homebtn>
 					</div>
-					<div class="form-group __datepicker-wrap">
-						<label>Дата</label>
-						<div>
-							<datepicker 
-							:input-class="'form-control'" 
-							v-model="nevt.date"
-							:language="'ru'"
-							:monday-first="true"
-							:format="'dd.MM.yyyy'"
-							></datepicker>
-						</div>
-					</div>
-					<div class="form-group">
-						<label>Описание</label>
-						<textarea v-model="nevt.descr" class="form-control"></textarea>
-					</div>
-					<div class="form-group">
-						<label>Жанр</label>
-						<select class="form-control" v-model="nevt.genre_id">
-							<option v-for="gen in genreList" v-bind:value="gen._id">{{gen.name}}</option>
-						</select>
-					</div>
-					<hr />
-					<div class="row">
-						<div class="col-xs-12">
-							<a v-on:click="$router.push({name:'mainpage'})" class="btn btn-default">
-								<i class="glyphicon glyphicon-chevron-left"></i> 
-								Вернуться к карте
-							</a>
-						</div>
-						<div class="col-xs-12 text-right">
-							<button type="submit" v-bind:disabled="nevt_invalid" class="btn btn-success btn-lg">
-								<i v-show="!submit_pending" class="glyphicon glyphicon-ok"></i> 
-								<i v-show="submit_pending" class="spin"></i> 
-								Создать
-							</button>
-						</div>
+					<div class="width-1of2 text-right">
+						<q-progress-button indeterminate class="orange full-width big" v-bind:disabled="nevt_invalid" v-bind:percentage="submit_pending" type="submit">
+							Готово
+						</q-progress-button>
 					</div>
 				</div>
-			</form>
+			</div>
+		</form>
 
-		</div>
-	</template>
+	</div>
+</template>
 
-	<style>
-	</style>
+<style>
+</style>

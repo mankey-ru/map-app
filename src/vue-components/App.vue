@@ -50,16 +50,31 @@
 				</div>
 				<hr />
 				<div>
-					<lilink to="event-list" icon="chevron-right">
+					<lilink to="page-how" icon="chevron-right">
 						Как это работает
 					</lilink>
 
-					<lilink to="event-list" icon="chevron-right">
+					<lilink to="page-about" icon="chevron-right">
 						О нас
 					</lilink>
 				</div>
 			</div>
 		</q-drawer>
+
+		<div slot="header" class="toolbar orange" v-show="$route.name!=='mainpage'">
+			<button class="11hide-on-drawer-visible" v-on:click="$refs.drawer_left.open()">
+				<i class="mdi mdi-menu"></i>
+			</button>
+			<q-toolbar-title :padding="2">
+				Джигурда!
+			</q-toolbar-title>
+			<button v-on:click="$router.push({name:'mainpage'})">
+				<i class="mdi mdi-google-maps"></i>
+			</button>
+			<button v-show="currentUser" v-on:click="$router.push({name:'user-profile-current'})">
+				<i class="mdi mdi-account-box"></i>
+			</button>
+		</div>
 
 		<router-view class="layout-view"></router-view>
 
@@ -77,6 +92,46 @@
 
 
 
-<style scoped>
+<style lang="less">
+/*
+Global styles
+стили в my.css нужны для мгновенного выполнения
+те что нет - перенести сюда
+*/
+.mar-v {
+	margin-top: 1em;
+	margin-bottom: 1em;
+}
+.mar-h {
+	margin-left: 1em;
+	margin-right: 1em;
+}
+.pad-v {
+	padding-top: 1em;
+	padding-bottom: 1em;
+}
+.pad-h {
+	padding-left: 1em;
+	padding-right: 1em;
+}
+.mar-v-group>* {
+	.mar-v();
+}
+.mar-h-group>* {
+	.mar-h();
+}
+.pad-v-group>* {
+	.pad-v();
+}
+.pad-h-group>* {
+	.pad-h();
+}
+.hamburger-icon {
+	line-height: 3em;
+	margin-left: 1em;
+	margin-top: 1em;
+	padding-left: .6rem; // override
+	padding-right: .6rem; // override
+}
 </style>
 

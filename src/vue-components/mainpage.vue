@@ -35,8 +35,9 @@
 					this.genres_checkAll(1);
 				}
 			},
-			genres_check: function(gen){
-				gen.selected = !gen.selected;			
+			genres_check: function(gen, boo){
+				var newState = typeof boo === 'undefined' ? !gen.selected : boo;
+				gen.selected = newState;			
 				var selected_ids = this.$data.genres
 				.filter(function(_gen){
 					return _gen.selected===true
@@ -45,6 +46,7 @@
 					return _gen._id
 				})
 				var hiddenQty = 0;
+				// TODO debounce or pass closure to $nextTick
 				for (var i=0, len=this.$data.evtList.length; i<len; i++) {
 					var evt = this.$data.evtList[i];
 					var evtMatch = selected_ids.indexOf(evt.genre_id) !== -1;
@@ -59,7 +61,7 @@
 			genres_checkAll: function (boo) {
 				boo = !!boo;
 				for (let gen of this.genres) {
-					gen.selected = !!boo;
+					this.genres_check(gen, boo)
 				}
 			},
 			evtSearch: function () {
@@ -169,54 +171,73 @@
 					</div>
 				</div>
 			</q-modal>
-			<q-modal ref="modal_genres" position="bottom">
-				<div class="generic-margin">
-					<div class="row generic-margin">
-						<div class="width-3of4">
-							<button v-on:click="genres_checkAll(1)" class="light">
-								Всё
-							</button> 
-							&#160;
-							<button v-on:click="genres_checkAll(0)" class="light">
-								Ничего
-							</button>
-						</div>
-						<div class="width-1of4 text-right">
-							<button v-on:click="$refs.modal_genres.close()" class="clear">
-								Отмена
-							</button>
+			<q-modal ref="modal_genres" position="bottom" v-bind:content-css="{minWidth: '70vw', minHeight: '40vh'}">
+				<q-layout>
+					<div slot="header" class="toolbar orange">
+						<q-toolbar-title :padding="1">
+							Выберите жанры
+						</q-toolbar-title>
+					</div>
+					<div slot="footer" class="toolbar orange">
+						<div class="row full-width">
+							<div class="width-3of4">
+								<button v-on:click="genres_checkAll(1)" class="orange">
+									<i class="mdi mdi-checkbox-multiple-marked-outline"></i> 
+									Всё
+								</button> 
+								&#160;
+								<button v-on:click="genres_checkAll(0)" class="orange">
+									<i class="mdi mdi-checkbox-multiple-blank-outline"></i>
+									Ничего
+								</button>
+							</div>
+							<div class="width-1of4 text-right">
+								<button v-on:click="$refs.modal_genres.close()" class="orange">
+									Закрыть
+								</button>
+							</div>
 						</div>
 					</div>
-					<div class="group">
-						<span v-for="gen in genres" class="chip label cursor-pointer" v-bind:class="gen.selected?'bg-orange':'bg-grey-4'" v-on:click="genres_check(gen)">
-							{{gen.name}}
-						</span>
+					<div class="layout-view">
+						<div class="layout-padding">
+							<div class="group">
+								<span v-for="gen in genres" class="chip label cursor-pointer" v-bind:class="gen.selected?'bg-orange':'bg-grey-4'" v-on:click="genres_check(gen)">
+									{{gen.name}}
+								</span>
+							</div>
+						</div>
 					</div>
-				</div>
+				</q-layout>
 			</q-modal>
-			<div v-show="map_pending" class="text-center">
-				<i class="spin spin-lg spin-global"></i>
-			</div>
+
+			<h1 v-show="map_pending" class="text-center">
+				Загрузка...
+			</h1>
 
 			<div v-show="!map_pending">
 				<div v-if="currentUser && currentUser.role" >
 					<div class="newEvtWrap absolute-bottom-right">
-						<button class="gt-sm glossy orange round big" v-on:click="GOTO_EVT_NEW">
-							Создать мероприятие
+						<button class="gt-md push orange round big" v-on:click="GOTO_EVT_NEW">
+							Создать мероприятие 
 						</button>
-						<button class="lt-md glossy orange circular big" v-on:click="GOTO_EVT_NEW">
-							<i>add</i>
+						<button class="lt-bg push orange circular big" v-on:click="GOTO_EVT_NEW">
+							<i class="mdi mdi-plus"></i>
 						</button>
 					</div>
 				</div>
 				<div class="hdn">
 					<!-- positions explained: https://google-developers.appspot.com/maps/documentation/javascript/examples/full/control-positioning-labels -->
-					<div data-pos="TOP" class="j-mapctrl" style="width: 100%; ">
+					<div data-pos="TOP" class="j-mapctrl map-ctrl-top">
 						<div class="map-ctrl-wrap">
 							<div class="row">
+								<!-- 
+									LEFT
+								-->
 								<div class="width-2of3">
 									<div class="map-pane-main row inline"><!-- hide-on-drawer-visible -->
+
 										<i v-on:click="$parent.$refs.drawer_left.open()" class="mdi mdi-menu"></i>
+
 										<form class="inline" v-on:submit.prevent="evtSearch">
 											<span class="gt-sm">
 												<input v-model="search.text" placeholder="Поиск" />
@@ -225,7 +246,7 @@
 											</span>
 										</form>
 									</div>
-									<div class="hidden-xs hidden-sm">
+									<div class="sm-hide">
 										<div class="map-pane__date">
 											<div class="cursor-pointer" v-on:click="$refs.modal_date.open()">
 												<span>{{search.date | dateFormatPretty}}</span> 
@@ -233,32 +254,32 @@
 											</div>
 										</div>
 									</div>
-									
 								</div>
+								<!-- 
+									RIGHT
+								-->
 								<div class="width-1of3">
 									<div class="text-right">
 										<!-- Mobile -->
-										<div class="lt-md">
-											<div>
-												<button class="primary push">
-													<i class="mdi mdi-calendar"></i>
-												</button>
-											</div>
-											<br/>
-											<div>
-												<button class="primary outline" v-on:click="evtSearch">
-													<i class="mdi mdi-file-find"></i>
-												</button>
-											</div>
+										<div class="lt-md group">
+											<button class="orange push bg-white text-black big">
+												<i class="mdi mdi-calendar"></i>
+											</button>
+											<br />
+											<button class="orange push bg-white text-black big" v-on:click="evtSearch">
+												<i class="mdi mdi-file-find"></i>
+											</button>
 										</div>
 										<!-- Desktop -->
 										<div class="gt-sm text-right">
-											<i v-if="currentUser"  v-on:click.prevent="GOTO_PROFILE" class="glyphicon glyphicon-user map-profile-icon"></i>
+											<div v-if="currentUser">
+												<i v-on:click.prevent="GOTO_PROFILE" class="mdi mdi-account-box map-profile-icon"></i>
+											</div>
 											<div v-if="!currentUser">
-												<button class="primary push bg-white text-black big" v-on:click="GOTO_LOGIN">
+												<button class="orange push bg-white text-black big" v-on:click="GOTO_LOGIN">
 													Вход
 												</button> &#160;
-												<button class="primary push bg-white text-black big" v-on:click="GOTO_REGISTER">
+												<button class="orange push bg-white text-black big" v-on:click="GOTO_REGISTER">
 													Регистрация
 												</button>
 											</div>
@@ -268,26 +289,26 @@
 							</div>
 						</div>
 					</div>
-					<div data-pos="LEFT_BOTTOM" class="j-mapctrl genre-wrap">
+					<div data-pos="LEFT_BOTTOM" class="j-mapctrl map-ctrl-bottom">
 						<div class="text-center">
-							<span v-show="evtHiddenQty!==0">
-								Скрыто {{evtHiddenQty}} из {{evtList.length}}. 
-								<a class="link-dotted" v-on:click="showAll">Показать все</a>
-							</span>
+							<div>
+								<span v-show="evtHiddenQty!==0">
+									Скрыто {{evtHiddenQty}} из {{evtList.length}}. 
+									<a class="link-dotted" v-on:click="showAll">Показать все</a>
+								</span>
+							</div>
 							<button class="orange push" v-on:click="$refs.modal_genres.open()">
 								Фильтр по жанрам
 							</button>
 						</div>
 					</div>
-				<!-- <div data-pos="RIGHT_BOTTOM" class="j-mapctrl map-ctrl-wrap">
-					<input id="map-ctrl-search" class="form-control" style="width: 20em" placeholder="Поиск мест" />
-				</div> -->
+					<!-- <div data-pos="RIGHT_BOTTOM" class="j-mapctrl map-ctrl-wrap"><input id="map-ctrl-search" class="form-control" style="width: 20em" placeholder="Поиск мест" /> </div> -->
+				</div>
 			</div>
+			<div id="map-container" class="__fullscreen"></div>
 		</div>
-		<div id="map-container" class="__fullscreen"></div>
-	</div>
 
-</div>
+	</div>
 </template>
 
 <style scoped lang="less">
@@ -302,6 +323,8 @@
 		font-size: 1.4em;
 	}
 	.map-profile-icon {
+		font-size: 6em;
+		cursor: pointer;
 	}
 	.map-pane__wrap {
 		float:left;
@@ -327,7 +350,13 @@
 			width:15em;
 		}
 	}
-	.genre-wrap { // лапоть внизу
+	.mdi {
+		cursor: pointer;
+	}
+	.map-ctrl-top {
+		width: 100%;		
+	}
+	.map-ctrl-bottom {
 		width: 100%;
 		padding-left: 2em;
 		padding-right: 2em;

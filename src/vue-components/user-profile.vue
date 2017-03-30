@@ -1,49 +1,63 @@
 <template>
-	<div>
-		<form v-on:submit.prevent="userEdit">
+	<div class="row">
+		<form v-on:submit.prevent="userEdit" class="width-2of4 offset-1of4 lt-bg-width-1of1 lt-bg-offset-0">
 			<div v-show="!user" class="text-center">
-				<i class="spin spin-lg"></i>
+				Загрузка...
 			</div>
 			<div v-show="user">
-				<div class="col-md-5 col-xs-24 text-right">
-					<img v-bind:src="user.pic" class="f-userpic" />
+				<div class="row">
+					<div class="width-1">
+						<h3>{{user.name}}</h3>
+					</div>
 				</div>
-				<div class="col-md-19 col-xs-24">
-					<h2 v-if="!own">{{user.name}}</h2>
-					<div v-if="own" class="form-group">
-						<label>Имя</label>
-						<input v-model="user.name" v-bind:readonly="!own" class="form-control" />
+				<div class="row">
+					<div class="width-1of3 text-right">
+						<img v-bind:src="user.pic" class="user-pic" />
 					</div>
-					<div class="form-group">
+					<div class="width-2of3 mar-v-group">
+						<h2 v-if="!own">{{user.name}}</h2>
+						<div v-if="own" class="floating-label">
+							<input v-model="user.name" v-bind:readonly="!own" class="full-width" required />
+							<label>Имя</label>
+						</div>
+						<div>
+							<label>
+								<q-toggle class="orange" v-model="currentUserIsMusician"></q-toggle>
+								Музыкант
+							</label>
+						</div>
+						<div class="__datepicker-wrap">
+							<label>Дата рождения</label>
+							<div v-if="own">
+								<datepicker 
+								:input-class="'full-width'" 
+								v-model="user.bdate"
+								:language="'ru'"
+								:monday-first="true"
+								:format="'dd.MM.yyyy'"
+								></datepicker>
+							</div>
+							<div v-if="!own">
+								{{user.bdate}}
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="mar-v-group"> 
+					<div class="floating-label">
+						<textarea v-model="user.descr" v-bind:readonly="!own" class="full-width user-textarea" required></textarea>
 						<label>О себе</label>
-						<textarea v-model="user.descr" v-bind:readonly="!own" class="form-control"></textarea>
 					</div>
-					<div class="form-group">
-						<label>Музыкант</label>
-						<br />
-						<input type="checkbox" v-bind:readonly="!own" v-model="user.role" style="width: 1.5em; height: 1.5em;vertical-align: middle;">
-					</div>
-					<div class="form-group __datepicker-wrap">
-						<label>Дата рождения</label>
-						<div v-if="own">
-							<datepicker 
-							:input-class="'form-control'" 
-							v-model="user.bdate"
-							:language="'ru'"
-							:monday-first="true"
-							:format="'dd.MM.yyyy'"
-							></datepicker>
+
+					<div class="row">
+						<div class="width-1of2">
+							<homebtn></homebtn>
 						</div>
-						<div v-if="!own">
-							{{user.bdate}}
+						<div class="width-1of2 text-right">
+							<q-progress-button indeterminate class="orange big" v-bind:percentage="submit_pending" type="submit">
+								Сохранить
+							</q-progress-button>
 						</div>
-					</div>
-					<div class="text-right">
-						<button type="submit" v-bind:disabled="submit_pending" class="btn btn-primary">
-							<i v-show="submit_pending" class="spin"></i>
-							<i v-show="!submit_pending" class="glyphicon glyphicon-ok"></i>
-							Сохранить
-						</button>
 					</div>
 				</div>
 			</div>
@@ -65,7 +79,7 @@
 			return {
 				user: false,
 				own: false,
-				submit_pending: false
+				submit_pending: 0
 			}
 		},
 		mixins: [mixins],
@@ -74,17 +88,16 @@
 				var user_id = this.$router.currentRoute.params.user_id;
 				if (user_id) {
 					request
-						.get(apiUrl + 'user/' + user_id) 
-						.end((err, res)=>{
-								if (err || !res.body) {
-									miniToastr.error(res.body.error || 'User fetch failed')
-								}
-								else {
-									this.user = data;
-									this.own = this.currentUser._id === data._id;
-								}
-								this.submit_pending = false;
-							})
+					.get(apiUrl + 'user/' + user_id) 
+					.end((err, res)=>{
+						if (err || !res.body) {
+							miniToastr.error(res.body.error || 'User fetch failed')
+						}
+						else {
+							this.user = data;
+							this.own = this.currentUser._id === data._id;
+						}
+					})
 				}
 				else {
 					this.$nextTick(()=>{
@@ -99,30 +112,40 @@
 							this.$router.push('/')
 						}
 					})
-						
+
 					
 				}
 			},
 			userEdit: function(){
-				this.submit_pending = true;
+				this.submit_pending = 1;
 				request
-					.post(apiUrl + 'auth/edit')
-					.send(this.user)
-					.end((err, res)=>{
-							if (err || !res.body ||  !res.body.ok) {
-								console.log(res.body)
-								miniToastr.error(res.body.error || 'User edit failed');
-							}
-							else {
-								miniToastr.success('Успех');
-								this.$store.dispatch('updateUser', this.user);
-							}
-							this.submit_pending = false;
-						});
+				.post(apiUrl + 'auth/edit')
+				.send(this.user)
+				.end((err, res)=>{
+					if (err || !res.body ||  !res.body.ok) {
+						console.log(res.body)
+						miniToastr.error(res.body.error || 'User edit failed');
+					}
+					else {
+						miniToastr.success('Успех');
+						this.$store.dispatch('updateUser', this.user);
+					}
+					this.submit_pending = 0;
+				});
 			}
 		},
 		mounted: function(){
 			this.getUser();
+		},
+		computed: {
+			currentUserIsMusician: { // for q-toggle which accepts boolean only
+				get: function(){
+					return !!this.user.role
+				},
+				set: function(val){
+					this.user.role = (val | 0);  
+				}
+			}
 		},
 		components: {
 			Datepicker
@@ -138,9 +161,13 @@
 </script>
 
 <style scoped>
-	.f-userpic {
+	.user-pic {
 		max-width:200px;
 		border-radius: .5em;
-
+		margin-right: 1em;
+	}
+	.user-textarea {
+		height: 7em;
+		resize: none;
 	}
 </style>
