@@ -94,11 +94,11 @@
 
 
 
-<style lang="less">
+<style lang="less">/* Global (not scoped) styles */
 /*
-Global styles
-стили в my.css нужны для мгновенного выполнения
-те что нет - перенести сюда
+========================================================================================
+								Basic helper classes
+========================================================================================
 */
 .mar-v {
 	margin-top: 1em;
@@ -128,12 +128,98 @@ Global styles
 .pad-h-group>* {
 	.pad-h();
 }
-.hamburger-icon {
-	line-height: 3em;
-	margin-left: 1em;
-	margin-top: 1em;
-	padding-left: .6rem; // override
-	padding-right: .6rem; // override
+/* --------------------------------------------------------------------- */
+.opa {
+	opacity: .5;
+}
+.nwr {
+	white-space: nowrap;
+}
+.pntr {
+	cursor: pointer;
+}
+.hdn {
+	display: none;
+}
+.link-dotted{
+	cursor: pointer;
+	border-bottom: 1px dotted;
+}
+.link-dotted:hover {
+	text-decoration: none;
+}
+/* --------------------------------------------------------------------- */
+textarea {
+	resize: none;
+}
+input:-webkit-autofill {
+	-webkit-box-shadow: 0 0 0px 1000px white inset;
+}
+blockquote {
+	border-left: 3px solid #bbb;
+	margin-left: .5em;
+	padding: .5em;
+}
+body {
+	overflow-y: scroll;
+	overflow-x: hidden;
+}
+.main-container {}
+
+/*
+========================================================================================
+								Map related common styles
+========================================================================================
+*/
+#map-container {
+	background-color: #eee;
+	border-radius: 3px;
+	min-height: 400px;
+}
+
+.__fullscreen {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	top: 0;
+	left: 0;
+	bottom:0;
+	right: 0;
+	overflow: hidden;
+}
+
+.map-ctrl-wrap {
+	padding: 1em;
+}
+
+/*
+========================================================================================
+						ext styles for vuejs-datepicker
+========================================================================================
+*/
+.__datepicker-clear {
+	position: absolute;
+	top: .5em;
+	right: .7em;
+	color: #666;
+	cursor: pointer;
+}
+.__datepicker-wrap {
+	position:relative
+}
+.__datepicker-wrap input[readonly]{ 
+	/*background-color: #fff;*/
+	cursor: pointer;
+}
+.__datepicker-wrap-noborder .calendar {
+	border-width: 0;
+}
+.__datepicker-wrap-center {
+	text-align: center;
+}
+.__datepicker-wrap-center .datepicker {
+	display: inline-block;
+	text-align: left;
 }
 </style>
 
