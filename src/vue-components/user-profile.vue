@@ -51,7 +51,7 @@
 							<homebtn></homebtn>
 						</div>
 						<div class="width-1of2 text-right">
-							<q-progress-button indeterminate class="orange big" v-bind:percentage="submit_pending" type="submit">
+							<q-progress-button v-if="own" indeterminate class="orange big" v-bind:percentage="submit_pending" type="submit">
 								Сохранить
 							</q-progress-button>
 						</div>

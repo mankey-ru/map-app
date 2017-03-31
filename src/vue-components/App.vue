@@ -7,8 +7,6 @@
 		data: function () {
 			return {
 				auth: {
-					email: '',
-					password: '',
 					pending: 0
 				}
 			}
@@ -81,7 +79,8 @@
 
 		<router-view class="layout-view"></router-view>
 
-		<q-ajax-bar position="bottom" color="orange" v-bind:speed="200" size="10px"></q-ajax-bar> <!-- Bottom progressbar -->
+		<q-ajax-bar position="bottom" color="orange" v-bind:speed="200" size="15px"></q-ajax-bar> 
+		<!-- Bottom progressbar -->
 
 		<!-- <q-drawer ref="drawer_right" right-side>
 			<div class="list platform-delimiter">

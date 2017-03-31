@@ -15,7 +15,10 @@ const routes = [{
 		path: '/mainpage',
 		alias: '/',
 		name: 'mainpage',
-		component: mainpage
+		component: mainpage,
+		meta: {
+			fullscreen: true
+		}
 	}, {
 		path: '/event/new',
 		name: 'event-new',
@@ -26,17 +29,11 @@ const routes = [{
 	}, {
 		path: '/event/card/:event_id',
 		name: 'event-card',
-		component: eventCard,
-		meta: {
-			showHeader: true
-		}
+		component: eventCard
 	}, {
 		path: '/event/list/',
 		name: 'event-list',
-		component: eventList,
-		meta: {
-			showHeader: true
-		}
+		component: eventList
 	}, {
 		name: 'user-profile-current',
 		path: '/user-profile',
@@ -81,6 +78,9 @@ var router = new VueRouter({
 
 // https://router.vuejs.org/en/advanced/navigation-guards.html
 router.beforeEach((to, from, next) => {
+	if (to.meta.fullscreen !== from.meta.fullscreen) {
+		_toggleClass(document.body, '__fullscreen', to.meta.fullscreen);
+	}
 	var store = this.a.app.$store;
 	if (store && !store.getters.currentUser && to.meta.needAuth === true) {
 		console.warn('vue-router.js: this page needs auth')
@@ -93,3 +93,17 @@ router.beforeEach((to, from, next) => {
 	}
 })
 export default router;
+
+
+
+function _toggleClass(el, theClass, boo) { // classList.toggle second argument support isnt good so...
+	var hasClass = el.className.indexOf(theClass) !== -1;
+	var conditionToRemove = typeof boo === 'undefined' ? hasClass : hasClass && !boo;
+	var conditionToAdd = typeof boo === 'undefined' ? !hasClass : !hasClass && boo;
+	if (conditionToRemove) {
+		el.className = el.className.split(theClass).join('')
+	}
+	else if (conditionToAdd) {
+		el.className += ' ' + theClass;
+	}
+}
