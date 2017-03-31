@@ -21,7 +21,10 @@
 
 <template>
 	<div>
-		<q-drawer ref="drawer_left" v-bind:backdrop-opacity="0"> <!-- Left Sidebar -->
+		<q-drawer ref="drawer_left" v-bind:backdrop-opacity=".2"> <!-- Left Sidebar -->
+			<h4 class="text-center mar-v">
+				<i class="mdi mdi-google-maps cursor-pointer" v-on:click="GOTO_MAIN($refs.drawer_left)"></i>
+			</h4>
 			<div class="list platform-delimiter">
 				<div v-if="currentUser">
 					<lilink to="user-profile-current" icon="account-box">
@@ -80,7 +83,7 @@
 
 		<q-ajax-bar position="bottom" color="orange" v-bind:speed="200" size="10px"></q-ajax-bar> <!-- Bottom progressbar -->
 
-		<q-drawer ref="drawer_right" right-side><!-- Right Sidebar -->
+		<!-- <q-drawer ref="drawer_right" right-side>
 			<div class="list platform-delimiter">
 				<div class="list-header">
 					Right Side Drawer
@@ -88,138 +91,142 @@
 				<q-drawer-link icon="mail" to="/shopping-cart">Shopping Cart</q-drawer-link>
 				<q-drawer-link icon="mail" to="/weather">Weather</q-drawer-link>
 			</div>
-		</q-drawer>
+		</q-drawer> -->
 	</div>
 </template>
 
 
 
 <style lang="less">/* Global (not scoped) styles */
-/*
-========================================================================================
-								Basic helper classes
-========================================================================================
-*/
-.mar-v {
-	margin-top: 1em;
-	margin-bottom: 1em;
-}
-.mar-h {
-	margin-left: 1em;
-	margin-right: 1em;
-}
-.pad-v {
-	padding-top: 1em;
-	padding-bottom: 1em;
-}
-.pad-h {
-	padding-left: 1em;
-	padding-right: 1em;
-}
-.mar-v-group>* {
-	.mar-v();
-}
-.mar-h-group>* {
-	.mar-h();
-}
-.pad-v-group>* {
-	.pad-v();
-}
-.pad-h-group>* {
-	.pad-h();
-}
-/* --------------------------------------------------------------------- */
-.opa {
-	opacity: .5;
-}
-.nwr {
-	white-space: nowrap;
-}
-.pntr {
-	cursor: pointer;
-}
-.hdn {
-	display: none;
-}
-.link-dotted{
-	cursor: pointer;
-	border-bottom: 1px dotted;
-}
-.link-dotted:hover {
-	text-decoration: none;
-}
-/* --------------------------------------------------------------------- */
-textarea {
-	resize: none;
-}
-input:-webkit-autofill {
-	-webkit-box-shadow: 0 0 0px 1000px white inset;
-}
-blockquote {
-	border-left: 3px solid #bbb;
-	margin-left: .5em;
-	padding: .5em;
-}
-body {
-	overflow-y: scroll;
-	overflow-x: hidden;
-}
-.main-container {}
+	.drawer-content.left-side {
+		/*box-shadow: 6px 0 19px 3px #888;*/
+	}
 
-/*
-========================================================================================
-								Map related common styles
-========================================================================================
-*/
-#map-container {
-	background-color: #eee;
-	border-radius: 3px;
-	min-height: 400px;
-}
+	/*
+	========================================================================================
+									Basic helper classes
+	========================================================================================
+	*/
 
-.__fullscreen {
-	position: absolute;
-	width: 100%;
-	height: 100%;
-	top: 0;
-	left: 0;
-	bottom:0;
-	right: 0;
-	overflow: hidden;
-}
+	.mar-v {
+		margin-top: 1em;
+		margin-bottom: 1em;
+	}
+	.mar-h {
+		margin-left: 1em;
+		margin-right: 1em;
+	}
+	.pad-v {
+		padding-top: 1em;
+		padding-bottom: 1em;
+	}
+	.pad-h {
+		padding-left: 1em;
+		padding-right: 1em;
+	}
+	.mar-v-group>* {
+		.mar-v();
+	}
+	.mar-h-group>* {
+		.mar-h();
+	}
+	.pad-v-group>* {
+		.pad-v();
+	}
+	.pad-h-group>* {
+		.pad-h();
+	}
+	/* --------------------------------------------------------------------- */
+	.opa {
+		opacity: .5;
+	}
+	.nwr {
+		white-space: nowrap;
+	}
+	.pntr {
+		cursor: pointer;
+	}
+	.hdn {
+		display: none;
+	}
+	.link-dotted{
+		cursor: pointer;
+		border-bottom: 1px dotted;
+	}
+	.link-dotted:hover {
+		text-decoration: none;
+	}
+	/* --------------------------------------------------------------------- */
+	textarea {
+		resize: none;
+	}
+	input:-webkit-autofill {
+		-webkit-box-shadow: 0 0 0px 1000px white inset;
+	}
+	blockquote {
+		border-left: 3px solid #bbb;
+		margin-left: .5em;
+		padding: .5em;
+	}
+	body {
+		overflow-y: scroll;
+		overflow-x: hidden;
+	}
+	.main-container {}
 
-.map-ctrl-wrap {
-	padding: 1em;
-}
+	/*
+	========================================================================================
+									Map related common styles
+	========================================================================================
+	*/
+	#map-container {
+		background-color: #eee;
+		border-radius: 3px;
+		min-height: 400px;
+	}
 
-/*
-========================================================================================
-						ext styles for vuejs-datepicker
-========================================================================================
-*/
-.__datepicker-clear {
-	position: absolute;
-	top: .5em;
-	right: .7em;
-	color: #666;
-	cursor: pointer;
-}
-.__datepicker-wrap {
-	position:relative
-}
-.__datepicker-wrap input[readonly]{ 
-	/*background-color: #fff;*/
-	cursor: pointer;
-}
-.__datepicker-wrap-noborder .calendar {
-	border-width: 0;
-}
-.__datepicker-wrap-center {
-	text-align: center;
-}
-.__datepicker-wrap-center .datepicker {
-	display: inline-block;
-	text-align: left;
-}
+	.__fullscreen {
+		position: absolute;
+		width: 100%;
+		height: 100%;
+		top: 0;
+		left: 0;
+		bottom:0;
+		right: 0;
+		overflow: hidden;
+	}
+
+	.map-ctrl-wrap {
+		padding: 1em;
+	}
+
+	/*
+	========================================================================================
+							ext styles for vuejs-datepicker
+	========================================================================================
+	*/
+	.__datepicker-clear {
+		position: absolute;
+		top: .5em;
+		right: .7em;
+		color: #666;
+		cursor: pointer;
+	}
+	.__datepicker-wrap {
+		position:relative
+	}
+	.__datepicker-wrap input[readonly]{ 
+		/*background-color: #fff;*/
+		cursor: pointer;
+	}
+	.__datepicker-wrap-noborder .calendar {
+		border-width: 0;
+	}
+	.__datepicker-wrap-center {
+		text-align: center;
+	}
+	.__datepicker-wrap-center .datepicker {
+		display: inline-block;
+		text-align: left;
+	}
 </style>
-

@@ -14,7 +14,7 @@ export default {
 			document.body.appendChild(mapContainer)
 		}
 		var bFullscreen = mapContainer.className.indexOf(fsClass) !== -1;
-		_toggleClass(document.body, fsClass, bFullscreen);
+		//_toggleClass(document.body, fsClass, bFullscreen);
 
 		GoogleMapsLoader.load((google) => {
 			map = new google.maps.Map(mapContainer, {
@@ -110,12 +110,11 @@ export default {
 function _toggleClass(el, theClass, boo) { // classList.toggle second argument support isnt good so...
 	var hasClass = el.className.indexOf(theClass) !== -1;
 	var conditionToRemove = typeof boo === 'undefined' ? hasClass : hasClass && !boo;
-	var conditionToAdd = typeof boo === 'undefined' ? true : boo;
+	var conditionToAdd = typeof boo === 'undefined' ? !hasClass : !hasClass && boo;
 	if (conditionToRemove) {
 		el.className = el.className.split(theClass).join('')
 	}
 	else if (conditionToAdd) {
 		el.className += ' ' + theClass;
 	}
-
 }

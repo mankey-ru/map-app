@@ -110,6 +110,11 @@ export default {
 			}
 			this.$router.push(rt)
 		},
+		GOTO_MAIN: function (drawer) {
+			this.GOTO__ABSTRACT({
+				name: 'mainpage'
+			}, drawer)
+		},
 		GOTO_REGISTER: function (drawer) {
 			this.GOTO__ABSTRACT({
 				name: 'user-register'
@@ -126,7 +131,7 @@ export default {
 			}, drawer)
 		},
 		GOTO__ABSTRACT: function(to, drawer){
-			if (drawer && drawer.close) {
+			if (drawer && drawer.setState) {
 				drawer.setState(false, () => {
 					this.$router.push(to)
 				});
