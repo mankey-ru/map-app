@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<div class="row">
-			<form v-on:submit.prevent="register_submit"  class="width-2of4 offset-1of4 lt-bg-width-1of1 lt-bg-offset-0 group">
+			<form v-on:submit.prevent="register_submit"  class="width-2of4 offset-1of4 lt-bg-width-1of1 lt-bg-offset-0 pad-h mar-v-group">
 				<div>
 					<h2>Регистрация</h2>
 				</div>

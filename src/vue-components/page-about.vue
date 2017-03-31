@@ -14,7 +14,7 @@
 
 <template>
 	<div class="row">
-		<div class="width-1of3 offset-1of3">
+		<div class="width-1of3 offset-1of3 lt-bg-width-1of1 lt-bg-offset-0 pad-h">
 			<h1>About us</h1>
 			<p>
 				Sed tempor, neque eget gravida placerat, odio sapien dapibus nibh, non consequat mauris urna nec libero. Aliquam erat volutpat. Ut consequat turpis dolor, in molestie lacus aliquam sit amet. Quisque scelerisque, neque a posuere fermentum, ligula lectus ornare eros, sit amet bibendum ligula tortor sed lectus. 

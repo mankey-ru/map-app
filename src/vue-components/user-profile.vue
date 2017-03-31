@@ -1,9 +1,6 @@
 <template>
 	<div class="row">
-		<form v-on:submit.prevent="userEdit" class="width-2of4 offset-1of4 lt-bg-width-1of1 lt-bg-offset-0">
-			<div v-show="!user" class="text-center">
-				Загрузка...
-			</div>
+		<form v-on:submit.prevent="userEdit" class="width-2of4 offset-1of4 lt-bg-width-1of1 lt-bg-offset-0 pad-h">
 			<div v-show="user">
 				<div class="row">
 					<div class="width-1">
@@ -15,19 +12,18 @@
 						<img v-bind:src="user.pic" class="user-pic" />
 					</div>
 					<div class="width-2of3 mar-v-group">
-						<h2 v-if="!own">{{user.name}}</h2>
 						<div v-if="own" class="floating-label">
 							<input v-model="user.name" v-bind:readonly="!own" class="full-width" required />
 							<label>Имя</label>
 						</div>
 						<div>
 							<label>
-								<q-toggle class="orange" v-model="currentUserIsMusician"></q-toggle>
+								<q-toggle v-bind:disable="!own" class="orange" v-model="currentUserIsMusician"></q-toggle>
 								Музыкант
 							</label>
 						</div>
 						<div class="__datepicker-wrap">
-							<label>Дата рождения</label>
+							<label>День рождения</label>
 							<div v-if="own">
 								<datepicker 
 								:input-class="'full-width'" 
@@ -37,17 +33,18 @@
 								:format="'dd.MM.yyyy'"
 								></datepicker>
 							</div>
-							<div v-if="!own">
-								{{user.bdate}}
-							</div>
+							<span v-if="!own">
+								{{user.bdate | df_pretty_dm}}
+							</span>
 						</div>
 					</div>
 				</div>
 				<div class="mar-v-group"> 
-					<div class="floating-label">
-						<textarea v-model="user.descr" v-bind:readonly="!own" class="full-width user-textarea" required></textarea>
+					<div class="floating-label" v-if="own">
+						<textarea v-if="own" v-model="user.descr" v-bind:readonly="!own" class="full-width user-textarea" required></textarea>
 						<label>О себе</label>
 					</div>
+					<p v-if="!own">{{user.descr}}</p>
 
 					<div class="row">
 						<div class="width-1of2">
@@ -88,16 +85,16 @@
 				var user_id = this.$router.currentRoute.params.user_id;
 				if (user_id) {
 					request
-					.get(apiUrl + 'user/' + user_id) 
-					.end((err, res)=>{
-						if (err || !res.body) {
-							miniToastr.error(res.body.error || 'User fetch failed')
-						}
-						else {
-							this.user = data;
-							this.own = this.currentUser._id === data._id;
-						}
-					})
+						.get(apiUrl + 'user/' + user_id) 
+						.end((err, res)=>{
+							if (err || !res.body) {
+								miniToastr.error(res.body.error || 'User fetch failed')
+							}
+							else {
+								this.user = res.body;
+								this.own = this.currentUser && this.currentUser._id === res.body._id;
+							}
+						})
 				}
 				else {
 					this.$nextTick(()=>{

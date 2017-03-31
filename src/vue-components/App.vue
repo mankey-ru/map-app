@@ -21,7 +21,7 @@
 
 <template>
 	<div>
-		<q-drawer ref="drawer_left"> <!-- Left Sidebar -->
+		<q-drawer ref="drawer_left" v-bind:backdrop-opacity="0"> <!-- Left Sidebar -->
 			<div class="list platform-delimiter">
 				<div v-if="currentUser">
 					<lilink to="user-profile-current" icon="account-box">
@@ -77,6 +77,8 @@
 		</div>
 
 		<router-view class="layout-view"></router-view>
+
+		<q-ajax-bar position="bottom" color="orange" v-bind:speed="200" size="10px"></q-ajax-bar> <!-- Bottom progressbar -->
 
 		<q-drawer ref="drawer_right" right-side><!-- Right Sidebar -->
 			<div class="list platform-delimiter">

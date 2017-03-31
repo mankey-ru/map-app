@@ -152,6 +152,12 @@ export default {
 				return ''
 			}
 			return moment(val).format('D MMMM, dddd');
+		},
+		df_pretty_dm: function (val) {
+			if (!val) {
+				return ''
+			}
+			return moment(val).format('D MMMM');
 		}
 	},
 	components: {

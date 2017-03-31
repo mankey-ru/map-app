@@ -143,10 +143,10 @@
 			}
 			infowindow = new google.maps.InfoWindow({
 				content: `
-				<h3>${evt.name}</h3>
+				<h4>${evt.name}</h4>
 				<pre>${evt.descr}</pre>
 				<div class="text-right">
-					<a class="btn btn-info" href="#/event/card/${evt._id}">Подробнее</a>
+					<button class="orange outline" onclick="location='#/event/card/${evt._id}'">Подробнее</a>
 				</div>`
 			});
 			infowindow.open(map, evt.mark);

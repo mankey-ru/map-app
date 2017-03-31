@@ -39,25 +39,21 @@
 </script>
 
 <template>
-	<div>
-		<div v-show="!evt" class="text-center">
-			<i class="spin spin-lg"></i>
-		</div>
-		<div v-if="evt">
+	<div class="row">
+		<div v-if="evt" class="width-2of4 offset-1of4 lt-bg-width-1of1 lt-bg-offset-0 pad-h">
 			<h2>{{evt.name}}</h2>
-			<h3>
-				<i class="glyphicon glyphicon-calendar"></i>&#160;
+			<p>
+				<i class="mdi mdi-calendar"></i>&#160;
 				{{evt.date | dateFormatPretty}}
-			</h3>
-			<h3>
-				<i class="glyphicon glyphicon-user"></i>&#160;
-				{{evt.author.name}}
-			</h3>
+			</p>
+			<p>
+				<a v-bind:href="'#/user-profile/'+evt.author._id">
+					<i class="mdi mdi-account-box"></i>&#160;
+					{{evt.author.name}}
+				</a>
+			</p>
 			<pre>{{evt.descr}}</pre>
-			<a v-on:click="$router.push({name:'mainpage'})" class="btn btn-default">
-				<i class="glyphicon glyphicon-chevron-left"></i> 
-				Вернуться к карте
-			</a>
+			<pre>Координаты: {{evt.latLng}}</pre>
 		</div>
 	</div>
 </template>

@@ -1,7 +1,7 @@
 <template>
 	<div class="generic-margin">
 		<div class="row">
-			<div class="offset-1of3 width-1of3 sm-width-1of1 sm-offset-0">
+			<div class="offset-1of3 width-1of3 lt-bg-width-1of1 lt-bg-offset-0 pad-h">
 				<h4 class="text-center">
 					Вход
 				</h4>

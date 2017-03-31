@@ -12,8 +12,8 @@ const TwitterStrategy = require('passport-twitter').Strategy;
 const FacebookStrategy = require('passport-facebook').Strategy;
 // Helper libs
 const _ = require('lodash');
-const waterfall = require('async/waterfall')
-	// Homebrew stuff
+const waterfall = require('async/waterfall');
+// Homebrew stuff
 const CONF = require('./conf/conf.js');
 const dbtools = require('./dbtools.js');
 const _api = require('./api-url.js');
