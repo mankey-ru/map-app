@@ -54,6 +54,9 @@ export default {
 					}
 					this.auth.pending = 0;
 				});
+			// TODO implement permanent credentials storage
+			// https://github.com/Crypho/cordova-plugin-secure-storage
+			// https://github.com/TheCocoaProject/cordova-plugin-nativestorage
 		},
 		LOG_IN_EXT: function (provider) {
 			window._handleLogonSuccess = (user) => {

@@ -8,7 +8,7 @@ if (!db_uri) {
 }
 
 var _db;
-module.exports =  {
+module.exports = {
 	connect: function (callback) {
 		mongodb.MongoClient.connect(db_uri, function (err, database) {
 			if (err) {
