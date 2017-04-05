@@ -18,7 +18,7 @@
 						</div>
 						<div>
 							<label>
-								<q-toggle v-bind:disable="!own" class="orange" v-model="currentUserIsMusician"></q-toggle>
+								<q-toggle v-bind:disable="!own" class="primary" v-model="currentUserIsMusician"></q-toggle>
 								Музыкант
 							</label>
 						</div>
@@ -51,7 +51,7 @@
 							<homebtn></homebtn>
 						</div>
 						<div class="width-1of2 text-right">
-							<q-progress-button v-if="own" indeterminate class="orange big" v-bind:percentage="submit_pending" type="submit">
+							<q-progress-button v-if="own" indeterminate class="primary big" v-bind:percentage="submit_pending" type="submit">
 								Сохранить
 							</q-progress-button>
 						</div>

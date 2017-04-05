@@ -171,7 +171,7 @@ export default {
 	components: {
 		homebtn: {
 			template: `
-			<button v-on:click="$router.push({name:'mainpage'})" class="orange outline" type="button">
+			<button v-on:click="$router.push({name:'mainpage'})" class="primary outline" type="button">
 				<i class="mdi mdi-google-maps"></i> Вернуться на карту
 			</button>`
 		}

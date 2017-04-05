@@ -162,7 +162,7 @@
 						<homebtn></homebtn>
 					</div>
 					<div class="width-1of2 text-right">
-						<q-progress-button indeterminate class="orange full-width big" v-bind:disabled="nevt_invalid" v-bind:percentage="submit_pending" type="submit">
+						<q-progress-button indeterminate class="primary full-width big" v-bind:disabled="nevt_invalid" v-bind:percentage="submit_pending" type="submit">
 							Готово
 						</q-progress-button>
 					</div>

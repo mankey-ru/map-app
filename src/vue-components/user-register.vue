@@ -8,8 +8,8 @@
 				<div class="row">
 					<div class="width-3of4">
 						<label>
-							<!-- <q-checkbox class="orange" v-model="nu.role"></q-checkbox> -->
-							<q-toggle class="orange" v-model="nu.role"></q-toggle>
+							<!-- <q-checkbox class="primary" v-model="nu.role"></q-checkbox> -->
+							<q-toggle class="primary" v-model="nu.role"></q-toggle>
 							Я музыкант
 						</label>
 
@@ -85,7 +85,7 @@
 								<homebtn></homebtn>
 							</div>
 							<div class="width-1of2 text-right">
-								<q-progress-button indeterminate class="orange full-width" v-bind:disabled="form_invalid" v-bind:percentage="nu.submit_pending" type="submit">
+								<q-progress-button indeterminate class="primary full-width" v-bind:disabled="form_invalid" v-bind:percentage="nu.submit_pending" type="submit">
 									Готово
 								</q-progress-button>
 							</div>

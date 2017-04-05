@@ -146,7 +146,7 @@
 				<h4>${evt.name}</h4>
 				<pre>${evt.descr}</pre>
 				<div class="text-right">
-					<button class="orange outline" onclick="location='#/event/card/${evt._id}'">Подробнее</a>
+					<button class="primary outline" onclick="location='#/event/card/${evt._id}'">Подробнее</a>
 				</div>`
 			});
 			infowindow.open(map, evt.mark);
@@ -173,26 +173,26 @@
 			</q-modal>
 			<q-modal ref="modal_genres" position="bottom" v-bind:content-css="{minWidth: '70vw', minHeight: '40vh'}">
 				<q-layout>
-					<div slot="header" class="toolbar orange">
+					<div slot="header" class="toolbar primary">
 						<q-toolbar-title :padding="1">
 							Выберите жанры
 						</q-toolbar-title>
 					</div>
-					<div slot="footer" class="toolbar orange">
+					<div slot="footer" class="toolbar primary">
 						<div class="row full-width">
 							<div class="width-3of4">
-								<button v-on:click="genres_checkAll(1)" class="orange">
+								<button v-on:click="genres_checkAll(1)" class="primary">
 									<i class="mdi mdi-checkbox-multiple-marked-outline"></i> 
 									Всё
 								</button> 
 								&#160;
-								<button v-on:click="genres_checkAll(0)" class="orange">
+								<button v-on:click="genres_checkAll(0)" class="primary">
 									<i class="mdi mdi-checkbox-multiple-blank-outline"></i>
 									Ничего
 								</button>
 							</div>
 							<div class="width-1of4 text-right">
-								<button v-on:click="$refs.modal_genres.close()" class="orange">
+								<button v-on:click="$refs.modal_genres.close()" class="primary">
 									Закрыть
 								</button>
 							</div>
@@ -201,7 +201,7 @@
 					<div class="layout-view">
 						<div class="layout-padding">
 							<div class="group">
-								<span v-for="gen in genres" class="chip label cursor-pointer" v-bind:class="gen.selected?'bg-orange':'bg-grey-4'" v-on:click="genres_check(gen)">
+								<span v-for="gen in genres" class="chip label cursor-pointer" v-bind:class="gen.selected?'bg-primary':'bg-grey-4'" v-on:click="genres_check(gen)">
 									{{gen.name}}
 								</span>
 							</div>
@@ -217,10 +217,10 @@
 			<div v-show="!map_pending">
 				<div v-if="currentUser && currentUser.role" >
 					<div class="newEvtWrap absolute-bottom-right">
-						<button class="gt-md push orange round big" v-on:click="GOTO_EVT_NEW">
+						<button class="gt-md push primary round big" v-on:click="GOTO_EVT_NEW">
 							Создать мероприятие 
 						</button>
-						<button class="lt-bg push orange circular big" v-on:click="GOTO_EVT_NEW">
+						<button class="lt-bg push primary circular big" v-on:click="GOTO_EVT_NEW">
 							<i class="mdi mdi-plus"></i>
 						</button>
 					</div>
@@ -262,11 +262,11 @@
 									<div class="text-right">
 										<!-- Mobile -->
 										<div class="lt-md group">
-											<button class="orange push bg-white text-black big">
+											<button class="primary push bg-white text-black big">
 												<i class="mdi mdi-calendar"></i>
 											</button>
 											<br />
-											<button class="orange push bg-white text-black big" v-on:click="evtSearch">
+											<button class="primary push bg-white text-black big" v-on:click="evtSearch">
 												<i class="mdi mdi-file-find"></i>
 											</button>
 										</div>
@@ -276,10 +276,10 @@
 												<i v-on:click.prevent="GOTO_PROFILE" class="mdi mdi-account-box map-profile-icon"></i>
 											</div>
 											<div v-if="!currentUser">
-												<button class="orange push bg-white text-black big" v-on:click="GOTO_LOGIN">
+												<button class="primary push bg-white text-black big" v-on:click="GOTO_LOGIN">
 													Вход
 												</button> &#160;
-												<button class="orange push bg-white text-black big" v-on:click="GOTO_REGISTER">
+												<button class="primary push bg-white text-black big" v-on:click="GOTO_REGISTER">
 													Регистрация
 												</button>
 											</div>
@@ -297,7 +297,7 @@
 									<a class="link-dotted" v-on:click="showAll">Показать все</a>
 								</span>
 							</div>
-							<button class="orange push" v-on:click="$refs.modal_genres.open()">
+							<button class="primary push" v-on:click="$refs.modal_genres.open()">
 								Фильтр по жанрам
 							</button>
 						</div>

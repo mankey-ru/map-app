@@ -62,7 +62,7 @@
 			</div>
 		</q-drawer>
 
-		<div slot="header" class="toolbar orange" v-show="$route.name!=='mainpage'">
+		<div slot="header" class="toolbar primary" v-show="$route.name!=='mainpage'">
 			<button class="11hide-on-drawer-visible" v-on:click="$refs.drawer_left.open()">
 				<i class="mdi mdi-menu"></i>
 			</button>
@@ -79,7 +79,7 @@
 
 		<router-view class="layout-view"></router-view>
 
-		<q-ajax-bar position="bottom" color="orange" v-bind:speed="200" size="15px"></q-ajax-bar> 
+		<q-ajax-bar position="bottom" color="primary" v-bind:speed="200" size="15px"></q-ajax-bar> 
 		<!-- Bottom progressbar -->
 
 		<!-- <q-drawer ref="drawer_right" right-side>
