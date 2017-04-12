@@ -7,6 +7,8 @@
 	import mapLib from './../map-lib.js'
 	import request from 'superagent'
 	import miniToastr from 'mini-toastr'
+	//import {Loading} from 'quasar-framework'
+	import {Toast} from 'quasar-framework'
 
 	var _vm;
 	var map;
@@ -19,6 +21,7 @@
 					date: '',
 					text: ''
 				},
+				search_pending: false,
 				map_pending: true,
 				genres: [],
 				evtList: [],
@@ -56,7 +59,6 @@
 					}
 				}
 				this.evtHiddenQty = hiddenQty;
-
 			},
 			genres_checkAll: function (boo) {
 				boo = !!boo;
@@ -65,7 +67,54 @@
 				}
 			},
 			evtSearch: function () {
-				alert(JSON.stringify(this.$data.search, null, 2))
+				//Loading.show();
+				this.search_pending = true;
+				this.getEvents();
+			},
+			getEvents: function() {
+				request
+					.get(apiUrl + 'events')
+					.query(this.search)
+					.end((err, res) => {
+						this.search_pending = false;
+						//Loading.hide()
+						if (err) {
+							miniToastr.error(err || 'Failed to get events')
+						}
+						else {
+							if (res.body.evtList instanceof Array) {
+								if (res.body.evtList.length===0) {
+									Toast.create.warning('По вашему запросу ничегошенки не нашлось :(');
+									return
+								}
+								for (var i = 0, len = this.$data.evtList.length; i < len; i++) {
+									var evt = this.$data.evtList[i];
+									evt.mark.setMap(null)
+								}
+								this.$data.evtList = [];
+								for (let evt of res.body.evtList) {
+									var mark = new google.maps.Marker({
+										position: {
+											lat: evt.latLng[0],
+											lng: evt.latLng[1]
+										},
+										map: map,
+										icon: 'pin.svg',
+										//animation: google.maps.Animation.DROP
+									})
+									mark.addListener('click', () => {
+										showEvtInfo(evt)
+									});
+									evt.mark = mark;
+									this.evtList.push(evt);
+									// Opening infobox automatically for single result
+									if (res.body.evtList.length===1) {
+										google.maps.event.trigger(mark, 'click');
+									}
+								}
+							}
+						}
+					})
 			}
 		},
 		mixins: [mixins],
@@ -99,137 +148,109 @@
 				_vm.$data.genres = mapped;
 			}
 			/**
-				Creating map
-				*/
-				mapLib.create((createdMap) => {
-					this.map_pending = false;
-					map = createdMap;
-
-					request
-					.get(apiUrl + 'events')
-					.end((err, res) => {
-						if (err) {
-							miniToastr.error(err || 'Failed to get events')
-						}
-						else {
-							if (res.body.evtList instanceof Array) {
-								for (let evt of res.body.evtList) {
-									var mark = new google.maps.Marker({
-										position: {
-											lat: evt.latLng[0],
-											lng: evt.latLng[1]
-										},
-										map: map,
-										icon: 'pin.svg',
-										//animation: google.maps.Animation.DROP
-									})
-									mark.addListener('click', () => {
-										showEvtInfo(evt)
-									});
-									evt.mark = mark;
-									this.evtList.push(evt);
-								}
-							}
-						}
-					})
-
-				});
-			}
+			Creating map
+			*/
+			mapLib.create((createdMap) => {
+				this.map_pending = false;
+				map = createdMap;
+				this.getEvents();
+			});
 		}
-		var infowindow;
-		function showEvtInfo(evt){
-			if (infowindow) {
-				infowindow.close();
-			}
-			infowindow = new google.maps.InfoWindow({
-				content: `
-				<h4>${evt.name}</h4>
-				<pre>${evt.descr}</pre>
-				<div class="text-right">
-					<button class="primary outline" onclick="location='#/event/card/${evt._id}'">Подробнее</a>
+	}
+	var infowindow;
+	function showEvtInfo(evt){
+		if (infowindow) {
+			infowindow.close();
+		}
+		infowindow = new google.maps.InfoWindow({
+			content: `
+			<h4>${evt.name}</h4>
+			<pre>${evt.descr}</pre>
+			<div class="text-right">
+				<button class="primary outline" onclick="location='#/event/card/${evt._id}'">Подробнее</a>
 				</div>`
 			});
-			infowindow.open(map, evt.mark);
-		}
-	</script>
+		infowindow.open(map, evt.mark);
+	}
+</script>
 
-	<template>
-		<!-- TODO use https://www.npmjs.com/package/v-media-query instead of bootstrap media queries like visible-xs -->
-		<div>
-			<q-modal ref="modal_date" position="top">
-				<div class="generic-margin">
-					<div>
-						<q-inline-datetime v-model="search.date" type="date"></q-inline-datetime>
-					</div>
-					<div class="text-right">
-						<button v-on:click.prevent="search.date = ''" class="tertiary">
-							Любая дата
-						</button>
-						<button v-on:click="$refs.modal_date.close()" class="tertiary">
-							Отмена
-						</button>
-					</div>
+<template>
+	<!-- TODO use https://www.npmjs.com/package/v-media-query instead of bootstrap media queries like visible-xs -->
+	<div>
+		<q-modal ref="modal_date" position="top">
+			<div class="generic-margin">
+				<div>
+					<q-inline-datetime v-model="search.date" type="date"></q-inline-datetime>
 				</div>
-			</q-modal>
-			<q-modal ref="modal_genres" position="bottom" v-bind:content-css="{minWidth: '70vw', minHeight: '40vh'}">
-				<q-layout>
-					<div slot="header" class="toolbar primary">
-						<q-toolbar-title :padding="1">
-							Выберите жанры
-						</q-toolbar-title>
-					</div>
-					<div slot="footer" class="toolbar primary">
-						<div class="row full-width">
-							<div class="width-3of4">
-								<button v-on:click="genres_checkAll(1)" class="primary">
-									<i class="mdi mdi-checkbox-multiple-marked-outline"></i> 
-									Всё
-								</button> 
-								&#160;
-								<button v-on:click="genres_checkAll(0)" class="primary">
-									<i class="mdi mdi-checkbox-multiple-blank-outline"></i>
-									Ничего
-								</button>
-							</div>
-							<div class="width-1of4 text-right">
-								<button v-on:click="$refs.modal_genres.close()" class="primary">
-									Закрыть
-								</button>
-							</div>
+				<div class="text-right">
+					<button v-on:click.prevent="search.date = ''" class="tertiary">
+						Любая дата
+					</button>
+					<button v-on:click="$refs.modal_date.close()" class="tertiary">
+						Отмена
+					</button>
+				</div>
+			</div>
+		</q-modal>
+		<q-modal ref="modal_genres" position="bottom" v-bind:content-css="{minWidth: '70vw', minHeight: '40vh'}">
+			<q-layout>
+				<div slot="header" class="toolbar primary">
+					<q-toolbar-title :padding="1">
+						Выберите жанры
+					</q-toolbar-title>
+				</div>
+				<div slot="footer" class="toolbar primary">
+					<div class="row full-width">
+						<div class="width-3of4">
+							<button v-on:click="genres_checkAll(1)" class="primary">
+								<i class="mdi mdi-checkbox-multiple-marked-outline"></i> 
+								Всё
+							</button> 
+							&#160;
+							<button v-on:click="genres_checkAll(0)" class="primary">
+								<i class="mdi mdi-checkbox-multiple-blank-outline"></i>
+								Ничего
+							</button>
+						</div>
+						<div class="width-1of4 text-right">
+							<button v-on:click="$refs.modal_genres.close()" class="primary">
+								Закрыть
+							</button>
 						</div>
 					</div>
-					<div class="layout-view">
-						<div class="layout-padding">
-							<div class="group">
-								<span v-for="gen in genres" class="chip label cursor-pointer" v-bind:class="gen.selected?'bg-primary':'bg-grey-4'" v-on:click="genres_check(gen)">
-									{{gen.name}}
-								</span>
-							</div>
+				</div>
+				<div class="layout-view">
+					<div class="layout-padding">
+						<div class="group">
+							<span v-for="gen in genres" class="chip label cursor-pointer color-white" v-bind:class="gen.selected?'bg-primary':'bg-grey-4'" v-on:click="genres_check(gen)">
+								{{gen.name}}
+							</span>
 						</div>
 					</div>
-				</q-layout>
-			</q-modal>
-
-			<h1 v-show="map_pending" class="text-center">
-				Загрузка...
-			</h1>
-
-			<div v-show="!map_pending">
-				<div v-if="currentUser && currentUser.role" >
-					<div class="newEvtWrap absolute-bottom-right">
-						<button class="gt-md push primary round big" v-on:click="GOTO_EVT_NEW">
-							Создать мероприятие 
-						</button>
-						<button class="lt-bg push primary circular big" v-on:click="GOTO_EVT_NEW">
-							<i class="mdi mdi-plus"></i>
-						</button>
-					</div>
 				</div>
-				<div class="hdn">
-					<!-- positions explained: https://google-developers.appspot.com/maps/documentation/javascript/examples/full/control-positioning-labels -->
-					<div data-pos="TOP" class="j-mapctrl map-ctrl-top">
-						<div class="map-ctrl-wrap">
-							<div class="row">
+			</q-layout>
+		</q-modal>
+
+		<h1 v-show="map_pending" class="text-center">
+			Загрузка...
+		</h1>
+
+		<div v-show="!map_pending">
+			<div v-if="currentUser && currentUser.role" >
+				<div class="newEvtWrap absolute-bottom-right">
+					<button class="gt-md push primary round big" v-on:click="GOTO_EVT_NEW">
+						Создать мероприятие 
+					</button>
+					<button class="lt-bg push primary circular big" v-on:click="GOTO_EVT_NEW">
+						<i class="mdi mdi-plus"></i>
+					</button>
+				</div>
+			</div>
+			<div class="hdn">
+				<!-- positions explained: https://google-developers.appspot.com/maps/documentation/javascript/examples/full/control-positioning-labels -->
+				<div data-pos="TOP" class="j-mapctrl map-ctrl-top">
+					<div class="map-ctrl-wrap">
+						<div class="row">
 								<!-- 
 									LEFT
 								-->
@@ -241,6 +262,7 @@
 										<form class="inline" v-on:submit.prevent="evtSearch">
 											<span class="gt-sm">
 												<input v-model="search.text" placeholder="Поиск" />
+												<spinner v-show="search_pending" v-bind:size="32"></spinner>
 												<i class="glyphicon glyphicon-search" v-on:click="evtSearch"></i>
 												<i class="glyphicon glyphicon-tasks"></i>
 											</span>

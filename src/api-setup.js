@@ -19,7 +19,7 @@ const dbtools = require('./dbtools.js');
 const _api = require('./api-url.js');
 const apiUrl = _api.path;
 
-module.exports = function (app) {
+module.exports = function(app) {
 	dbtools.connect();
 	app.use(require("body-parser").json());
 	setupAuth(app);
@@ -30,14 +30,14 @@ function setupApi(app) {
 
 	// https://docs.mongodb.com/v3.2/tutorial/geospatial-tutorial/#differences-between-flat-and-spherical-geometry
 
-	app.get(apiUrl + 'commondata', function (req, res) {
+	app.get(apiUrl + 'commondata', function(req, res) {
 		var currentUser = req.user;
 		if (currentUser) {
 			currentUser.pwd = '<NO>';
 		}
 
 		dbtools.getDb().collection(C_GENRES).find().toArray(
-			function (err, docs) {
+			function(err, docs) {
 				if (err) {
 					handleError(res, err, 'Failed to get common data');
 				}
@@ -50,11 +50,11 @@ function setupApi(app) {
 			});
 	});
 
-	app.get(apiUrl + 'user/:user_id', function (req, res) {
+	app.get(apiUrl + 'user/:user_id', function(req, res) {
 		var user_id = ObjectID(req.params.user_id);
 		dbtools.getDb().collection(C_USERS).findOne({
 			_id: user_id
-		}, function (err, doc) {
+		}, function(err, doc) {
 			if (err) {
 				handleError(res, err, "Failed to get user.");
 			}
@@ -73,19 +73,47 @@ function setupApi(app) {
 		POST создать новый
 	*/
 
-	app.get(apiUrl + 'events', function (req, res) {
+	app.get(apiUrl + 'events', function(req, res) {
+		var COL = dbtools.getDb().collection(C_EVENTS);
 		var match = {};
 		if (req.query.own) {
 			if (req.user) {
-				match = {
-					author_id: ObjectID(req.user._id)
-				}
+				match.author_id = ObjectID(req.user._id)
 			}
 			else {
 				handleError(res, 'Unauthorized', 'Unauthorized', 403);
 				return
 			}
 		}
+		var TS = req.query.text;
+		if (TS) {
+			COL.createIndex({ // do I need to check text index each time via getIndexes?
+				name: 'text',
+				descr: 'text'
+			});
+
+			/*
+				Mongo 's full-text doesnt support word partials and wildcards, so
+				if search string length less than 4 then mongo will look for exact words			
+			*/
+			if (TS.length < 4) {				
+				match.$text = {
+					$search: TS // , $language: 'russian' TODO req.user.lang or something
+				};
+			}
+			else {
+				var reSearch = {
+					$regex: TS,
+					$options: 'i'
+				};
+				match.$or = [{
+					name: reSearch
+				}, {
+					descr: reSearch
+				}];
+			}
+		}
+
 		//console.log(match)
 		var aRules = [{
 			$match: match
@@ -99,21 +127,19 @@ function setupApi(app) {
 		}, {
 			$unwind: '$author'
 		}];
-		dbtools.getDb().collection(C_EVENTS)
-			.aggregate(aRules)
-			.toArray(function (err, docs) {
-				if (err) {
-					handleError(res, err, 'Failed to get events');
-				}
-				else {
-					res.status(200).json({
-						evtList: docs
-					}).end();
-				}
-			});
+		COL.aggregate(aRules).toArray(function(err, docs) {
+			if (err) {
+				handleError(res, err, 'Failed to get events');
+			}
+			else {
+				res.status(200).json({
+					evtList: docs
+				}).end();
+			}
+		});
 	});
 
-	app.post(apiUrl + 'events', function (req, res) {
+	app.post(apiUrl + 'events', function(req, res) {
 		if (!req.user) {
 			handleError(res, "User not authed");
 			return
@@ -123,7 +149,7 @@ function setupApi(app) {
 		newEvent.author_id = ObjectID(req.user._id);
 
 		dbtools.getDb().collection(C_EVENTS)
-			.insertOne(newEvent, function (err, insert) {
+			.insertOne(newEvent, function(err, insert) {
 				if (err || !insert.result.ok) {
 					handleError(res, err, 'Failed to create first reply');
 				}
@@ -133,7 +159,7 @@ function setupApi(app) {
 			});
 	});
 
-	app.get(apiUrl + 'events/:event_id', function (req, res) {
+	app.get(apiUrl + 'events/:event_id', function(req, res) {
 		if (!req.params.event_id) {
 			handleError(res, err, 'Missing required parameter: event_id');
 		}
@@ -153,7 +179,7 @@ function setupApi(app) {
 		}];
 		dbtools.getDb().collection(C_EVENTS)
 			.aggregate(aRules)
-			.toArray(function (err, docs) {
+			.toArray(function(err, docs) {
 				if (err || !docs || !docs.length) {
 					handleError(res, err, 'Failed to find event');
 				}
@@ -199,13 +225,13 @@ function setupAuth(app) {
 	app.use(passport.initialize());
 	app.use(passport.session()); // restore auth state, if any, from the session
 
-	passport.serializeUser(function (user, cb) {
+	passport.serializeUser(function(user, cb) {
 		cb(null, user._id);
 	});
-	passport.deserializeUser(function (_id, cb) {
+	passport.deserializeUser(function(_id, cb) {
 		dbtools.getDb().collection(C_USERS).findOne({
 			_id: ObjectID(_id)
-		}, function (err, user) {
+		}, function(err, user) {
 			if (err) {
 				return cb(err);
 			}
@@ -217,7 +243,7 @@ function setupAuth(app) {
 	*/
 	// Primary auth request
 	app.get(apiUrl + 'auth/in',
-		function (req, res, next) {
+		function(req, res, next) {
 			passport.authenticate(req.query.provider)(req, res, next);
 			// здесь можно передать объект с доп. permissions
 			// пример для vkontakte:
@@ -230,7 +256,7 @@ function setupAuth(app) {
 	var extLoginCb = _api.path + 'auth/external-callback';
 	var extLoginCb_full = _api.domain + extLoginCb;
 	app.get(extLoginCb,
-		function (req, res, next) {
+		function(req, res, next) {
 			/*if (req.user) {
 				req.logout();
 			}*/
@@ -238,7 +264,7 @@ function setupAuth(app) {
 				failureFlash: true
 			})(req, res, next);
 		},
-		function (req, res) {
+		function(req, res) {
 			var usr = JSON.stringify(req.user);
 			res
 				.status(200)
@@ -261,7 +287,7 @@ function setupAuth(app) {
 			failureRedirect: resultUrl
 		})
 	);
-	app.get(resultUrl, function (req, res) {
+	app.get(resultUrl, function(req, res) {
 		if (req.user) {
 			req.user.pwd = '<NO>';
 		}
@@ -270,10 +296,10 @@ function setupAuth(app) {
 		});
 	});
 	passport.use(new LocalStrategy(
-		function (email, password, done) {
+		function(email, password, done) {
 			dbtools.getDb().collection(C_USERS).findOne({
 				email: email
-			}, function (err, user) {
+			}, function(err, user) {
 				if (err) {
 					return done(err);
 				}
@@ -295,7 +321,7 @@ function setupAuth(app) {
 			consumerSecret: CONF.get().twitter_consumer_secret,
 			callbackURL: extLoginCb_full + '?provider=twitter',
 		},
-		function (token, tokenSecret, profile, done) {
+		function(token, tokenSecret, profile, done) {
 			var newUser = {
 				twitter_id: profile.id,
 				name: profile.displayName,
@@ -310,7 +336,7 @@ function setupAuth(app) {
 					new: true, // return new doc if one is upserted
 					upsert: true // insert the document if it does not exist
 				},
-				function (err, dbres) {
+				function(err, dbres) {
 					return done(err, dbres.value);
 				})
 		}
@@ -325,7 +351,7 @@ function setupAuth(app) {
 			callbackURL: extLoginCb_full + '?provider=facebook',
 			profileFields: ['id', 'displayName', 'name', 'picture.type(large)']
 		},
-		function (accessToken, refreshToken, profile, done) {
+		function(accessToken, refreshToken, profile, done) {
 			var newUser = {
 				facebook_id: profile.id,
 				name: profile.displayName,
@@ -340,7 +366,7 @@ function setupAuth(app) {
 					new: true, // return new doc if one is upserted
 					upsert: true // insert the document if it does not exist
 				},
-				function (err, dbres) {
+				function(err, dbres) {
 					return done(err, dbres.value);
 				})
 		}
@@ -357,7 +383,7 @@ function setupAuth(app) {
 				// https://vk.com/dev/objects/user
 				// https://vk.com/dev/objects/user_2
 		},
-		function (accessToken, refreshToken, params, profile, done) {
+		function(accessToken, refreshToken, params, profile, done) {
 			var vkUser = profile._json;
 			var newUser = {
 				vkontakte_id: profile.id,
@@ -384,21 +410,21 @@ function setupAuth(app) {
 					new: true, // return new doc if one is upserted
 					upsert: true // insert the document if it does not exist
 				},
-				function (err, dbres) {
+				function(err, dbres) {
 					return done(err, dbres.value);
 				})
 		}));
 	/**
 		Log out
 	*/
-	app.post(apiUrl + 'auth/out', function (req, res) {
+	app.post(apiUrl + 'auth/out', function(req, res) {
 		req.logout();
 		res.redirect(resultUrl);
 	});
 	/**
 		Edit profile
 	*/
-	app.post(apiUrl + 'auth/edit', function (req, res) {
+	app.post(apiUrl + 'auth/edit', function(req, res) {
 		if (!req.user) {
 			handleError(res, 'User not authed');
 			return
@@ -415,7 +441,7 @@ function setupAuth(app) {
 				_id: req.user._id
 			}, {
 				$set: userUpd
-			}, function (err, cmdres) {
+			}, function(err, cmdres) {
 				if (err || !cmdres || !cmdres.result || !cmdres.result.ok) {
 					handleError(res, err || cmdres, 'User update failed');
 				}
@@ -432,7 +458,7 @@ function setupAuth(app) {
 	const bcrypt = require('bcrypt');
 	const saltRounds = 8;
 
-	app.post(apiUrl + 'auth/reg', function (req, res) {
+	app.post(apiUrl + 'auth/reg', function(req, res) {
 		if (req.user) {
 			// user already authed
 			req.logout();
@@ -459,27 +485,27 @@ function setupAuth(app) {
 			// check if email is unique
 			// TODO create unique constraint on email
 			// https://docs.mongodb.com/manual/reference/method/db.collection.createIndex/
-			function (next) {
+			function(next) {
 				db.collection(C_USERS).find({
 					email: req.body.email
-				}).toArray(function (err, docs) {
+				}).toArray(function(err, docs) {
 					//console.log(err || docs.length !== 0)
 					var fail = err || docs.length !== 0;
 					next(err || docs.length !== 0 ? 'User with speciafied email already exists' : null)
 				})
 			},
 			// Generating pwd hash
-			function (next) { // TODOOOOO
+			function(next) { // TODOOOOO
 				//console.log('bcrypt.hash', arguments)
-				bcrypt.hash(req.body.password, saltRounds, function (err, hash) {
+				bcrypt.hash(req.body.password, saltRounds, function(err, hash) {
 					newUser.pwd = hash;
 					next();
 				});
 			},
 			// Inserting user
-			function (next) {
+			function(next) {
 				db.collection(C_USERS)
-					.insertOne(newUser, function (err, insert) {
+					.insertOne(newUser, function(err, insert) {
 						newUser = insert.ops[0];
 						next(err || !insert.result.ok ? 'Failed to create new user' : null);
 					});
@@ -491,7 +517,7 @@ function setupAuth(app) {
 				handleError(res, err, err);
 			}
 			else {
-				req.login(newUser, function (err) {
+				req.login(newUser, function(err) {
 					if (err) {
 						// potential error from the login() callback would come from your serializeUser() function
 						handleError(res, 'Automatic login of new user failed');
