@@ -115,9 +115,11 @@
 <template>
 	<div class="row">
 		<form v-on:submit.prevent="nevt_submit" class="width-2of4 offset-1of4 lt-bg-width-1of1 lt-bg-offset-0 pad-h">
-			<h2 class="">{{title}}</h2>
-			<br />
+
 			<div class="group">
+				<h1 class="gt-bg">
+					Новое мероприятие
+				</h1>
 				<div>
 					<label>Место</label>
 					<div v-show="1">

@@ -41,7 +41,7 @@
 <template>
 	<div class="row">
 		<div v-if="evt" class="width-2of4 offset-1of4 lt-bg-width-1of1 lt-bg-offset-0 pad-h">
-			<h2>{{evt.name}}</h2>
+			<h2 class="gt-bg">{{evt.name}}</h2>
 			<p>
 				<i class="mdi mdi-calendar"></i>&#160;
 				{{evt.date | dateFormatPretty}}

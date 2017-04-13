@@ -2,9 +2,9 @@
 	<div class="generic-margin">
 		<div class="row">
 			<div class="offset-1of3 width-1of3 lt-bg-width-1of1 lt-bg-offset-0 pad-h">
-				<h4 class="text-center">
+				<h5 class="gt-bg">
 					Вход
-				</h4>
+				</h5>
 				<form v-on:submit.prevent="LOG_IN" class="group">
 					<div class="">
 						<div class="stacked-label">

@@ -17,47 +17,73 @@ const routes = [{
 		name: 'mainpage',
 		component: mainpage,
 		meta: {
-			fullscreen: true
+			fullscreen: true,
+			title: 'Джигурда!'
 		}
 	}, {
 		path: '/event/new',
 		name: 'event-new',
 		component: eventNew,
 		meta: {
-			needAuth: true
+			needAuth: true,
+			title: 'Новое мероприятие'
 		}
 	}, {
 		path: '/event/card/:event_id',
 		name: 'event-card',
-		component: eventCard
+		component: eventCard,
+		meta: {
+			title: 'Мероприятие'
+		}
 	}, {
 		path: '/event/list/',
 		name: 'event-list',
-		component: eventList
+		component: eventList,
+		meta: {
+			title: 'Список мероприятий'
+		}
 	}, {
 		name: 'user-profile-current',
 		path: '/user-profile',
-		component: user_profile
+		component: user_profile,
+		meta: {
+			title: 'Ваш профиль'
+		}
 	}, {
 		name: 'user-profile-any',
 		path: '/user-profile/:user_id',
-		component: user_profile
+		component: user_profile,
+		meta: {
+			title: 'Профиль пользователя'
+		}
 	}, {
 		name: 'user-register',
 		path: '/register',
-		component: user_register
+		component: user_register,
+		meta: {
+			title: 'Регистрация'
+		}
 	}, {
 		name: 'user-login',
 		path: '/login',
-		component: user_login
+		component: user_login,
+		meta: {
+			title: 'Вход'
+		}
 	}, {
 		path: '/about',
 		name: 'page-about',
-		component: page_about
+		component: page_about,
+		meta: {
+			title: 'О нас'
+		}
 	}, {
 		path: '/how-it-works',
 		name: 'page-how',
-		component: page_how
+		component: page_how,
+		meta: {
+			title: 'Как это работает'
+		}
 	},
 	// 404
 	{

@@ -73,10 +73,10 @@
 			},
 			getEvents: function() {
 				request
-					.get(apiUrl + 'events')
-					.query(this.search)
-					.end((err, res) => {
-						this.search_pending = false;
+				.get(apiUrl + 'events')
+				.query(this.search)
+				.end((err, res) => {
+					this.search_pending = false;
 						//Loading.hide()
 						if (err) {
 							miniToastr.error(err || 'Failed to get events')
@@ -178,17 +178,23 @@
 	<!-- TODO use https://www.npmjs.com/package/v-media-query instead of bootstrap media queries like visible-xs -->
 	<div>
 		<q-modal ref="modal_date" position="top">
-			<div class="generic-margin">
+			<div class="generic-margin group">
 				<div>
-					<q-inline-datetime v-model="search.date" type="date"></q-inline-datetime>
+					<q-inline-datetime v-model="search.date" type="date" v-on:input="$refs.modal_date.close()">
+						
+					</q-inline-datetime>
 				</div>
-				<div class="text-right">
-					<button v-on:click.prevent="search.date = ''" class="tertiary">
-						Любая дата
-					</button>
-					<button v-on:click="$refs.modal_date.close()" class="tertiary">
-						Отмена
-					</button>
+				<div class="row">
+					<div class="width-1of2">
+						<button v-on:click.prevent="search.date = ''" class="tertiary">
+							Любая дата
+						</button>
+					</div>
+					<div class="width-1of2 text-right">
+						<button v-on:click="$refs.modal_date.close()" class="primary">
+							Ок
+						</button>
+					</div>
 				</div>
 			</div>
 		</q-modal>
@@ -222,7 +228,7 @@
 				<div class="layout-view">
 					<div class="layout-padding">
 						<div class="group">
-							<span v-for="gen in genres" class="chip label cursor-pointer color-white" v-bind:class="gen.selected?'bg-primary':'bg-grey-4'" v-on:click="genres_check(gen)">
+							<span v-for="gen in genres" class="chip label cursor-pointer text-white" v-bind:class="gen.selected?'bg-primary':'bg-grey-6'" v-on:click="genres_check(gen)">
 								{{gen.name}}
 							</span>
 						</div>

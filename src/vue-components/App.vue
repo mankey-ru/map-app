@@ -67,7 +67,7 @@
 				<i class="mdi mdi-menu"></i>
 			</button>
 			<q-toolbar-title :padding="2">
-				Джигурда!
+				{{$route.meta.title}}
 			</q-toolbar-title>
 			<button v-on:click="$router.push({name:'mainpage'})">
 				<i class="mdi mdi-google-maps"></i>

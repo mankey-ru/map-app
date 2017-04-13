@@ -1,6 +1,7 @@
 // MongoDB stuff
 const mongodb = require("mongodb");
 const ObjectID = mongodb.ObjectID;
+const ISODate = mongodb.ISODate;
 const C_EVENTS = "events";
 const C_USERS = "users";
 const C_GENRES = "genres";
@@ -13,6 +14,7 @@ const FacebookStrategy = require('passport-facebook').Strategy;
 // Helper libs
 const _ = require('lodash');
 const waterfall = require('async/waterfall');
+const moment = require('moment');
 // Homebrew stuff
 const CONF = require('./conf/conf.js');
 const dbtools = require('./dbtools.js');
@@ -96,7 +98,7 @@ function setupApi(app) {
 				Mongo 's full-text doesnt support word partials and wildcards, so
 				if search string length less than 4 then mongo will look for exact words			
 			*/
-			if (TS.length < 4) {				
+			if (TS.length < 4) {
 				match.$text = {
 					$search: TS // , $language: 'russian' TODO req.user.lang or something
 				};
@@ -114,7 +116,15 @@ function setupApi(app) {
 			}
 		}
 
-		//console.log(match)
+		var DS = req.query.date;
+		if (DS) {
+			var MD = moment(DS);
+			match.date = { // yup, event date is a string
+				$gte: MD.startOf('day').toISOString(),
+				$lte: MD.endOf('day').toISOString()
+			};
+		}
+
 		var aRules = [{
 			$match: match
 		}, {

@@ -77,8 +77,9 @@ var conf_browser = {
 			'vue$': 'vue/dist/vue.common.js',
 			// original material-design-icons npm package provides only stock icons
 			// and, by the way, is heavy as shit because of bunch of irrelevant files inside
+			'material-design-icons/iconfont/MaterialIcons-Regular.woff': path.resolve(__dirname, './node_modules/material-design-icons-iconfont/dist/fonts/MaterialIcons-Regular.woff')			
 			// so I made this dummy file to avoid build errors and use perfect mdi package
-			'material-design-icons/iconfont/MaterialIcons-Regular.woff': path.resolve(__dirname, './www/fonts/DummyFont.woff')
+			// 'material-design-icons/iconfont/MaterialIcons-Regular.woff': path.resolve(__dirname, './www/fonts/DummyFont.woff')
 		}
 	},
 	devServer: {

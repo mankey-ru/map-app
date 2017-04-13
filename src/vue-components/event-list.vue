@@ -56,7 +56,7 @@
 <template>
 	<div class="row" >
 		<div class="width-2of4 offset-1of4 lt-bg-width-1of1 lt-bg-offset-0 pad-h">
-			<h2>{{pageTitle}}</h2>
+			<h5>{{pageTitle}}</h5>
 			<div v-show="evtList.length" class="group">
 				<div v-if="status">
 					<h2>
