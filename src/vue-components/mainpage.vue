@@ -290,13 +290,13 @@
 									<div class="text-right">
 										<!-- Mobile -->
 										<div class="lt-md group">
-											<button class="primary push bg-white text-black big">
+											<button class="primary push bg-white text-black big" v-on:click="$refs.modal_date.open()">
 												<i class="mdi mdi-calendar"></i>
 											</button>
-											<br />
+											<!-- <br />
 											<button class="primary push bg-white text-black big" v-on:click="evtSearch">
 												<i class="mdi mdi-file-find"></i>
-											</button>
+											</button> -->
 										</div>
 										<!-- Desktop -->
 										<div class="gt-sm text-right">

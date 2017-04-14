@@ -4,9 +4,9 @@
 	import mixins from './../vue-mixins.js'
 	import miniToastr from 'mini-toastr'
 	import request from 'superagent'
-	import Datepicker from 'vuejs-datepicker'
 
 	var _vm;
+	var mapInitd = false;
 	export default {
 		name: 'evt-new',
 		data: function () {
@@ -17,7 +17,7 @@
 					name: '',
 					descr: '',
 					latLng: false,
-					date: new Date(),
+					date: '',
 					genre_id: ''
 				},
 				submit_pending: 0
@@ -47,6 +47,48 @@
 			nevt_discard: function(){
 				this.mark_cur.setMap(null);
 				this.mark_cur = false;
+			},
+			mapOpen: function(){
+				this.$refs.modal_map.open()
+				if (mapInitd === false) {
+
+					_vm = this;
+
+					mapLib.create((map, google) => {
+
+						placeMarker(map.getCenter()); // initial draggable marker
+
+						// This code is to prevent situation when mobile user 
+						// scrolls page above map and in the end of scroll click event fires
+						var touchmove = false;
+						document.body.addEventListener('touchmove', function(event) {
+							touchmove = true;
+						});
+						google.maps.event.addListener(map, 'mousedown', function(evt) {
+							touchmove = false;
+						});
+						google.maps.event.addListener(map, 'click', function(evt) {
+							if (touchmove === false) {
+								placeMarker(evt.latLng);
+							}
+						});
+
+						function placeMarker(location) {
+							var options = {
+								position: location,
+								map: map,
+								draggable: true,
+								icon: 'pin.svg',
+								animation: google.maps.Animation.DROP
+							}
+							if (_vm.mark_cur) {
+								_vm.nevt_discard();
+							}
+							_vm.mark_cur = new google.maps.Marker(options);
+						}
+					})
+					mapInitd = true;
+				}
 			}
 		},
 		computed: {
@@ -62,87 +104,88 @@
 						value: el._id
 					}
 				});
+			},
+			nevt_date: function (){
+				console.log(this.$options.filters.dateTimeFormat)
+				return this.$options.filters.dateTimeFormat(this.$data.nevt.date)
 			}
-		},
-		components: {
-			Datepicker
 		},
 		mounted: function () {
 			if (this.currentUser && (this.currentUser.role | 0) < 1) {
 				console.log('User cannot create events')
 				this.$router.push('/user-profile')
 			}
-
-			_vm = this;
-
-			mapLib.create((map, google) => {
-
-				placeMarker(map.getCenter()); // initial draggable marker
-
-				// This code is to prevent situation when mobile user 
-				// scrolls page above map and in the end of scroll click event fires
-				var touchmove = false;
-				document.body.addEventListener('touchmove', function (event) {
-					touchmove = true;
-				});
-				google.maps.event.addListener(map, 'mousedown', function (evt) {
-					touchmove = false;
-				});
-				google.maps.event.addListener(map, 'click', function (evt) {
-					if (touchmove === false) {
-						placeMarker(evt.latLng);
-					}
-				});
-
-				function placeMarker(location) {
-					var options = {
-						position: location,
-						map: map,
-						draggable: true,
-						icon: 'pin.svg',
-						animation: google.maps.Animation.DROP
-					}
-					if (_vm.mark_cur) {
-						_vm.nevt_discard();
-					}
-					_vm.mark_cur = new google.maps.Marker(options);
-				}
-			})
 		}
 	}
 </script>
 
 <template>
 	<div class="row">
-		<form v-on:submit.prevent="nevt_submit" class="width-2of4 offset-1of4 lt-bg-width-1of1 lt-bg-offset-0 pad-h">
 
+		<q-modal ref="modal_datetime" position="top">
 			<div class="group">
-				<h1 class="gt-bg">
-					Новое мероприятие
-				</h1>
 				<div>
-					<label>Место</label>
-					<div v-show="1">
-						<div class="hdn">
-							<div data-pos="TOP_LEFT" class="map-ctrl-wrap">
-								<input id="map-ctrl-search" style="width: 20em" placeholder="Поиск мест" />
+					<q-inline-datetime v-model="nevt.date" type="datetime"></q-inline-datetime>
+				</div>
+				<div class="text-right">
+					<button v-on:click="$refs.modal_datetime.close()" class="primary">
+						Ок
+					</button>
+				</div>
+			</div>
+		</q-modal>
+
+		<q-modal ref="modal_map" position="left" :content-css="{minWidth: '80vw', minHeight: '80vh'}">
+			<q-layout>
+				<div slot="header" class="toolbar">
+					<button @click="$refs.modal_map.close()">
+						<i>keyboard_arrow_left</i>
+					</button>
+					<q-toolbar-title :padding="1">
+						Выберите место
+					</q-toolbar-title>
+				</div>
+				<div class="layout-view">
+					<div class="layout-padding">
+						<div class="group">
+							<div>
+								<div class="hdn">
+									<div data-pos="TOP_LEFT" class="map-ctrl-wrap">
+										<input id="map-ctrl-search" style="width: 20em" placeholder="Поиск мест" />
+									</div>
+								</div>
+								<div id="map-container"></div>
 							</div>
 						</div>
-						<div id="map-container"></div>
 					</div>
+				</div>
+				<div slot="footer" class="toolbar">
+					<q-toolbar-title :padding="1">
+						<div class="text-right">
+							<button v-on:click="$refs.modal_map.close()" class="primary">
+								Ок
+							</button>
+						</div>
+					</q-toolbar-title>
+				</div>
+			</q-layout>
+		</q-modal>
+		<form v-on:submit.prevent="nevt_submit" class="width-2of4 offset-1of4 lt-bg-width-1of1 lt-bg-offset-0 pad-h">
+			<h3 class="gt-bg">
+				Новое мероприятие
+			</h3>
+			<div class="group">
+				<div>		
+					<button v-on:click.prevent="mapOpen" class="primary small">
+						Выбрать место
+					</button>
 				</div>
 				<div class="floating-label">
 					<input v-model="nevt.name" required class="full-width" />
 					<label>Название</label>
 				</div>
-				<div class="stacked-label __datepicker-wrap">
-					<datepicker 
-					v-bind:input-class="'full-width'" 
-					v-model="nevt.date"
-					v-bind:language="'ru'"
-					v-bind:monday-first="true"
-					v-bind:format="'dd.MM.yyyy'"
-					></datepicker>
+				<div class="floating-label">
+					<input v-model="nevt_date" required class="full-width" v-on:focus="$refs.modal_datetime.open()" />
 					<label>Дата</label>
 				</div>
 				<div class="floating-label">
@@ -151,9 +194,7 @@
 				</div>
 				<div>
 					<q-dialog-select type="radio" required class="full-width"
-					v-model="nevt.genre_id" 
-					v-bind:options="genreList" 
-					ok-label="Выбрать" cancel-label="Отмена" 
+					v-model="nevt.genre_id" v-bind:options="genreList" ok-label="Выбрать" cancel-label="Отмена" 
 					title="Жанр мероприятия" label="Жанр"></q-dialog-select>
 				</div>
 				<br />
@@ -172,8 +213,5 @@
 			</div>
 		</form>
 
-	</div>
+	</div> 
 </template>
-
-<style>
-</style>

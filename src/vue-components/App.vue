@@ -106,7 +106,9 @@
 									Basic helper classes
 	========================================================================================
 	*/
-
+	.hi-content {
+		height:90vh;
+	}
 	.mar-v {
 		margin-top: 1em;
 		margin-bottom: 1em;
@@ -167,9 +169,9 @@
 		margin-left: .5em;
 		padding: .5em;
 	}
-	body {
-		overflow-y: scroll;
-		overflow-x: hidden;
+	body, body.desktop.with-modal {
+		overflow-y: scroll !important;
+		overflow-x: hidden !important;
 	}
 	.main-container {}
 

@@ -1,10 +1,10 @@
 <template>
 	<div class="generic-margin">
-		<div class="row">
+		<div class="row items-center hi-content">
 			<div class="offset-1of3 width-1of3 lt-bg-width-1of1 lt-bg-offset-0 pad-h">
-				<h5 class="gt-bg">
-					Вход
-				</h5>
+				<h3 class="gt-bg">
+					Войти с паролем
+				</h3>
 				<form v-on:submit.prevent="LOG_IN" class="group">
 					<div class="">
 						<div class="stacked-label">
@@ -18,10 +18,11 @@
 							<input  v-model="auth.password" type="password" class="full-width"/>
 						</div>
 					</div>
+					<br/>
 					<div class="row">
 						<div class="width-2of3">
-							<button class="primary clear" v-link="'register'" type="button">Регистрация</button> 
-							<button class="primary clear" type="button">Забыли пароль?</button>
+							<button class="primary clear small" v-link="'register'" type="button">Регистрация</button> 
+							<button class="primary clear small" type="button">Забыли пароль?</button>
 						</div>
 						<div class="width-1of3 text-right">
 							<q-progress-button indeterminate dark-filler class="primary full-width" v-bind:percentage="auth.pending">
@@ -30,8 +31,11 @@
 						</div>
 					</div>
 				</form>
+				<hr style="margin: 3em 0;"/>
 				<div class="social-login-wrap">
-					<h5 class="text-center">Войти через соцсети</h5>
+					<h3 class="gt-bg">
+						Войти через соцсети
+					</h3>
 					<div class="flex justify-around">
 						<button class="tertiary circular" v-bind:disabled="auth.pending===1" v-on:click="LOG_IN_EXT('facebook')">
 							<i class="mdi mdi-facebook"></i>
@@ -50,14 +54,14 @@
 						</button>
 					</div>
 				</div>
-				<div class="text-center">
+				<!-- <div class="text-center">
 					<a href="#/" class="primary clear">
 						Перейти к карте
 					</a>
 					<br/>
 					<br/>
 					<a href="#/" class="mdi mdi-map-marker-circle"></a>
-				</div>
+				</div> -->
 			</div>
 		</div>
 	</div>

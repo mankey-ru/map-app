@@ -16,6 +16,7 @@
 	<div class="row">
 		<div class="width-1of3 offset-1of3 lt-bg-width-1of1 lt-bg-offset-0 pad-h">
 			<h1>How it works</h1>
+			
 			<p>Quisque commodo dui ut pharetra vehicula. Ut consequat nulla eu arcu gravida scelerisque. In ullamcorper nisi ut odio placerat vestibulum. Fusce a dolor nec orci ultricies sagittis at sit amet lorem. Fusce purus quam, facilisis id iaculis eget, elementum in orci. Maecenas ornare arcu sed massa congue suscipit. Etiam nec feugiat justo. Phasellus diam ex, aliquam quis posuere vitae, venenatis sit amet massa. Pellentesque quis odio sed orci pharetra pulvinar. Nullam sit amet est pretium, convallis erat sit amet, volutpat erat. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed facilisis arcu et lectus porta, ut accumsan risus porttitor. Quisque iaculis tempus congue. Praesent auctor diam id metus molestie cursus. Aliquam sit amet dui mollis, cursus orci a, pharetra elit. Aliquam viverra, neque ac tempor pharetra, metus sem aliquet ipsum, ac congue nibh nibh eget ante.</p>
 
 			<p>Ut feugiat urna id nibh pharetra laoreet. Donec lobortis lectus sapien, nec luctus dolor pulvinar quis. In eget maximus urna. Pellentesque aliquet sed erat vel bibendum. Duis et metus a nulla luctus tincidunt. Nam at enim lorem. Nunc vitae dignissim magna, vitae gravida felis. Suspendisse nec orci nunc.</p>

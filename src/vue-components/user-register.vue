@@ -1,72 +1,50 @@
 <template>
 	<div>
-		<div class="row">
-			<form v-on:submit.prevent="register_submit"  class="width-2of4 offset-1of4 lt-bg-width-1of1 lt-bg-offset-0 pad-h mar-v-group">
+		<div class="row items-center hi-content">
+			<form v-on:submit.prevent="register_submit"  class="offset-1of3 width-1of3 lt-bg-width-1of1 lt-bg-offset-0 pad-h mar-v-group">
 				<h1 class="gt-bg">Регистрация</h1>
 
-				<div class="row">
-					<div class="width-3of4">
-						<label>
-							<!-- <q-checkbox class="primary" v-model="nu.role"></q-checkbox> -->
-							<q-toggle class="primary" v-model="nu.role"></q-toggle>
-							Я музыкант
-						</label>
+				
+				<label>
+					<!-- <q-checkbox class="primary" v-model="nu.role"></q-checkbox> -->
+					<q-toggle class="primary" v-model="nu.role"></q-toggle>
+					Я музыкант
+				</label>
+				<div class="floating-label">
+					<input required class="full-width" v-model="nu.name">
+					<label>Логин</label>
+				</div>
+				<div class="floating-label">
+					<input required v-model="nu.email" class="full-width">
+					<label>Электронная почта</label>
+				</div>
+				<i v-show="nu.email_pending" class="spin spin-sm"></i>
+				<div v-show="nu.email_unique" class="color-good">
+					<i class="glyphicon glyphicon-ok-circle"></i>
+					Not available
+				</div>
+				<div v-show="nu.email_exists" class="color-bad">
+					<i class="glyphicon glyphicon-ban-circle"></i>
+					Available
+				</div>
+				<div v-show="email_invalid===true" class="color-bad">
+					<i class="glyphicon glyphicon-ban-circle"></i>
+					Invalid format
+				</div>
+				<div class="floating-label">
+					<input v-if="!nu.password_visible" type="password" v-model="nu.password"required class="full-width" />
+					<input v-if="nu.password_visible" type="text" v-model="nu.password" required class="full-width" />
+					<label>Пароль</label>
+				</div>
+				<i v-show="!nu.password_visible" v-on:click="nu.password_visible = !nu.password_visible" class="glyphicon glyphicon-eye-open"></i>
+				<i v-show="nu.password_visible" v-on:click="nu.password_visible = !nu.password_visible" class="glyphicon glyphicon-eye-close"></i>
 
+				<div v-bind:class="{opa: nu.password_visible}">
+					<div class="floating-label">
+						<input required v-model="nu.password_confirm" v-bind:disabled="nu.password_visible" class="full-width" type="password">
+						<label>Ещё раз пароль</label>
 					</div>
-				</div>
-				<div class="row">
-					<div class="width-3of4">
-						<div class="floating-label">
-							<input required class="full-width" v-model="nu.name">
-							<label>Логин</label>
-						</div>
-					</div>
-					<div class="width-1of4"></div>
-				</div>
-				<div class="row">
-					<div class="width-3of4">
-						<div class="floating-label">
-							<input required v-model="nu.email" class="full-width">
-							<label>Электронная почта</label>
-						</div>
-					</div>
-					<div class="width-1of4">
-						<i v-show="nu.email_pending" class="spin spin-sm"></i>
-						<div v-show="nu.email_unique" class="color-good">
-							<i class="glyphicon glyphicon-ok-circle"></i>
-							Not available
-						</div>
-						<div v-show="nu.email_exists" class="color-bad">
-							<i class="glyphicon glyphicon-ban-circle"></i>
-							Available
-						</div>
-						<div v-show="email_invalid===true" class="color-bad">
-							<i class="glyphicon glyphicon-ban-circle"></i>
-							Invalid format
-						</div>
-					</div>
-				</div>
-				<div class="row">
-					<div class="width-3of4">
-						<div class="floating-label">
-							<input v-if="!nu.password_visible" type="password" v-model="nu.password"required class="full-width" />
-							<input v-if="nu.password_visible" type="text" v-model="nu.password" required class="full-width" />
-							<label>Пароль</label>
-						</div>
-					</div>
-					<div class="width-1of4">
-						<i v-show="!nu.password_visible" v-on:click="nu.password_visible = !nu.password_visible" class="glyphicon glyphicon-eye-open"></i>
-						<i v-show="nu.password_visible" v-on:click="nu.password_visible = !nu.password_visible" class="glyphicon glyphicon-eye-close"></i>
-					</div>
-				</div>
-				<div class="row" v-bind:class="{opa: nu.password_visible}">
-					<div class="width-3of4">
-						<div class="floating-label">
-							<input required v-model="nu.password_confirm" v-bind:disabled="nu.password_visible" class="full-width" type="password">
-							<label>Ещё раз пароль</label>
-						</div>
-					</div>
-					<div class="width-1of4" v-show="!nu.password_visible">
+					<div v-show="!nu.password_visible">
 						<div v-show="password_match===true" class="color-good">
 							<i class="glyphicon glyphicon-ok-circle"></i>
 							Match
@@ -78,17 +56,13 @@
 					</div>
 				</div>
 				<div class="row">
-					<div class="width-3of4">
-						<div class="row">
-							<div class="width-1of2">
-								<homebtn></homebtn>
-							</div>
-							<div class="width-1of2 text-right">
-								<q-progress-button indeterminate class="primary full-width" v-bind:disabled="form_invalid" v-bind:percentage="nu.submit_pending" type="submit">
-									Готово
-								</q-progress-button>
-							</div>
-						</div>
+					<div class="width-1of2">
+						<homebtn></homebtn>
+					</div>
+					<div class="width-1of2 text-right">
+						<q-progress-button indeterminate class="primary full-width" v-bind:disabled="form_invalid" v-bind:percentage="nu.submit_pending" type="submit">
+							Готово
+						</q-progress-button>
 					</div>
 				</div>
 			</form>
