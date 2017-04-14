@@ -20,14 +20,16 @@
 					date: '',
 					genre_id: ''
 				},
+				newplace: {
+					active: false,
+					title: ''
+				},
 				submit_pending: 0
 			}
 		},
 		mixins: [mixins],
 		methods: {
 			nevt_submit: function(){
-				var pos = this.mark_cur.getPosition()
-				this.nevt.latLng = [pos.lat(), pos.lng()]
 				this.submit_pending = 1;
 				request
 				.post(apiUrl + 'events')
@@ -47,6 +49,10 @@
 			nevt_discard: function(){
 				this.mark_cur.setMap(null);
 				this.mark_cur = false;
+			},
+			updateLocation: function(){
+				var pos = this.mark_cur.getPosition()
+				this.nevt.latLng = [pos.lat(), pos.lng()]
 			},
 			mapOpen: function(){
 				this.$refs.modal_map.open()
@@ -135,11 +141,11 @@
 			</div>
 		</q-modal>
 
-		<q-modal ref="modal_map" position="left" :content-css="{minWidth: '80vw', minHeight: '80vh'}">
+		<q-modal ref="modal_map" position="right" v-on:close="updateLocation" :content-css="{minWidth: '80vw', minHeight: '80vh'}">
 			<q-layout>
 				<div slot="header" class="toolbar">
 					<button @click="$refs.modal_map.close()">
-						<i>keyboard_arrow_left</i>
+						<i>keyboard_arrow_right</i>
 					</button>
 					<q-toolbar-title :padding="1">
 						Выберите место
@@ -175,14 +181,28 @@
 				Новое мероприятие
 			</h3>
 			<div class="group">
-				<div>		
-					<button v-on:click.prevent="mapOpen" class="primary small">
-						Выбрать место
-					</button>
+
+				<div class="row">
+					<div class="width-1of5">
+						<button v-on:click.prevent="mapOpen" class="primary">
+							<span v-if="nevt.latLng">Изменить</span><span v-else>Указать</span> место
+						</button>
+					</div>
+					<div class="width-2of5 text-right" style="padding-top:.4em;padding-right:1.4em;">
+						<label>
+							Запомнить место
+							<q-checkbox v-model="newplace.active"></q-checkbox>
+						</label>
+					</div>
+					<div class="width-2of5">
+						<div v-show="newplace.active">
+							<input v-model="newplace.title" placeholder="Введите название" required class="full-width" />
+						</div>
+					</div>
 				</div>
 				<div class="floating-label">
 					<input v-model="nevt.name" required class="full-width" />
-					<label>Название</label>
+					<label>Название мероприятия</label>
 				</div>
 				<div class="floating-label">
 					<input v-model="nevt_date" required class="full-width" v-on:focus="$refs.modal_datetime.open()" />
@@ -201,10 +221,10 @@
 				<br />
 				<br />
 				<div class="row">
-					<div class="width-1of2">
+					<div class="width-2of3">
 						<homebtn></homebtn>
 					</div>
-					<div class="width-1of2 text-right">
+					<div class="width-1of3 text-right">
 						<q-progress-button indeterminate class="primary full-width big" v-bind:disabled="nevt_invalid" v-bind:percentage="submit_pending" type="submit">
 							Готово
 						</q-progress-button>
