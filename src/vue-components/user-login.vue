@@ -2,7 +2,7 @@
 	<div class="generic-margin">
 		<div class="row items-center">
 			<div class="offset-1of3 width-1of3 lt-bg-width-1of1 lt-bg-offset-0 pad-h">
-				<h1 class="gt-bg h1-md">
+				<h1 class="text-center h1-md">
 					Войти с паролем
 				</h1>
 				<form v-on:submit.prevent="LOG_IN" class="group-x">
@@ -34,20 +34,20 @@
 					</div>
 					<br/>
 					<div>
-						<button class="primary clear small" v-link="'register'" type="button">Регистрация</button> 
-						<button class="primary clear small" type="button">Забыли пароль?</button>
+						<button class="tertiary clear small" v-link="'register'" type="button">Регистрация</button> 
+						<button class="tertiary clear small" type="button">Забыли пароль?</button>
 						<q-progress-button indeterminate dark-filler class="primary pull-right" v-bind:percentage="auth.pending" v-bind:disabled="$v.$invalid">
 							Войти
 						</q-progress-button> <!-- http://quasar-framework.org/components/progress-button.html -->
 						
 					</div>
 				</form>
-				<hr style="margin: 3em 0;"/>
-				<div class="social-login-wrap">
-					<h1 class="gt-bg h1-md">
+				<div class="vspace-3"></div>
+				<div>
+					<h1 class="text-center h1-md">
 						Войти через соцсети
 					</h1>
-					<div class="flex justify-around">
+					<div class="flex justify-around social-login-btn-wrap">
 						<button class="secondary circular" v-bind:disabled="auth.pending===1" v-on:click="LOG_IN_EXT('facebook')">
 							<i class="mdi mdi-facebook"></i>
 						</button> 
@@ -108,8 +108,8 @@
 	export default Comp;
 </script>
 
-<style lang="less">
-	.social-login-wrap {
+<style lang="less" scoped>
+	.social-login-btn-wrap {
 		margin-top: 2em;
 		margin-bottom: 2em;
 	}

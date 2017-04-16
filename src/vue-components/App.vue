@@ -106,11 +106,19 @@
 									Basic helper classes
 	========================================================================================
 	*/
+	.vspace-3 {
+		width: 100%;
+		clear: both;
+		height: 3em;
+	}
 	.h1-md {
 		font-size: 2.5rem;
 	}
 	.group-x {
-		&>.stacked-label, &>.floating-label {			
+		&>label, 
+		&>.stacked-label, 
+		&>.floating-label {		
+			display: block;	
 			margin-bottom: 2em;
 		}
 	}
