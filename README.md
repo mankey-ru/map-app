@@ -10,5 +10,6 @@
 
 # Major TODOs
 - replace homebrewed server validation with plugin like [express-validation](https://www.npmjs.com/package/express-validation) or [express-validator](https://www.npmjs.com/package/express-validator)
-- common testing https://mochajs.org/
-- Vue testing https://github.com/eddyerburgh/avoriaz
+- general testing https://mochajs.org/
+- Vue testing https://github.com/eddyerburgh/avoria
+- logger i.e. [bunyan](https://github.com/trentm/node-bunyan)

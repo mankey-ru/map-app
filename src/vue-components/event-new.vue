@@ -205,7 +205,7 @@
 					<label>Название мероприятия</label>
 				</div>
 				<div class="floating-label">
-					<input v-model="nevt_date" required class="full-width" v-on:focus="$refs.modal_datetime.open()" />
+					<input v-model="nevt_date" required class="full-width" v-on:focus.prevent="$refs.modal_datetime.open()" />
 					<label>Дата</label>
 				</div>
 				<div class="floating-label">

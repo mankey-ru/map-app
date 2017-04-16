@@ -1,55 +1,66 @@
 <template>
 	<div class="generic-margin">
-		<div class="row items-center hi-content">
+		<div class="row items-center">
 			<div class="offset-1of3 width-1of3 lt-bg-width-1of1 lt-bg-offset-0 pad-h">
-				<h3 class="gt-bg">
+				<h1 class="gt-bg h1-md">
 					Войти с паролем
-				</h3>
-				<form v-on:submit.prevent="LOG_IN" class="group">
-					<div class="">
-						<div class="stacked-label">
-							<label>Email</label>
-							<input v-model="auth.email" type="email" class="full-width" />
-						</div>
+				</h1>
+				<form v-on:submit.prevent="LOG_IN" class="group-x">
+					<div class="stacked-label">
+						<label>
+							Email
+							<span class="err-label">
+								<span v-show="!$v.auth.email.required">
+									Это обязательное поле
+								</span>
+								<span v-show="!$v.auth.email.email">
+									Некорректный формат адреса электронной почты
+								</span>
+							</span>
+						</label>
+						<input v-model="auth.email" type="email" class="full-width" 
+						v-on:input="$v.auth.email.$touch()" v-bind:class="{'has-error':$v.auth.email.$error}" />
 					</div>
-					<div class="">
-						<div class="stacked-label">
-							<label>Пароль</label>
-							<input  v-model="auth.password" type="password" class="full-width"/>
-						</div>
+					<div class="stacked-label">
+						<label>
+							Пароль
+							<span class="err-label">
+								<span v-show="!$v.auth.password.required">
+									Это обязательное поле
+								</span>
+							</span>
+						</label>
+						<input  v-model="auth.password" type="password" class="full-width" v-on:input="$v.auth.password.$touch()" v-bind:class="{'has-error':$v.auth.password.$error}" />
 					</div>
 					<br/>
-					<div class="row">
-						<div class="width-2of3">
-							<button class="primary clear small" v-link="'register'" type="button">Регистрация</button> 
-							<button class="primary clear small" type="button">Забыли пароль?</button>
-						</div>
-						<div class="width-1of3 text-right">
-							<q-progress-button indeterminate dark-filler class="primary full-width" v-bind:percentage="auth.pending">
-								Войти
-							</q-progress-button> <!-- http://quasar-framework.org/components/progress-button.html -->
-						</div>
+					<div>
+						<button class="primary clear small" v-link="'register'" type="button">Регистрация</button> 
+						<button class="primary clear small" type="button">Забыли пароль?</button>
+						<q-progress-button indeterminate dark-filler class="primary pull-right" v-bind:percentage="auth.pending" v-bind:disabled="$v.$invalid">
+							Войти
+						</q-progress-button> <!-- http://quasar-framework.org/components/progress-button.html -->
+						
 					</div>
 				</form>
 				<hr style="margin: 3em 0;"/>
 				<div class="social-login-wrap">
-					<h3 class="gt-bg">
+					<h1 class="gt-bg h1-md">
 						Войти через соцсети
-					</h3>
+					</h1>
 					<div class="flex justify-around">
-						<button class="tertiary circular" v-bind:disabled="auth.pending===1" v-on:click="LOG_IN_EXT('facebook')">
+						<button class="secondary circular" v-bind:disabled="auth.pending===1" v-on:click="LOG_IN_EXT('facebook')">
 							<i class="mdi mdi-facebook"></i>
 						</button> 
-						<button class="tertiary circular" v-bind:disabled="auth.pending===1" v-on:click="LOG_IN_EXT('vkontakte')">
+						<button class="secondary circular" v-bind:disabled="auth.pending===1" v-on:click="LOG_IN_EXT('vkontakte')">
 							<i class="mdi mdi-vk"></i>
 						</button> 
-						<button class="tertiary circular" v-bind:disabled="auth.pending===1" v-on:click="LOG_IN_EXT('twitter')">
+						<button class="secondary circular" v-bind:disabled="auth.pending===1" v-on:click="LOG_IN_EXT('twitter')">
 							<i class="mdi mdi-twitter"></i>
 						</button>
-						<button class="tertiary circular" v-bind:disabled="1 || auth.pending" v-on:click="LOG_IN_EXT('youtube')">
+						<button class="secondary circular" v-bind:disabled="1 || auth.pending" v-on:click="LOG_IN_EXT('youtube')">
 							<i class="mdi mdi-youtube-play"></i>
 						</button>
-						<button class="tertiary circular" v-bind:disabled="1 || auth.pending" v-on:click="LOG_IN_EXT('instagram')">
+						<button class="secondary circular" v-bind:disabled="1 || auth.pending" v-on:click="LOG_IN_EXT('instagram')">
 							<i class="mdi mdi-instagram"></i>
 						</button>
 					</div>
@@ -69,6 +80,8 @@
 
 <script>
 	import mixins from './../vue-mixins.js';
+	import { required, email } from 'vuelidate/lib/validators'
+
 	var Comp = {
 		name: 'user-login-page',
 		mixins: [mixins],
@@ -78,6 +91,16 @@
 					email: '',
 					password: '',
 					pending: 0
+				}
+			}
+		},
+		validations: { // https://monterail.github.io/vuelidate/#getting-started
+			auth: {
+				email: {
+					required, email
+				},
+				password: {
+					required
 				}
 			}
 		}

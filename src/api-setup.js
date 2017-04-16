@@ -243,6 +243,7 @@ function setupAuth(app) {
 			_id: ObjectID(_id)
 		}, function(err, user) {
 			if (err) {
+				console.log('LOOKS LIKE TOPOLOGY ERROR HAPPENS HERE')
 				return cb(err);
 			}
 			cb(null, user);

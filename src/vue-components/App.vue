@@ -106,8 +106,25 @@
 									Basic helper classes
 	========================================================================================
 	*/
-	.hi-content {
-		height:90vh;
+	.h1-md {
+		font-size: 2.5rem;
+	}
+	.group-x {
+		&>.stacked-label, &>.floating-label {			
+			margin-bottom: 2em;
+		}
+	}
+	.--err {		
+		color: #db2828;
+	}
+	.err-label {
+		.--err();
+   		margin-left: 1em;
+	}
+	.err-msg {
+		.--err();
+		text-align: right;
+		font-size: .7em;
 	}
 	.mar-v {
 		margin-top: 1em;
