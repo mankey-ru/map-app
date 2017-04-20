@@ -4,8 +4,15 @@ import store from './vue-store.js'
 import App from './vue-components/App.vue'
 import Quasar from 'quasar-framework'
 Vue.use(Quasar)
+
 import Vuelidate from 'vuelidate'
 Vue.use(Vuelidate)
+
+import VueChe from 'vue-che'
+Vue.use(VueChe, {
+	errorClass: 'has-error',
+	lang: 'ru'
+})
 
 
 // for some unclear reason

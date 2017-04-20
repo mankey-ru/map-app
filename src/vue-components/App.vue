@@ -19,78 +19,70 @@
 
 <template>
 	<div>
-		<q-drawer ref="drawer_left" v-bind:backdrop-opacity=".2"> <!-- Left Sidebar -->
-			<h4 class="text-center mar-v">
-				<i class="mdi mdi-google-maps cursor-pointer" v-on:click="GOTO_MAIN($refs.drawer_left)"></i>
-			</h4>
-			<div class="list platform-delimiter">
-				<div v-if="currentUser">
-					<lilink to="user-profile-current" icon="account-box">
-						{{currentUser.name}}
-					</lilink>
-					<div v-if="currentUser.role">
-						<lilink to="event-new" icon="new-box">
-							Добавить событие
-						</lilink>
+		<q-layout>
 
-						<lilink to="event-list" icon="format-list-bulleted-type">
-							Мои мероприятия
+			<div slot="header" class="toolbar primary" v-show="$route.name!=='mainpage'">
+				<button class="hide-on-drawer-visible" v-on:click="$refs.drawer_left.open()">
+					<i class="mdi mdi-menu"></i>
+				</button>
+				<q-toolbar-title :padding="2">
+					{{$route.meta.title}}
+				</q-toolbar-title>
+				<button v-on:click="$router.push({name:'mainpage'})">
+					<i class="mdi mdi-google-maps"></i>
+				</button>
+				<button v-show="currentUser" v-on:click="$router.push({name:'user-profile-current'})">
+					<i class="mdi mdi-account-box"></i>
+				</button>
+			</div>
+
+			<q-drawer ref="drawer_left" v-bind:backdrop-opacity=".2"> <!-- Left Sidebar -->
+				<h4 class="text-center mar-v">
+					<i class="mdi mdi-google-maps cursor-pointer" v-on:click="GOTO_MAIN($refs.drawer_left)"></i>
+				</h4>
+				<div class="list platform-delimiter">
+					<div v-if="currentUser">
+						<lilink to="user-profile-current" icon="account-box">
+							{{currentUser.name}}
+						</lilink>
+						<div v-if="currentUser.role">
+							<lilink to="event-new" icon="new-box">
+								Добавить событие
+							</lilink>
+
+							<lilink to="event-list" icon="format-list-bulleted-type">
+								Мои мероприятия
+							</lilink>
+						</div>
+						<q-progress-button indeterminate class="tertiary full-width" v-bind:percentage="auth.pending" v-on:click.native="LOG_OUT">
+							Выйти
+						</q-progress-button>
+					</div>
+					<div v-if="!currentUser">
+						<lilink to="user-login" icon="login-variant">
+							Вход
+						</lilink>
+						<lilink to="user-register" icon="account-card-details">
+							Регистрация
 						</lilink>
 					</div>
-					<q-progress-button indeterminate class="tertiary full-width" v-bind:percentage="auth.pending" v-on:click.native="LOG_OUT">
-						Выйти
-					</q-progress-button>
+					<hr />
+					<div>
+						<lilink to="page-how" icon="chevron-right">
+							Как это работает
+						</lilink>
+
+						<lilink to="page-about" icon="chevron-right">
+							О нас
+						</lilink>
+					</div>
 				</div>
-				<div v-if="!currentUser">
-					<lilink to="user-login" icon="login-variant">
-						Вход
-					</lilink>
-					<lilink to="user-register" icon="account-card-details">
-						Регистрация
-					</lilink>
-				</div>
-				<hr />
-				<div>
-					<lilink to="page-how" icon="chevron-right">
-						Как это работает
-					</lilink>
+			</q-drawer>
 
-					<lilink to="page-about" icon="chevron-right">
-						О нас
-					</lilink>
-				</div>
-			</div>
-		</q-drawer>
+			<router-view class="layout-view"></router-view>
 
-		<div slot="header" class="toolbar primary" v-show="$route.name!=='mainpage'">
-			<button class="11hide-on-drawer-visible" v-on:click="$refs.drawer_left.open()">
-				<i class="mdi mdi-menu"></i>
-			</button>
-			<q-toolbar-title :padding="2">
-				{{$route.meta.title}}
-			</q-toolbar-title>
-			<button v-on:click="$router.push({name:'mainpage'})">
-				<i class="mdi mdi-google-maps"></i>
-			</button>
-			<button v-show="currentUser" v-on:click="$router.push({name:'user-profile-current'})">
-				<i class="mdi mdi-account-box"></i>
-			</button>
-		</div>
-
-		<router-view class="layout-view"></router-view>
-
-		<q-ajax-bar position="bottom" color="primary" v-bind:speed="200" size="15px"></q-ajax-bar> 
-		<!-- Bottom progressbar -->
-
-		<!-- <q-drawer ref="drawer_right" right-side>
-			<div class="list platform-delimiter">
-				<div class="list-header">
-					Right Side Drawer
-				</div>
-				<q-drawer-link icon="mail" to="/shopping-cart">Shopping Cart</q-drawer-link>
-				<q-drawer-link icon="mail" to="/weather">Weather</q-drawer-link>
-			</div>
-		</q-drawer> -->
+			<q-ajax-bar position="bottom" color="primary" v-bind:speed="200" size="15px"></q-ajax-bar> 
+		</q-layout>
 	</div>
 </template>
 
@@ -127,7 +119,7 @@
 	}
 	.err-label {
 		.--err();
-   		margin-left: 1em;
+		margin-left: 1em;
 	}
 	.err-msg {
 		.--err();

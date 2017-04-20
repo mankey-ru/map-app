@@ -6,7 +6,7 @@ var app = express();
 // webpack builds an extra gzip file via CompressionPlugin (see webpack.config.js)
 // then express rewrites requests for js
 app.get('/build-browser.js', function (req, res, next) {
-	req.url = req.url + '.gz';
+	req.url = req.url + '-compressed.gz'; // -compressed is for different filename, otherwise cordova throws an exception
 	res.set('Content-Encoding', 'gzip');
 	next();
 });

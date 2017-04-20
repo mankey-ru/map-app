@@ -263,7 +263,7 @@
 								<div class="width-2of3">
 									<div class="map-pane-main row inline"><!-- hide-on-drawer-visible -->
 
-										<i v-on:click="$parent.$refs.drawer_left.open()" class="mdi mdi-menu"></i>
+										<i v-on:click="$parent.$parent.$refs.drawer_left.open()" class="mdi mdi-menu"></i>
 
 										<form class="inline" v-on:submit.prevent="evtSearch">
 											<span class="gt-sm">
@@ -380,6 +380,7 @@
 	}
 	.mdi {
 		cursor: pointer;
+		font-size: 2.5em;
 	}
 	.map-ctrl-top {
 		width: 100%;		

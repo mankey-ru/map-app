@@ -122,7 +122,7 @@ if (process.env.NODE_ENV === 'production' || bAnalyze) { // http://vue-loader.vu
 			https://github.com/webpack-contrib/compression-webpack-plugin
 		*/
 		new CompressionPlugin({
-			asset: "[path].gz[query]",
+			asset: "[path]-compressed.gz[query]",
 			algorithm: "gzip",
 			test: /\.js$|\.css$|\.html$/,
 			threshold: 10240,
@@ -137,9 +137,11 @@ if (process.env.NODE_ENV === 'production' || bAnalyze) { // http://vue-loader.vu
 		new webpack.ContextReplacementPlugin(/moment[\/\\]locale$/, /ru/),
 		/**
 			This hack is for preventing Cordova exception about "duplicated" files which is js and js.gz
+			deprecated: ive just added -compressed suffix to make filename different
+			TODO delete WebpackCleanPlugin
 		*/
 		new WebpackCleanPlugin([
-			'www/build-browser.js'
+			// 'www/build-browser.js'
 		])
 		// TODO https://github.com/webpack-contrib/i18n-webpack-plugin
 	])

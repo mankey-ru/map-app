@@ -268,9 +268,6 @@ function setupAuth(app) {
 	var extLoginCb_full = _api.domain + extLoginCb;
 	app.get(extLoginCb,
 		function(req, res, next) {
-			/*if (req.user) {
-				req.logout();
-			}*/
 			passport.authenticate(req.query.provider, {
 				failureFlash: true
 			})(req, res, next);
