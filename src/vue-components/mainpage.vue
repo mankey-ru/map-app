@@ -268,9 +268,10 @@
 										<form class="inline" v-on:submit.prevent="evtSearch">
 											<span class="gt-sm">
 												<input v-model="search.text" placeholder="Поиск" />
-												<spinner v-show="search_pending" v-bind:size="32"></spinner>
-												<i class="glyphicon glyphicon-search" v-on:click="evtSearch"></i>
-												<i class="glyphicon glyphicon-tasks"></i>
+												<span class="search-icon-wrap">
+													<spinner v-show="search_pending" v-bind:size="30"></spinner>
+													<i v-show="!search_pending" v-on:click="evtSearch" class="search-icon">search</i>
+												</span>
 											</span>
 										</form>
 									</div>
@@ -340,8 +341,16 @@
 </template>
 
 <style scoped lang="less">
+	.search-icon {
+		cursor: pointer;	
+		font-size: 1.7em;
+	}
+	.search-icon-wrap {
+    	width: 2em;
+   		display: inline-block;
+	}
 	.newEvtWrap {
-		margin: 3em;
+		margin: 2em;
 		z-index: 29;
 	}
 	.-boxshad {
@@ -349,10 +358,6 @@
 	}
 	.-map-pane-fontsize {
 		font-size: 1.4em;
-	}
-	.map-profile-icon {
-		font-size: 6em;
-		cursor: pointer;
 	}
 	.map-pane__wrap {
 		float:left;
@@ -381,6 +386,10 @@
 	.mdi {
 		cursor: pointer;
 		font-size: 2.5em;
+	}
+	.map-profile-icon {
+		font-size: 6em;
+		cursor: pointer;
 	}
 	.map-ctrl-top {
 		width: 100%;		

@@ -39,8 +39,8 @@
 </script>
 
 <template>
-	<div class="row">
-		<div v-if="evt" class="width-2of4 offset-1of4 lt-bg-width-1of1 lt-bg-offset-0 pad-h">
+	<div>
+		<div v-if="evt">
 			<h2 class="gt-bg">{{evt.name}}</h2>
 			<p>
 				<i class="mdi mdi-calendar"></i>&#160;
@@ -54,6 +54,9 @@
 			</p>
 			<pre>{{evt.descr}}</pre>
 			<pre>Координаты: {{evt.latLng}}</pre>
+		</div>
+		<div v-else class="spinner-wrap">
+			<spinner :size="50"></spinner>
 		</div>
 	</div>
 </template>

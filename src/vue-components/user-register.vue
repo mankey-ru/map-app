@@ -1,52 +1,50 @@
 <template>
 	<div>
-		<div class="row items-center hi-content">
-			<form v-on:submit.prevent="register_submit"  class="offset-1of3 width-1of3 lt-bg-width-1of1 lt-bg-offset-0 pad-h group-x">
-				<h1 class="text-center h1-md">Регистрация</h1>
+		<form v-on:submit.prevent="register_submit" class="group-x">
+			<h1 class="text-center h1-md">Регистрация</h1>
+			<label>
+				<!-- <q-checkbox class="primary" v-model="role"></q-checkbox> --> 
+				<q-toggle class="primary" v-model="role"></q-toggle> &#160; 
+				<b>Я музыкант</b>
+			</label>
+			<div class="stacked-label">
+				<input class="full-width" v-model="name" v-che:NAME.reqd />
 				<label>
-					<!-- <q-checkbox class="primary" v-model="role"></q-checkbox> --> 
-					<q-toggle class="primary" v-model="role"></q-toggle> &#160; 
-					<b>Я музыкант</b>
+					Имя <span class="err-label" v-html="cheErr('NAME')"></span>
 				</label>
-				<div class="stacked-label">
-					<input class="full-width" v-model="name" v-che:NAME.reqd />
-					<label>
-						Имя <span class="err-label" v-html="cheErr('NAME')"></span>
-					</label>
-				</div>
-				<div class="stacked-label">
-					<input v-model="email" class="full-width" v-che:EMAIL.reqd.email>
-					<label>
-						Электронная почта <span class="err-label" v-html="cheErr('EMAIL')"></span>
-					</label>
-				</div>
-				<div class="stacked-label">
-					<input v-if="!password_visible" type="password" v-model="password" class="full-width" v-che:PASSWORD.reqd />
-					<input v-if="password_visible" type="text" v-model="password" class="full-width" v-che:PASSWORD.reqd />
+			</div>
+			<div class="stacked-label">
+				<input v-model="email" class="full-width" v-che:EMAIL.reqd.email>
+				<label>
+					Электронная почта <span class="err-label" v-html="cheErr('EMAIL')"></span>
+				</label>
+			</div>
+			<div class="stacked-label">
+				<input v-if="!password_visible" type="password" v-model="password" class="full-width" v-che:PASSWORD.reqd />
+				<input v-if="password_visible" type="text" v-model="password" class="full-width" v-che:PASSWORD.reqd />
 
-					<div class="pwdvis">
-						<i v-show="!password_visible" v-on:click="password_visible = true" class="mdi mdi-eye"></i>
-						<i v-show="password_visible" v-on:click="password_visible = false" class="mdi mdi-eye-off"></i>
-					</div>
-					<label>
-						Пароль 
-					</label>
+				<div class="pwdvis">
+					<i v-show="!password_visible" v-on:click="password_visible = true" class="mdi mdi-eye"></i>
+					<i v-show="password_visible" v-on:click="password_visible = false" class="mdi mdi-eye-off"></i>
 				</div>
-				<div class="stacked-label"  v-bind:class="{opa: password_visible}">
-					<input v-model="password_confirm" v-bind:disabled="password_visible" class="full-width" type="password" v-che:PASSWORD_CONFIRM.sameas="'password'">
-					<label>
-						Ещё раз пароль <span class="err-label" v-html="cheErr('PASSWORD_CONFIRM')"></span>
-					</label>
-				</div>
+				<label>
+					Пароль 
+				</label>
+			</div>
+			<div class="stacked-label"  v-bind:class="{opa: password_visible}">
+				<input v-model="password_confirm" v-bind:disabled="password_visible" class="full-width" type="password" v-che:PASSWORD_CONFIRM.sameas="'password'">
+				<label>
+					Ещё раз пароль <span class="err-label" v-html="cheErr('PASSWORD_CONFIRM')"></span>
+				</label>
+			</div>
 
-				<div>
-					<homebtn></homebtn>
-					<q-progress-button indeterminate class="primary pull-right" v-bind:percentage="submit_pending" type="submit">
-						Готово
-					</q-progress-button>
-				</div>
-			</form>
-		</div>
+			<div>
+				<homebtn></homebtn>
+				<q-progress-button indeterminate class="primary pull-right" v-bind:percentage="submit_pending" type="submit">
+					Готово
+				</q-progress-button>
+			</div>
+		</form>
 	</div>
 </template>
 
@@ -82,19 +80,19 @@
 				}				
 				this.submit_pending = 1;
 				request
-					.post(apiUrl + 'auth/reg')
-					.send(this.$data)
-					.end((err, res)=>{
-						if (err || !res.body) {
-							miniToastr.error(res.body.error || 'Registration failed');
-						}
-						else {
-							miniToastr.success('Registration succeeded');
-							this.$root.currentUser = res.body;
-							this.GOTO_PROFILE(); 
-						}
-						submit_pending = 0;
-					});
+				.post(apiUrl + 'auth/reg')
+				.send(this.$data)
+				.end((err, res)=>{
+					if (err || !res.body) {
+						miniToastr.error(res.body.error || 'Registration failed');
+					}
+					else {
+						miniToastr.success('Registration succeeded');
+						this.$root.currentUser = res.body;
+						this.GOTO_PROFILE(); 
+					}
+					submit_pending = 0;
+				});
 			}
 		},
 		mixins: [mixins],
@@ -110,9 +108,9 @@
 <style scoped>
 	.pwdvis {
 		position: absolute;
-    	right: 4px;
-    	bottom: .5em;
-    	cursor: pointer;
+		right: 4px;
+		bottom: .5em;
+		cursor: pointer;
 	}
 	.color-good {
 		color: #5cb85c; /* taken from btn-success */

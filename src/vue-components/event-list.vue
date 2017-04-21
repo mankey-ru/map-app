@@ -54,33 +54,34 @@
 </script>
 
 <template>
-	<div class="row" >
-		<div class="width-2of4 offset-1of4 lt-bg-width-1of1 lt-bg-offset-0 pad-h">
-			<h5>{{pageTitle}}</h5>
-			<div v-show="evtList.length" class="group">
-				<div v-if="status">
-					<h2>
-						<div class="label label-warning">
-							{{status}}
-						</div>
-					</h2>
-				</div>
-				<table class="q-table horizontal-delimiter full-width">
-					<tbody>
-						<tr v-for="evt in evtList">
-							<td>
-								<a v-bind:href="'#/event/card/'+evt._id">{{evt.name}}</a>
-							</td>
-							<td>
-								{{evt.descr}}
-							</td>
-							<td>
-								{{evt.date | dateTimeFormat}}
-							</td>
-						</tr>
-					</tbody>
-				</table>
+	<div>
+		<h1 class="h1-md">{{pageTitle}}</h1>
+		<div v-if="evtList.length" class="group-x">
+			<div v-if="status">
+				<h2>
+					<div class="label label-warning">
+						{{status}}
+					</div>
+				</h2>
 			</div>
+			<table class="q-table horizontal-delimiter full-width">
+				<tbody>
+					<tr v-for="evt in evtList">
+						<td>
+							<a v-bind:href="'#/event/card/'+evt._id">{{evt.name}}</a>
+						</td>
+						<td>
+							{{evt.descr}}
+						</td>
+						<td>
+							{{evt.date | dateTimeFormat}}
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<div v-else class="spinner-wrap">
+			<spinner :size="50"></spinner>
 		</div>
 	</div>
 </template>

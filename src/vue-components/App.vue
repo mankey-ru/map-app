@@ -25,32 +25,39 @@
 				<button class="hide-on-drawer-visible" v-on:click="$refs.drawer_left.open()">
 					<i class="mdi mdi-menu"></i>
 				</button>
-				<q-toolbar-title :padding="2">
+				<q-toolbar-title v-bind:padding="1">
 					{{$route.meta.title}}
 				</q-toolbar-title>
 				<button v-on:click="$router.push({name:'mainpage'})">
-					<i class="mdi mdi-google-maps"></i>
+					<!-- <i class="mdi mdi-google-maps"></i> -->
+					<i>explore</i>
 				</button>
 				<button v-show="currentUser" v-on:click="$router.push({name:'user-profile-current'})">
 					<i class="mdi mdi-account-box"></i>
 				</button>
 			</div>
-
 			<q-drawer ref="drawer_left" v-bind:backdrop-opacity=".2"> <!-- Left Sidebar -->
+				<div class="toolbar light" v-show="$route.name==='mainpage'">
+					<q-toolbar-title v-bind:padding="1">
+						{{$route.meta.title}}
+					</q-toolbar-title>
+				</div>
 				<h4 class="text-center mar-v">
-					<i class="mdi mdi-google-maps cursor-pointer" v-on:click="GOTO_MAIN($refs.drawer_left)"></i>
+					<!-- <i class="mdi mdi-google-maps cursor-pointer sidebar-logo" v-on:click="$router.push({name:'mainpage'})"></i> -->
+					<h1 class="h1-md cursor-pointer" v-on:click="$router.push({name:'mainpage'})">
+						Лого
+					</h1>
 				</h4>
 				<div class="list platform-delimiter">
 					<div v-if="currentUser">
-						<lilink to="user-profile-current" icon="account-box">
+						<lilink to="user-profile-current" icon="account-box" v-bind:drawer="$refs.drawer_left">
 							{{currentUser.name}}
 						</lilink>
 						<div v-if="currentUser.role">
-							<lilink to="event-new" icon="new-box">
+							<lilink to="event-new" icon="new-box" v-bind:drawer="$refs.drawer_left">
 								Добавить событие
 							</lilink>
-
-							<lilink to="event-list" icon="format-list-bulleted-type">
+							<lilink to="event-list" icon="format-list-bulleted-type" v-bind:drawer="$refs.drawer_left">
 								Мои мероприятия
 							</lilink>
 						</div>
@@ -59,29 +66,33 @@
 						</q-progress-button>
 					</div>
 					<div v-if="!currentUser">
-						<lilink to="user-login" icon="login-variant">
+						<lilink to="user-login" icon="login-variant" v-bind:drawer="$refs.drawer_left">
 							Вход
 						</lilink>
-						<lilink to="user-register" icon="account-card-details">
+						<lilink to="user-register" icon="account-card-details" v-bind:drawer="$refs.drawer_left">
 							Регистрация
 						</lilink>
 					</div>
 					<hr />
 					<div>
-						<lilink to="page-how" icon="chevron-right">
+						<lilink to="page-how" icon="chevron-right" v-bind:drawer="$refs.drawer_left">
 							Как это работает
 						</lilink>
 
-						<lilink to="page-about" icon="chevron-right">
+						<lilink to="page-about" icon="chevron-right" v-bind:drawer="$refs.drawer_left">
 							О нас
 						</lilink>
 					</div>
 				</div>
 			</q-drawer>
 
-			<router-view class="layout-view"></router-view>
+			<div class="row layout-view">
+				<div v-bind:class="$route.meta.fullWidth?'router-view-wrap width-1of1':'router-view-wrap offset-1of4 width-2of4 lt-bg-width-1of1 lt-bg-offset-0'">
+					<router-view></router-view>
+				</div>
+			</div>
 
-			<q-ajax-bar position="bottom" color="primary" v-bind:speed="200" size="15px"></q-ajax-bar> 
+			<q-ajax-bar position="bottom" color="primary" v-bind:speed="100" size="15px"></q-ajax-bar>			
 		</q-layout>
 	</div>
 </template>
@@ -91,6 +102,26 @@
 <style lang="less">/* Global (not scoped) styles */
 	.drawer-content.left-side {
 		/*box-shadow: 6px 0 19px 3px #888;*/
+	}
+	body.mobile, body.cordova {		
+		.router-view-wrap {
+			padding: 1em;
+		}
+	}
+	.sidebar-logo {
+		font-size: 3em;
+	}
+
+ /* width took from drawer code */
+/*	@media screen and (min-width: 921px) {
+		.sidebar-title {
+			display: none !important;
+		}
+	}*/
+
+	.spinner-wrap {
+		padding: 5em;
+		text-align: center;
 	}
 
 	/*
@@ -190,7 +221,6 @@
 		overflow-y: scroll !important;
 		overflow-x: hidden !important;
 	}
-	.main-container {}
 
 	/*
 	========================================================================================
@@ -216,35 +246,5 @@
 
 	.map-ctrl-wrap {
 		padding: 1em;
-	}
-
-	/*
-	========================================================================================
-							ext styles for vuejs-datepicker
-	========================================================================================
-	*/
-	.__datepicker-clear {
-		position: absolute;
-		top: .5em;
-		right: .7em;
-		color: #666;
-		cursor: pointer;
-	}
-	.__datepicker-wrap {
-		position:relative
-	}
-	.__datepicker-wrap input[readonly]{ 
-		/*background-color: #fff;*/
-		cursor: pointer;
-	}
-	.__datepicker-wrap-noborder .calendar {
-		border-width: 0;
-	}
-	.__datepicker-wrap-center {
-		text-align: center;
-	}
-	.__datepicker-wrap-center .datepicker {
-		display: inline-block;
-		text-align: left;
 	}
 </style>

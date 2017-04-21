@@ -1,7 +1,7 @@
 <template>
-	<div class="row">
-		<form v-on:submit.prevent="userEdit" class="width-2of4 offset-1of4 lt-bg-width-1of1 lt-bg-offset-0 pad-h">
-			<div v-show="user">
+	<div>
+		<form v-on:submit.prevent="userEdit">
+			<div v-if="user">
 				<div class="row">
 					<div class="width-1">
 						<h3>{{user.name}}</h3>
@@ -57,6 +57,9 @@
 						</div>
 					</div>
 				</div>
+			</div>
+			<div v-else class="spinner-wrap">
+				<spinner :size="50"></spinner>
 			</div>
 		</form>
 	</div>

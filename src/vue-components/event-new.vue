@@ -126,8 +126,7 @@
 </script>
 
 <template>
-	<div class="row">
-
+	<div>
 		<q-modal ref="modal_datetime" position="top">
 			<div class="group">
 				<div>
@@ -176,25 +175,25 @@
 				</div>
 			</q-layout>
 		</q-modal>
-		<form v-on:submit.prevent="nevt_submit" class="width-2of4 offset-1of4 lt-bg-width-1of1 lt-bg-offset-0 pad-h">
-			<h3 class="gt-bg">
+		<form v-on:submit.prevent="nevt_submit">
+			<h1 class="h1-md">
 				Новое мероприятие
-			</h3>
+			</h1>
 			<div class="group">
 
 				<div class="row">
-					<div class="width-1of5">
+					<div class="width-1of3">
 						<button v-on:click.prevent="mapOpen" class="primary">
 							<span v-if="nevt.latLng">Изменить</span><span v-else>Указать</span> место
 						</button>
 					</div>
-					<div class="width-2of5 text-right" style="padding-top:.4em;padding-right:1.4em;">
+					<div class="width-1of3 text-right" style="padding-top:.4em;padding-right:1.4em;">
 						<label>
 							Запомнить место
 							<q-checkbox v-model="newplace.active"></q-checkbox>
 						</label>
 					</div>
-					<div class="width-2of5">
+					<div class="width-1of3">
 						<div v-show="newplace.active">
 							<input v-model="newplace.title" placeholder="Введите название" required class="full-width" />
 						</div>

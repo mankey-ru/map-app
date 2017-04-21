@@ -1,3 +1,7 @@
+/**
+	Global mixins
+*/
+
 const moment = require('moment')
 moment.locale('ru');
 
@@ -25,7 +29,6 @@ import { mapGetters, mapActions } from 'vuex'
   methods: mapActions(['actionName'])
 }
 */
-
 
 export default {
 	methods: {
@@ -114,26 +117,26 @@ export default {
 			this.$router.push(rt)
 		},
 		GOTO_MAIN: function (drawer) {
-			this.GOTO__ABSTRACT({
+			this.GOTO({
 				name: 'mainpage'
 			}, drawer)
 		},
 		GOTO_REGISTER: function (drawer) {
-			this.GOTO__ABSTRACT({
+			this.GOTO({
 				name: 'user-register'
 			}, drawer)
 		},
 		GOTO_EVT_NEW: function (drawer) {
-			this.GOTO__ABSTRACT({
+			this.GOTO({
 				name: 'event-new'
 			}, drawer)
 		},
 		GOTO_LOGIN: function (drawer) {
-			this.GOTO__ABSTRACT({
+			this.GOTO({
 				name: 'user-login'
 			}, drawer)
 		},
-		GOTO__ABSTRACT: function(to, drawer){
+		GOTO: function(to, drawer){
 			if (drawer && drawer.setState) {
 				drawer.setState(false, () => {
 					this.$router.push(to)
