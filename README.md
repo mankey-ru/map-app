@@ -46,6 +46,6 @@ explorer "%cd%\dist\MappApp-win32-x64"
 
 # Major TODOs
 - replace homebrewed server validation with plugin like [express-validation](https://www.npmjs.com/package/express-validation) or [express-validator](https://www.npmjs.com/package/express-validator)
-- general testing https://mochajs.org/
-- Vue testing https://github.com/eddyerburgh/avoria
-- logger i.e. [bunyan](https://github.com/trentm/node-bunyan)
+- unit testing (i.e. [mocha](https://mochajs.org/) or [chai](http://chaijs.com/))
+- Vue testing (i.e. [avoriaz](https://github.com/eddyerburgh/avoria))
+- logger (i.e. [bunyan](https://github.com/trentm/node-bunyan))
