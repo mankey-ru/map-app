@@ -9,6 +9,14 @@ Keywords
 - ExpressJS
 - MongoDB
 - Heroku
+- crypto (all credentials like database url and api keys are encrypted with AES-256-CTR)
+
+App is as much universal as it possible at all
+=========
+- it has both client- and server-side
+- it works in browser
+- it works on all modile platforms (ready to build with Cordova)
+- in works on all desktop platforms (ready to build with ElectronJS)
 
 Commands
 =========
