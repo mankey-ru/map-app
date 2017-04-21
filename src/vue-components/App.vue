@@ -50,7 +50,7 @@
 				</h4>
 				<div class="list platform-delimiter">
 					<div v-if="currentUser">
-						<lilink to="user-profile-current" icon="account-box" v-bind:drawer="$refs.drawer_left">
+						<lilink to="user-profile-current" class="multiple-lines" icon="account-box" v-bind:drawer="$refs.drawer_left">
 							{{currentUser.name}}
 						</lilink>
 						<div v-if="currentUser.role">
