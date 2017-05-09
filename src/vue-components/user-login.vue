@@ -41,7 +41,7 @@
 				
 			</div>
 		</form>
-		<div class="vspace-3"></div>
+		<!-- <div class="vspace-2"></div> -->
 		<div>
 			<h1 class="text-center h1-md">
 				Войти через соцсети

@@ -105,7 +105,7 @@
 	}
 	body.mobile, body.cordova {		
 		.router-view-wrap {
-			padding: 1em;
+			padding: 10px 15px;
 		}
 	}
 	.sidebar-logo {
@@ -129,9 +129,16 @@
 									Basic helper classes
 	========================================================================================
 	*/
-	.vspace-3 {
+	.--vspace {
 		width: 100%;
 		clear: both;
+	}
+	.vspace-2 {
+		.--vspace();
+		height: 2em;
+	}
+	.vspace-3 {
+		.--vspace();
 		height: 3em;
 	}
 	.h1-md {
