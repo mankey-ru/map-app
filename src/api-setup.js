@@ -345,7 +345,7 @@ function setupAuth(app) {
 					upsert: true // insert the document if it does not exist
 				},
 				function(err, dbres) {
-					return done(err, dbres.value);
+					return done(err, dbres ? dbres.value : null);
 				})
 		}
 	));
@@ -375,7 +375,7 @@ function setupAuth(app) {
 					upsert: true // insert the document if it does not exist
 				},
 				function(err, dbres) {
-					return done(err, dbres.value);
+					return done(err, dbres ? dbres.value : null);
 				})
 		}
 	));
@@ -419,7 +419,7 @@ function setupAuth(app) {
 					upsert: true // insert the document if it does not exist
 				},
 				function(err, dbres) {
-					return done(err, dbres.value);
+					return done(err, dbres ? dbres.value : null);
 				})
 		}));
 	/**
