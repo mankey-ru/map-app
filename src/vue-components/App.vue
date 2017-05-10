@@ -21,7 +21,7 @@
 	<div>
 		<q-layout>
 
-			<div slot="header" class="toolbar primary" v-show="$route.name!=='mainpage'">
+			<div slot="header" class="toolbar primary" v-show="!$route.meta.noToolbar">
 				<button class="hide-on-drawer-visible" v-on:click="$refs.drawer_left.open()">
 					<i class="mdi mdi-menu"></i>
 				</button>
@@ -36,8 +36,8 @@
 					<i class="mdi mdi-account-box"></i>
 				</button>
 			</div>
-			<q-drawer ref="drawer_left" v-bind:backdrop-opacity=".2"> <!-- Left Sidebar -->
-				<div class="toolbar light" v-show="$route.name==='mainpage'">
+			<q-drawer ref="drawer_left" v-bind:backdrop-opacity="0"> <!-- Left Sidebar -->
+				<div class="toolbar light" v-show="$route.meta.noToolbar">
 					<q-toolbar-title v-bind:padding="1">
 						{{$route.meta.title}}
 					</q-toolbar-title>
@@ -241,7 +241,7 @@
 	}
 
 	.__fullscreen {
-		position: absolute;
+		position: absolute !important; // override .mapboxgl-map
 		width: 100%;
 		height: 100%;
 		top: 0;

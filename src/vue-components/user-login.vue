@@ -64,33 +64,28 @@
 				</button>
 			</div>
 		</div>
-				<!-- <div class="text-center">
-					<a href="#/" class="primary clear">
-						Перейти к карте
-					</a>
-					<br/>
-					<br/>
-					<a href="#/" class="mdi mdi-map-marker-circle"></a>
-				</div> -->
-			</div>
-		</template>
+		<!-- <div class="text-center"><a href="#/" class="primary clear">Перейти к карте</a><br/><br/><a href="#/" class="mdi mdi-map-marker-circle"></a></div> -->
+	</div>
+</template>
 
-		<script>
-			import mixins from './../vue-mixins.js';
-			import { required, email } from 'vuelidate/lib/validators'
 
-			var Comp = {
-				name: 'user-login-page',
-				mixins: [mixins],
-				data: function () {
-					return {
-						auth: {
-							email: '',
-							password: '',
-							pending: 0
-						}
-					}
-				},
+
+<script>
+	import mixins from './../vue-mixins.js'
+	import { required, email } from 'vuelidate/lib/validators'
+
+	var Comp = {
+		name: 'user-login-page',
+		mixins: [mixins],
+		data: function () {
+			return {
+				auth: {
+					email: '',
+					password: '',
+					pending: 0
+				}
+			}
+		},
 		validations: { // https://monterail.github.io/vuelidate/#getting-started
 			auth: {
 				email: {
@@ -104,6 +99,8 @@
 	}
 	export default Comp;
 </script>
+
+
 
 <style lang="less" scoped>
 	.social-login-btn-wrap {

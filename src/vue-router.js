@@ -2,6 +2,7 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 
 import mainpage from './vue-components/mainpage.vue';
+import mainpage2 from './vue-components/mainpage2.vue';
 import eventNew from './vue-components/event-new.vue';
 import eventCard from './vue-components/event-card.vue';
 import eventList from './vue-components/event-list.vue';
@@ -18,7 +19,18 @@ const routes = [{
 		component: mainpage,
 		meta: {
 			fullscreen: true,
-			title: 'Джигурда!'
+			title: 'Main Page',
+			noToolbar: true
+		}
+	}, {
+		path: '/mainpage2',
+		alias: '/',
+		name: 'mainpage2',
+		component: mainpage2,
+		meta: {
+			fullscreen: true,
+			title: 'Main Page Beta',
+			noToolbar: true
 		}
 	}, {
 		path: '/event/new',
