@@ -46,30 +46,6 @@ var conf_browser = {
 					name: 'fonts/[name].[hash:7].[ext]'
 				}
 			}
-			/*
-			Loader for SCSS|SASS
-			https://github.com/webpack-contrib/sass-loader
-			npm install sass-loader --save-dev
-			,{
-				test: /\.scss$/,
-				use: [{
-					loader: "style-loader" // creates style nodes from JS strings
-				}, {
-					loader: "css-loader" // translates CSS into CommonJS
-				}, {
-					loader: "sass-loader" // compiles Sass to CSS
-				}]
-			}*/
-
-			/*
-				Global vars
-				new webpack.DefinePlugin({
-					'process.env': config[env.prod ? 'build' : 'dev'].env,
-					'DEV': env.dev,
-					'PROD': env.prod,
-					'__THEME': '"' + env.platform.theme + '"'
-				}),
-			*/
 		]
 	},
 	resolve: {
@@ -111,7 +87,8 @@ if (process.env.NODE_ENV === 'production' || bAnalyze) { // http://vue-loader.vu
 		new webpack.optimize.UglifyJsPlugin({
 			sourceMap: true,
 			compress: {
-				warnings: false
+				warnings: false,
+                comparisons: false  // workaround for https://github.com/mapbox/mapbox-gl-js/issues/4359
 			}
 		}),
 		new webpack.LoaderOptionsPlugin({
