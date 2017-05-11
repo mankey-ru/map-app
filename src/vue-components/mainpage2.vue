@@ -1,77 +1,79 @@
 <script>
+import mixins from './../vue-mixins.js'
+import request from 'superagent'
+import {
+	Toast,
+	Dialog
+}
+from 'quasar-framework'
 
-	import mixins from './../vue-mixins.js'
-	import request from 'superagent'
-	import {Toast,  Dialog} from 'quasar-framework'
+var apiUrl = require('./../api-url.js').def;
 
-	var apiUrl = require('./../api-url.js').def;
+require('mapbox-gl/dist/mapbox-gl.css');
 
-	require('mapbox-gl/dist/mapbox-gl.css');
+import mapboxgl from 'mapbox-gl';
+mapboxgl.accessToken = 'pk.eyJ1IjoiZDBlc250bWF0dGVyIiwiYSI6ImNqMDF1aWpqcDAyMW8ycXFuaDM2MzU1emIifQ.6PVUbllSeBVy41c-fSeqTg';
 
-	import mapboxgl from 'mapbox-gl';
-	mapboxgl.accessToken = 'pk.eyJ1IjoiZDBlc250bWF0dGVyIiwiYSI6ImNqMDF1aWpqcDAyMW8ycXFuaDM2MzU1emIifQ.6PVUbllSeBVy41c-fSeqTg';
+var map;
+var _vm;
 
-	var map;
-	var _vm;
-
-	export default {
-		name: 'MainPage',
-		data: function () {
-			return {
-				search: {
-					date: '',
-					text: ''
-				},
-				search_pending: false,
-				map_pending: true,
-				genres: [],
-				evtList: [],
-				evtHiddenQty: 0
+export default {
+	name: 'MainPage',
+	data: function() {
+		return {
+			search: {
+				date: '',
+				text: ''
+			},
+			search_pending: false,
+			map_pending: true,
+			genres: [],
+			evtList: [],
+			evtHiddenQty: 0
+		}
+	},
+	computed: {},
+	methods: {
+		showAll: function() {
+			for (var i = 0, len = this.$data.evtList.length; i < len; i++) {
+				this.$data.evtList[i].mark.setVisible(true)
+				this.evtHiddenQty = 0;
+				this.genres_checkAll(1);
 			}
 		},
-		computed: {
-		},
-		methods: {
-			showAll: function(){
-				for (var i=0, len=this.$data.evtList.length; i<len; i++) {
-					this.$data.evtList[i].mark.setVisible(true)
-					this.evtHiddenQty = 0;
-					this.genres_checkAll(1);
-				}
-			},
-			genres_check: function(gen, boo){
-				var newState = typeof boo === 'undefined' ? !gen.selected : boo;
-				gen.selected = newState;			
-				var selected_ids = this.$data.genres
-				.filter(function(_gen){
-					return _gen.selected===true
+		genres_check: function(gen, boo) {
+			var newState = typeof boo === 'undefined' ? !gen.selected : boo;
+			gen.selected = newState;
+			var selected_ids = this.$data.genres
+				.filter(function(_gen) {
+					return _gen.selected === true
 				})
-				.map(function(_gen){
+				.map(function(_gen) {
 					return _gen._id
 				})
-				var hiddenQty = 0;
-				// TODO debounce or pass closure to $nextTick
-				for (var i=0, len=this.$data.evtList.length; i<len; i++) {
-					var evt = this.$data.evtList[i];
-					var evtMatch = selected_ids.indexOf(evt.genre_id) !== -1;
-					evt.mark.setVisible(evtMatch)
-					if (evtMatch===false) {
-						hiddenQty++
-					}
+			var hiddenQty = 0;
+			// TODO debounce or pass closure to $nextTick
+			for (var i = 0, len = this.$data.evtList.length; i < len; i++) {
+				var evt = this.$data.evtList[i];
+				var evtMatch = selected_ids.indexOf(evt.genre_id) !== -1;
+				evt.mark.setVisible(evtMatch)
+				if (evtMatch === false) {
+					hiddenQty++
 				}
-				this.evtHiddenQty = hiddenQty;
-			},
-			genres_checkAll: function (boo) {
-				boo = !!boo;
-				for (let gen of this.genres) {
-					this.genres_check(gen, boo)
-				}
-			},
-			evtSearch: function () {
-				this.search_pending = true;
-				this.getEvents();
-			},
-			getEvents: function() {
+			}
+			this.evtHiddenQty = hiddenQty;
+		},
+		genres_checkAll: function(boo) {
+			boo = !!boo;
+			for (let gen of this.genres) {
+				this.genres_check(gen, boo)
+			}
+		},
+		evtSearch: function() {
+			this.search_pending = true;
+			this.getEvents();
+		},
+		getEvents: function() {
 			request
 				.get(apiUrl + 'events')
 				.query(this.search)
@@ -88,37 +90,17 @@
 							}
 
 							console.time('removing markers from map');
-							for (var i=0, len=this.$data.evtList.length; i<len; i++) {
+							/*for (var i=0, len=this.$data.evtList.length; i<len; i++) {
 								this.$data.evtList[i].mark.remove();
-							}
+							}*/
 							console.timeEnd('removing markers from map');
-								
+
 							this.$data.evtList = [];
+							var featureList = [];
 
 							console.time('adding markers on map');
-							for (var i=0, len=2; i<len; i++) { // res.body.evtList.length 
+							for (var i = 0, len = res.body.evtList.length; i < len; i++) { // res.body.evtList.length 
 								var evt = res.body.evtList[i];
-								var el = document.createElement('div');
-								el.className = 'mark-custom-cls';
-								el.addEventListener('click', function() {
-									Dialog.create({
-										title: evt.name,
-										message: evt.descr,
-										buttons: [{
-											label: 'Подробнее',
-											handler: function() {
-												_vm.$router.push(`event/card/${evt._id}`);
-											}
-										}]
-									})
-								});
-
-								var mark = new mapboxgl.Marker(el, {offset: [-22 / 2, -22 / 2]})
-									.setLngLat(evt.latLng.reverse())
-									.addTo(map);
-									//.setPopup() https://www.mapbox.com/mapbox-gl-js/api/#popup
-									// icon: 'pin.svg',
-								evt.mark = mark;
 
 								this.$data.evtList.push(evt);
 
@@ -126,52 +108,113 @@
 								if (res.body.evtList.length === 1) {
 									// mark.togglePopup()
 								}
+								var evtFeature = {
+									type: 'Feature',
+									properties: {
+										_id: evt._id,
+										name: evt.name,
+										descr: evt.descr,
+										iconcode: 'star' 
+										// https://github.com/mapbox/mapbox-gl-styles/tree/master/sprites/basic-v9/_svg
+										// theatre art-gallery star music
+									},
+									geometry: {
+										type: 'Point',
+										coordinates: evt.latLng.reverse()
+									}
+								};
+								evt.mark = evtFeature;
+								featureList.push(evtFeature);
 							}
+							var myLayer = map.addLayer({
+								id: 'myLayerId',
+								type: 'symbol',
+								source: {
+									type: 'geojson',
+									data: {
+										type: 'FeatureCollection',
+										features: featureList
+									}
+								},
+								layout: {
+									'icon-image': '{iconcode}-15', 
+            						// 'text-field': '{name}',
+									'icon-allow-overlap': true
+								}/*,
+								paint: {
+									'fill-color': "#00ffff"
+								}*/
+							});
+
+							map.on('click', 'myLayerId', function(ev) {
+								var props = ev.features[0].properties;
+								Dialog.create({
+									title: props.name,
+									message: props.descr,
+									buttons: [{
+										label: 'Подробнее',
+										handler: function() {
+											_vm.$router.push(`event/card/${props._id}`);
+										}
+									}]
+								})
+								/*new mapboxgl.Popup()
+									.setLngLat(ev.features[0].geometry.coordinates)
+									.setHTML(ev.features[0].properties.description)
+									.addTo(map);*/
+							});
+							map.on('mouseenter', 'myLayerId', function() {
+								map.getCanvas().style.cursor = 'pointer';
+							});
+							map.on('mouseleave', 'myLayerId', function() {
+								map.getCanvas().style.cursor = '';
+							});
+
 							console.timeEnd('adding markers on map');
 						}
 
 					}
 				})
-			}
-		},
-		mixins: [mixins],
-		components: {},
-		mounted: function() {
-			_vm = this;
+		}
+	},
+	mixins: [mixins],
+	components: {},
+	mounted: function() {
+		_vm = this;
 
-			map = new mapboxgl.Map({
-				container: 'map-container',
-				//style: 'mapbox://styles/mapbox/streets-v9',
-				style: 'mapbox://styles/d0esntmatter/cj2kdezgu001e2smvq8302bid',
-				minZoom: 10,
-				zoom: 13,
-				center: [37.62113,55.75184] // lng then lat
+		map = new mapboxgl.Map({
+			container: 'map-container',
+			//style: 'mapbox://styles/mapbox/streets-v9',
+			style: 'mapbox://styles/d0esntmatter/cj2kdezgu001e2smvq8302bid',
+			minZoom: 10,
+			zoom: 13,
+			center: [37.62113, 55.75184] // lng then lat
+		});
+		map.on('load', _vm.getEvents);
+		window.mmm = map;
+
+		// Handling genre list
+		// If store have genres right now, they are copied to $data right now
+		if (this.$store.state.genreList) {
+			setGenres(this.$store.state.genreList)
+		}
+		else { // Otherwise it happens after store mutation
+			this.$store.subscribe(function(mutation, state) {
+				if (mutation.type === 'm_loadCommonData') {
+					setGenres(state.genreList)
+				}
+			})
+		}
+
+		function setGenres(state_genreList) {
+			var mapped = state_genreList.map((v) => {
+				_vm.$set(v, 'selected', true)
+				return v
 			});
-			map.on('load', _vm.getEvents);
-			window.mmm = map;
-
-			// Handling genre list
-			// If store have genres right now, they are copied to $data right now
-			if (this.$store.state.genreList) {
-				setGenres(this.$store.state.genreList)
-			}
-			else { // Otherwise it happens after store mutation
-				this.$store.subscribe(function(mutation, state) {
-					if (mutation.type === 'm_loadCommonData') {
-						setGenres(state.genreList)
-					}
-				})
-			}
-
-			function setGenres(state_genreList) {
-				var mapped = state_genreList.map((v) => {
-					_vm.$set(v, 'selected', true)
-					return v
-				});
-				_vm.$data.genres = mapped;
-			}
+			_vm.$data.genres = mapped;
 		}
 	}
+}
 </script>
 
 <template>
