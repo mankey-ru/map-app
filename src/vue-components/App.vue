@@ -78,9 +78,14 @@
 						<lilink to="page-how" icon="chevron-right" v-bind:drawer="$refs.drawer_left">
 							Как это работает
 						</lilink>
-
 						<lilink to="page-about" icon="chevron-right" v-bind:drawer="$refs.drawer_left">
 							О нас
+						</lilink>
+					</div>					
+					<hr />
+					<div>						
+						<lilink to="mainpage2" icon="chevron-right" v-bind:drawer="$refs.drawer_left">
+							<b>BETA VERSION</b>
 						</lilink>
 					</div>
 				</div>

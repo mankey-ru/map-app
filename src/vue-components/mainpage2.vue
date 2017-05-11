@@ -86,9 +86,18 @@
 								Toast.create.warning('По вашему запросу ничегошенки не нашлось :(');
 								return
 							}
-							console.time('adding markers on map');
+
+							console.time('removing markers from map');
+							for (var i=0, len=this.$data.evtList.length; i<len; i++) {
+								this.$data.evtList[i].mark.remove();
+							}
+							console.timeEnd('removing markers from map');
+								
 							this.$data.evtList = [];
-							for (let evt of res.body.evtList) {
+
+							console.time('adding markers on map');
+							for (var i=0, len=2; i<len; i++) { // res.body.evtList.length 
+								var evt = res.body.evtList[i];
 								var el = document.createElement('div');
 								el.className = 'mark-custom-cls';
 								el.addEventListener('click', function() {
@@ -104,17 +113,16 @@
 									})
 								});
 
-								var mark = new mapboxgl.Marker(el, {
-										offset: [-22 / 2, -22 / 2]
-									})
+								var mark = new mapboxgl.Marker(el, {offset: [-22 / 2, -22 / 2]})
 									.setLngLat(evt.latLng.reverse())
 									.addTo(map);
-								//.setPopup() https://www.mapbox.com/mapbox-gl-js/api/#popup
-								// icon: 'pin.svg',
-
+									//.setPopup() https://www.mapbox.com/mapbox-gl-js/api/#popup
+									// icon: 'pin.svg',
 								evt.mark = mark;
-								this.evtList.push(evt);
-								// Opening infobox automatically for single result
+
+								this.$data.evtList.push(evt);
+
+								// Opening infobox automatically for a single result
 								if (res.body.evtList.length === 1) {
 									// mark.togglePopup()
 								}
