@@ -250,8 +250,4 @@
 		right: 0;
 		overflow: hidden;
 	}
-
-	.map-ctrl-wrap {
-		padding: 1em;
-	}
 </style>

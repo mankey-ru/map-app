@@ -2,7 +2,7 @@
 
 	import mixins from './../vue-mixins.js'
 	import request from 'superagent'
-	import {Toast} from 'quasar-framework'
+	import {Toast,  Dialog} from 'quasar-framework'
 
 	var apiUrl = require('./../api-url.js').def;
 
@@ -72,44 +72,58 @@
 				this.getEvents();
 			},
 			getEvents: function() {
-				request
+			request
 				.get(apiUrl + 'events')
 				.query(this.search)
 				.end((err, res) => {
 					this.search_pending = false;
-						if (err) {
-							Toast.create.error(err || 'Failed to get events')
-						}
-						else {
-							if (res.body.evtList instanceof Array) {
-								if (res.body.evtList.length===0) {
-									Toast.create.warning('По вашему запросу ничегошенки не нашлось :(');
-									return
-								}
-								this.$data.evtList = [];
-								for (let evt of res.body.evtList) {
-									var mark = new google.maps.Marker({
-										position: {
-											lat: evt.latLng[0],
-											lng: evt.latLng[1]
-										},
-										map: map,
-										icon: 'pin.svg',
-										//animation: google.maps.Animation.DROP
+					if (err) {
+						Toast.create.error(err || 'Failed to get events')
+					}
+					else {
+						if (res.body.evtList instanceof Array) {
+							if (res.body.evtList.length === 0) {
+								Toast.create.warning('По вашему запросу ничегошенки не нашлось :(');
+								return
+							}
+							console.time('adding markers on map');
+							this.$data.evtList = [];
+							for (let evt of res.body.evtList) {
+								var el = document.createElement('div');
+								el.className = 'mark-custom-cls';
+								el.addEventListener('click', function() {
+									Dialog.create({
+										title: evt.name,
+										message: evt.descr,
+										buttons: [{
+											label: 'Подробнее',
+											handler: function() {
+												_vm.$router.push(`event/card/${evt._id}`);
+											}
+										}]
 									})
-									mark.addListener('click', () => {
-										showEvtInfo(evt)
-									});
-									evt.mark = mark;
-									this.evtList.push(evt);
-									// Opening infobox automatically for single result
-									if (res.body.evtList.length===1) {
-										google.maps.event.trigger(mark, 'click');
-									}
+								});
+
+								var mark = new mapboxgl.Marker(el, {
+										offset: [-22 / 2, -22 / 2]
+									})
+									.setLngLat(evt.latLng.reverse())
+									.addTo(map);
+								//.setPopup() https://www.mapbox.com/mapbox-gl-js/api/#popup
+								// icon: 'pin.svg',
+
+								evt.mark = mark;
+								this.evtList.push(evt);
+								// Opening infobox automatically for single result
+								if (res.body.evtList.length === 1) {
+									// mark.togglePopup()
 								}
 							}
+							console.timeEnd('adding markers on map');
 						}
-					})
+
+					}
+				})
 			}
 		},
 		mixins: [mixins],
@@ -119,23 +133,13 @@
 
 			map = new mapboxgl.Map({
 				container: 'map-container',
-				style: 'mapbox://styles/mapbox/streets-v9',
-				minZoom: 13,
-				center: [37.62113,55.75184]
+				//style: 'mapbox://styles/mapbox/streets-v9',
+				style: 'mapbox://styles/d0esntmatter/cj2kdezgu001e2smvq8302bid',
+				minZoom: 10,
+				zoom: 13,
+				center: [37.62113,55.75184] // lng then lat
 			});
-			map.on('load', function(){
-				setLang();
-			})
-
-
-			var styleNames = ['country-label-lg', 'country-label-md', 'country-label-sm', 'water-label','water-label-sm','waterway-label','state-label-lg','state-label-md','state-label-sm','rail-label','road-label-large','road-label-medium','road-label-small','airport-label','housenum-label']; // TODO make it in init via style
-			function setLang(code){
-				code = code || 'ru';
-				for (var i = 0; i < styleNames.length; i++) {
-					map.setLayoutProperty(styleNames[i], 'text-field', '{name_ru}');
-				}
-			}
-			
+			map.on('load', _vm.getEvents);
 			window.mmm = map;
 
 			// Handling genre list
@@ -159,21 +163,6 @@
 				_vm.$data.genres = mapped;
 			}
 		}
-	}
-	var infowindow;
-	function showEvtInfo(evt){
-		if (infowindow) {
-			infowindow.close();
-		}
-		infowindow = new google.maps.InfoWindow({
-			content: `
-			<h4>${evt.name}</h4>
-			<pre>${evt.descr}</pre>
-			<div class="text-right">
-				<button class="primary outline" onclick="location='#/event/card/${evt._id}'">Подробнее</a>
-				</div>`
-			});
-		infowindow.open(map, evt.mark);
 	}
 </script>
 
@@ -201,6 +190,7 @@
 				</div>
 			</div>
 		</q-modal>
+
 		<q-modal ref="modal_genres" position="bottom" v-bind:content-css="{minWidth: '70vw', minHeight: '40vh'}">
 			<q-layout>
 				<div slot="header" class="toolbar primary">
@@ -240,144 +230,114 @@
 			</q-layout>
 		</q-modal>
 
-		<h1 v-show="map_pending" class="text-center">
-			Загрузка...
-		</h1>
+		<div class="map-ctrl-wrap absolute-top-left">
+			<div class="map-pane-main row inline"><!-- hide-on-drawer-visible -->
 
-		<div>
-			<div v-if="currentUser && currentUser.role" >
-				<div class="newEvtWrap absolute-bottom-right">
-					<button class="gt-md push primary round big" v-on:click="GOTO_EVT_NEW">
-						Создать мероприятие 
-					</button>
-					<button class="lt-bg push primary circular big" v-on:click="GOTO_EVT_NEW">
-						<i class="mdi mdi-plus"></i>
-					</button>
+				<i v-on:click="$parent.$parent.$refs.drawer_left.open()" class="mdi mdi-menu"></i>
+
+				<form class="inline" v-on:submit.prevent="evtSearch">
+					<span class="gt-sm">
+						<input v-model="search.text" placeholder="Поиск" />
+						<span class="search-icon-wrap">
+							<spinner v-show="search_pending" v-bind:size="30"></spinner>
+							<i v-show="!search_pending" v-on:click="evtSearch" class="search-icon">search</i>
+						</span>
+					</span>
+				</form>
+			</div>
+			<div class="sm-hide row inline">
+				<div class="map-pane__date">
+					<div class="cursor-pointer" v-on:click="$refs.modal_date.open()">
+						<span>{{search.date | dateFormatPretty}}</span> 
+						<i class="mdi mdi-calendar"></i>
+					</div>
 				</div>
 			</div>
-			<div class="hdn">
-				<!-- positions explained: https://google-developers.appspot.com/maps/documentation/javascript/examples/full/control-positioning-labels -->
-				<div data-pos="TOP" class="j-mapctrl map-ctrl-top">
-					<div class="map-ctrl-wrap">
-						<div class="row">
-								<!-- 
-									LEFT
-								-->
-								<div class="width-2of3">
-									<div class="map-pane-main row inline"><!-- hide-on-drawer-visible -->
-
-										<i v-on:click="$parent.$parent.$refs.drawer_left.open()" class="mdi mdi-menu"></i>
-
-										<form class="inline" v-on:submit.prevent="evtSearch">
-											<span class="gt-sm">
-												<input v-model="search.text" placeholder="Поиск" />
-												<span class="search-icon-wrap">
-													<spinner v-show="search_pending" v-bind:size="30"></spinner>
-													<i v-show="!search_pending" v-on:click="evtSearch" class="search-icon">search</i>
-												</span>
-											</span>
-										</form>
-									</div>
-									<div class="sm-hide">
-										<div class="map-pane__date">
-											<div class="cursor-pointer" v-on:click="$refs.modal_date.open()">
-												<span>{{search.date | dateFormatPretty}}</span> 
-												<i class="mdi mdi-calendar"></i>
-											</div>
-										</div>
-									</div>
-								</div>
-								<!-- 
-									RIGHT
-								-->
-								<div class="width-1of3">
-									<div class="text-right">
-										<!-- Mobile -->
-										<div class="lt-md group">
-											<button class="primary push bg-white text-black big" v-on:click="$refs.modal_date.open()">
-												<i class="mdi mdi-calendar"></i>
-											</button>
-											<!-- <br />
-											<button class="primary push bg-white text-black big" v-on:click="evtSearch">
-												<i class="mdi mdi-file-find"></i>
-											</button> -->
-										</div>
-										<!-- Desktop -->
-										<div class="gt-sm text-right">
-											<div v-if="currentUser">
-												<i v-on:click.prevent="GOTO_PROFILE" class="mdi mdi-account-box map-profile-icon"></i>
-											</div>
-											<div v-if="!currentUser">
-												<button class="primary push bg-white text-black big" v-on:click="GOTO_LOGIN">
-													Вход
-												</button> &#160;
-												<button class="primary push bg-white text-black big" v-on:click="GOTO_REGISTER">
-													Регистрация
-												</button>
-											</div>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-					<div data-pos="LEFT_BOTTOM" class="j-mapctrl map-ctrl-bottom">
-						<div class="text-center">
-							<div>
-								<span v-show="evtHiddenQty!==0">
-									Скрыто {{evtHiddenQty}} из {{evtList.length}}. 
-									<a class="link-dotted" v-on:click="showAll">Показать все</a>
-								</span>
-							</div>
-							<button class="primary push" v-on:click="$refs.modal_genres.open()">
-								Фильтр по жанрам
-							</button>
-						</div>
-					</div>
-					<!-- <div data-pos="RIGHT_BOTTOM" class="j-mapctrl map-ctrl-wrap"><input id="map-ctrl-search" class="form-control" style="width: 20em" placeholder="Поиск мест" /> </div> -->
-				</div>
-			</div>
-			<div id="map-container" class="__fullscreen"></div>
 		</div>
 
+
+		<div class="map-ctrl-wrap absolute-top-right">
+			<!-- Mobile -->
+			<div class="lt-md">
+				<button class="primary push bg-white text-black big" v-on:click="$refs.modal_date.open()">
+					<i class="mdi mdi-calendar"></i>
+				</button>
+			</div>
+			<!-- Desktop -->
+			<div class="gt-sm">
+				<div v-if="currentUser">
+					<i v-on:click.prevent="GOTO_PROFILE" class="mdi mdi-account-box map-profile-icon"></i>
+				</div>
+				<div v-if="!currentUser">
+					<button class="primary push bg-white text-black big" v-on:click="GOTO_LOGIN">
+						Вход
+					</button> &#160;
+					<button class="primary push bg-white text-black big" v-on:click="GOTO_REGISTER">
+						Регистрация
+					</button>
+				</div>
+			</div>
+		</div>
+
+		<div class="map-ctrl-wrap absolute-bottom-left">
+			<div class="text-center">
+				<div>
+					<span v-show="evtHiddenQty!==0">
+						Скрыто {{evtHiddenQty}} из {{evtList.length}}. 
+						<a class="link-dotted" v-on:click="showAll">Показать все</a>
+					</span>
+				</div>
+				<button class="primary push" v-on:click="$refs.modal_genres.open()">
+					Фильтр по жанрам
+				</button>
+			</div>
+		</div>
+
+		<div v-if="currentUser && currentUser.role" >
+			<div class="map-ctrl-wrap absolute-bottom-right">
+				<button class="gt-md push primary round big" v-on:click="GOTO_EVT_NEW">
+					Создать мероприятие 
+				</button>
+				<button class="lt-bg push primary circular big" v-on:click="GOTO_EVT_NEW">
+					<i class="mdi mdi-plus"></i>
+				</button>
+			</div>
+		</div>
+
+		<div id="map-container" class="__fullscreen"></div>
 	</div>
+</div>
 </template>
 
 <style scoped lang="less">
+	.map-ctrl-wrap {
+		margin: 1.5em;
+		z-index: 1;
+	}
 	.search-icon {
 		cursor: pointer;	
 		font-size: 1.7em;
 	}
 	.search-icon-wrap {
-    	width: 2em;
-   		display: inline-block;
-	}
-	.newEvtWrap {
-		margin: 2em;
-		z-index: 29;
+		width: 1.5em;
+		display: inline-block;
 	}
 	.-boxshad {
 		box-shadow: #000 1px 2px 4px 0px;
 	}
-	.-map-pane-fontsize {
+	.map-pane__content {
+		.-boxshad();		
 		font-size: 1.4em;
-	}
-	.map-pane__wrap {
-		float:left;
+		border-radius: 3px;
+		background: #fff;
+		padding: .3em .5em;
 	}
 	.map-pane__date {
 		.map-pane__content();
 		display: inline-block;
 	}
-	.map-pane__content {
-		.-boxshad();
-		.-map-pane-fontsize();
-		border-radius: 3px;
-		background: #fff;
-		padding: .3em .5em;
-	}
-	.map-pane-main {
-		.map-pane__wrap();
+	.map-pane-main {		
+		float:left;
 		.map-pane__content();
 		margin-right: .4em;
 		input{
@@ -388,18 +348,23 @@
 	}
 	.mdi {
 		cursor: pointer;
-		font-size: 2.5em;
+		font-size: 1.8em;
 	}
 	.map-profile-icon {
 		font-size: 6em;
 		cursor: pointer;
 	}
-	.map-ctrl-top {
-		width: 100%;		
-	}
-	.map-ctrl-bottom {
-		width: 100%;
-		padding-left: 2em;
-		padding-right: 2em;
+</style>
+
+<style>
+	.mark-custom-cls {
+		width: 44px;
+		/* background-image: url(pin.svg); */
+		width: 22px;
+		height: 22px;
+		background-color: #1290fd;
+		box-shadow: #aaa 0px 0px 9px 3px;
+		border-radius: 50%;
+		cursor: pointer;
 	}
 </style>
