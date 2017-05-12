@@ -1,8 +1,8 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 
-import mainpage from './vue-components/mainpage.vue';
-import mainpage2 from './vue-components/mainpage2.vue';
+import mainpageGmaps from './vue-components/mainpage.vue';
+import mainpage from './vue-components/mainpage2.vue';
 import eventNew from './vue-components/event-new.vue';
 import eventCard from './vue-components/event-card.vue';
 import eventList from './vue-components/event-list.vue';
@@ -14,22 +14,21 @@ import page_about from './vue-components/page-about.vue';
 
 const routes = [{
 		path: '/mainpage2',
-		alias: '/',
 		name: 'mainpage2',
 		component: mainpage,
 		meta: {
 			fullscreen: true,
-			title: 'Main Page',
+			title: 'Main Page Gmaps',
 			noToolbar: true
 		}
 	}, {
 		path: '/mainpage',
 		alias: '/',
 		name: 'mainpage',
-		component: mainpage2,
+		component: mainpage,
 		meta: {
 			fullscreen: true,
-			title: 'Main Page Beta',
+			title: 'Main Page',
 			noToolbar: true
 		}
 	}, {

@@ -1,60 +1,60 @@
 <script>
-import mixins from './../vue-mixins.js'
-import request from 'superagent'
-import {
-	Toast,
-	Dialog
-}
-from 'quasar-framework'
+	import mixins from './../vue-mixins.js'
+	import request from 'superagent'
+	import {
+		Toast,
+		Dialog
+	}
+	from 'quasar-framework'
 
-var apiUrl = require('./../api-url.js').def;
+	var apiUrl = require('./../api-url.js').def;
 
-require('mapbox-gl/dist/mapbox-gl.css');
+	require('mapbox-gl/dist/mapbox-gl.css');
 
-import mapboxgl from 'mapbox-gl';
-mapboxgl.accessToken = 'pk.eyJ1IjoiZDBlc250bWF0dGVyIiwiYSI6ImNqMmxtdHF2ODAwMHAycW82NTkycmlrNXcifQ.FoKPoQo54xurQSdHSnShRw';
+	import mapboxgl from 'mapbox-gl';
+	mapboxgl.accessToken = 'pk.eyJ1IjoiZDBlc250bWF0dGVyIiwiYSI6ImNqMmxtdHF2ODAwMHAycW82NTkycmlrNXcifQ.FoKPoQo54xurQSdHSnShRw';
 
-var _vm;
-var map;
-var layerRef;
-var layerID = 'evtLayerID';
-var uniqueFeatures;
+	var _vm;
+	var map;
+	var layerRef;
+	var layerID = 'evtLayerID';
+	var uniqueFeatures;
 
-export default {
-	name: 'MainPage',
-	data: function() {
-		return {
-			search: {
-				date: '',
-				text: ''
-			},
-			search_pending: false,
-			map_pending: true,
-			genres: [],
-			evtList: [],
-			evtHiddenQty: 0
-		}
-	},
-	computed: {},
-	methods: {
-		showAll: function() {
-			for (var i = 0, len = this.$data.evtList.length; i < len; i++) {
-				this.$data.evtList[i].mark.setVisible(true)
-				this.evtHiddenQty = 0;
-				this.genres_checkAll(1);
+	export default {
+		name: 'MainPage',
+		data: function() {
+			return {
+				search: {
+					date: '',
+					text: ''
+				},
+				search_pending: false,
+				map_pending: true,
+				genres: [],
+				evtList: [],
+				evtHiddenQty: 0
 			}
 		},
-		genres_check: function(gen, boo) {
-			var newState = typeof boo === 'undefined' ? !gen.selected : boo;
-			gen.selected = newState;
-			var selected_ids = this.$data.genres
+		computed: {},
+		methods: {
+			showAll: function() {
+				for (var i = 0, len = this.$data.evtList.length; i < len; i++) {
+					this.$data.evtList[i].mark.setVisible(true)
+					this.evtHiddenQty = 0;
+					this.genres_checkAll(1);
+				}
+			},
+			genres_check: function(gen, boo) {
+				var newState = typeof boo === 'undefined' ? !gen.selected : boo;
+				gen.selected = newState;
+				var selected_ids = this.$data.genres
 				.filter(function(_gen) {
 					return _gen.selected === true
 				})
 				.map(function(_gen) {
 					return _gen._id
 				})
-			var matchedEvents = [];
+				var matchedEvents = [];
 			// TODO debounce or pass closure to $nextTick
 			for (var i = 0, len = this.$data.evtList.length; i < len; i++) {
 				var event = this.$data.evtList[i];
@@ -84,20 +84,20 @@ export default {
 		},
 		getEvents: function() {
 			request
-				.get(apiUrl + 'events')
-				.query(this.search)
-				.end((err, res) => {
-					this.search_pending = false;
-					if (err) {
-						Toast.create.error(err || 'Failed to get events')
-					}
-					else {
-						if (res.body.evtList instanceof Array) {
-							if (res.body.evtList.length === 0) {
-								Toast.create.warning('По вашему запросу ничегошенки не нашлось :(');
-								return
-							}
-							if (layerRef) {
+			.get(apiUrl + 'events')
+			.query(this.search)
+			.end((err, res) => {
+				this.search_pending = false;
+				if (err) {
+					Toast.create.error(err || 'Failed to get events')
+				}
+				else {
+					if (res.body.evtList instanceof Array) {
+						if (res.body.evtList.length === 0) {
+							Toast.create.warning('По вашему запросу ничегошенки не нашлось :(');
+							return
+						}
+						if (layerRef) {
 								map.removeSource(layerID); // map.removeLayer(layerID); layer removed automatically with source
 							}
 
@@ -187,16 +187,7 @@ export default {
 			map.on('moveend', function() {
 				var features = map.queryRenderedFeatures({layers: [layerID]});
 				if (features) {
-					var uniqueFeatures = getUniqueFeatures(features, '_id');
-					// Populate features for the listing overlay.
-					renderListings(uniqueFeatures);
-
-					// Clear the input container
-					filterEl.value = '';
-
-					// Store the current features in sn `airports` variable to
-					// later use for filtering on `keyup`.
-					airports = uniqueFeatures;
+					uniqueFeatures = getUniqueFeatures(features, '_id');
 				}
 			});
 		});
@@ -307,39 +298,33 @@ function getUniqueFeatures(array, comparatorProperty) {
 
 		<div class="map-ctrl-wrap absolute-top-left">
 			<div class="map-pane-main row inline"><!-- hide-on-drawer-visible -->
-
 				<i v-on:click="$parent.$parent.$refs.drawer_left.open()" class="mdi mdi-menu"></i>
-
-				<form class="inline" v-on:submit.prevent="evtSearch">
-					<span class="gt-sm">
-						<input v-model="search.text" placeholder="Поиск" />
-						<span class="search-icon-wrap">
-							<spinner v-show="search_pending" v-bind:size="30"></spinner>
-							<i v-show="!search_pending" v-on:click="evtSearch" class="search-icon">search</i>
-						</span>
+				<form class="gt-md" v-on:submit.prevent="evtSearch">
+					<input v-model="search.text" placeholder="Поиск" />
+					<span class="search-icon-wrap">
+						<spinner v-show="search_pending" v-bind:size="30"></spinner>
+						<i v-show="!search_pending" v-on:click="evtSearch" class="search-icon">search</i>
 					</span>
 				</form>
 			</div>
-			<div class="sm-hide row inline">
-				<div class="map-pane__date">
+			<span class="gt-md inline">
+				<div class="map-pane__date"><!-- Calendar Desktop -->
 					<div class="cursor-pointer" v-on:click="$refs.modal_date.open()">
 						<span>{{search.date | dateFormatPretty}}</span> 
 						<i class="mdi mdi-calendar"></i>
 					</div>
-				</div>
-			</div>
+				</div>				
+			</span>
 		</div>
 
 
-		<div class="map-ctrl-wrap absolute-top-right">
-			<!-- Mobile -->
-			<div class="lt-md">
+		<div class="map-ctrl-wrap absolute-top-right">			
+			<div class="lt-bg"><!-- Calendar Mobile -->
 				<button class="primary push bg-white text-black big" v-on:click="$refs.modal_date.open()">
 					<i class="mdi mdi-calendar"></i>
 				</button>
-			</div>
-			<!-- Desktop -->
-			<div class="gt-sm">
+			</div>			
+			<div class="gt-md"><!-- Desktop -->
 				<div v-if="currentUser">
 					<i v-on:click.prevent="GOTO_PROFILE" class="mdi mdi-account-box icon-profile"></i>
 				</div>
