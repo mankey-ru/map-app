@@ -65,7 +65,7 @@ function compile() {
 	console.log(`   Your encrypted config is ready to be commited to a public repo. Path is ${path_encrypted}`);
 
 	fs.writeFileSync(path_blank, getFileContents(sett));
-	console.log(`   Your "blank" config you've just filled in is blank again and safe`);
+	console.log(`   Your "blank" config you've just filled in is blank again and safe to commit to Github`);
 
 	console.log('\n')
 }
