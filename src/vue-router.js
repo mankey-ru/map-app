@@ -13,9 +13,9 @@ import page_how from './vue-components/page-how.vue';
 import page_about from './vue-components/page-about.vue';
 
 const routes = [{
-		path: '/mainpage',
+		path: '/mainpage2',
 		alias: '/',
-		name: 'mainpage',
+		name: 'mainpage2',
 		component: mainpage,
 		meta: {
 			fullscreen: true,
@@ -23,9 +23,9 @@ const routes = [{
 			noToolbar: true
 		}
 	}, {
-		path: '/mainpage2',
+		path: '/mainpage',
 		alias: '/',
-		name: 'mainpage2',
+		name: 'mainpage',
 		component: mainpage2,
 		meta: {
 			fullscreen: true,

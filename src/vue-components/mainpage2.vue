@@ -12,10 +12,13 @@ var apiUrl = require('./../api-url.js').def;
 require('mapbox-gl/dist/mapbox-gl.css');
 
 import mapboxgl from 'mapbox-gl';
-mapboxgl.accessToken = 'pk.eyJ1IjoiZDBlc250bWF0dGVyIiwiYSI6ImNqMDF1aWpqcDAyMW8ycXFuaDM2MzU1emIifQ.6PVUbllSeBVy41c-fSeqTg';
+mapboxgl.accessToken = 'pk.eyJ1IjoiZDBlc250bWF0dGVyIiwiYSI6ImNqMmxtdHF2ODAwMHAycW82NTkycmlrNXcifQ.FoKPoQo54xurQSdHSnShRw';
 
-var map;
 var _vm;
+var map;
+var layerRef;
+var layerID = 'evtLayerID';
+var uniqueFeatures;
 
 export default {
 	name: 'MainPage',
@@ -51,17 +54,23 @@ export default {
 				.map(function(_gen) {
 					return _gen._id
 				})
-			var hiddenQty = 0;
+			var matchedEvents = [];
 			// TODO debounce or pass closure to $nextTick
 			for (var i = 0, len = this.$data.evtList.length; i < len; i++) {
-				var evt = this.$data.evtList[i];
-				var evtMatch = selected_ids.indexOf(evt.genre_id) !== -1;
-				evt.mark.setVisible(evtMatch)
-				if (evtMatch === false) {
-					hiddenQty++
+				var event = this.$data.evtList[i];
+				var eventMatch = selected_ids.indexOf(event.genre_id) !== -1;
+				if (eventMatch === true) {
+					matchedEvents.push(event);
 				}
 			}
-			this.evtHiddenQty = hiddenQty;
+			this.evtHiddenQty = this.evtList.length - matchedEvents.length;
+			var features = map.queryRenderedFeatures({layers: [layerID]});
+			if (features) {				
+				// map.setFilter(layerID, ['has', '_id']); ---- показать все
+				map.setFilter(layerID, ['in', '_id'].concat(matchedEvents.map(function(event) {
+					return event._id;
+				})));
+			}
 		},
 		genres_checkAll: function(boo) {
 			boo = !!boo;
@@ -88,34 +97,26 @@ export default {
 								Toast.create.warning('По вашему запросу ничегошенки не нашлось :(');
 								return
 							}
-
-							console.time('removing markers from map');
-							/*for (var i=0, len=this.$data.evtList.length; i<len; i++) {
-								this.$data.evtList[i].mark.remove();
-							}*/
-							console.timeEnd('removing markers from map');
+							if (layerRef) {
+								map.removeSource(layerID); // map.removeLayer(layerID); layer removed automatically with source
+							}
 
 							this.$data.evtList = [];
 							var featureList = [];
 
-							console.time('adding markers on map');
+							//console.time('adding markers on map');
 							for (var i = 0, len = res.body.evtList.length; i < len; i++) { // res.body.evtList.length 
 								var evt = res.body.evtList[i];
-
-								this.$data.evtList.push(evt);
-
-								// Opening infobox automatically for a single result
-								if (res.body.evtList.length === 1) {
-									// mark.togglePopup()
-								}
+								this.$data.evtList.push(evt);								
 								var evtFeature = {
 									type: 'Feature',
 									properties: {
 										_id: evt._id,
 										name: evt.name,
 										descr: evt.descr,
-										iconcode: 'star' 
+										iconcode: 'fire-station' 
 										// https://github.com/mapbox/mapbox-gl-styles/tree/master/sprites/basic-v9/_svg
+										// https://www.mapbox.com/maki-icons/
 										// theatre art-gallery star music
 									},
 									geometry: {
@@ -126,8 +127,8 @@ export default {
 								evt.mark = evtFeature;
 								featureList.push(evtFeature);
 							}
-							var myLayer = map.addLayer({
-								id: 'myLayerId',
+							layerRef = map.addLayer({
+								id: layerID,
 								type: 'symbol',
 								source: {
 									type: 'geojson',
@@ -136,17 +137,14 @@ export default {
 										features: featureList
 									}
 								},
-								layout: {
+								layout: { // https://www.mapbox.com/mapbox-gl-js/style-spec/#layers-symbol
 									'icon-image': '{iconcode}-15', 
-            						// 'text-field': '{name}',
-									'icon-allow-overlap': true
-								}/*,
-								paint: {
-									'fill-color': "#00ffff"
-								}*/
+									'icon-allow-overlap': true,
+									'icon-size': 1.3
+								}
 							});
 
-							map.on('click', 'myLayerId', function(ev) {
+							map.on('click', layerID, function(ev) {
 								var props = ev.features[0].properties;
 								Dialog.create({
 									title: props.name,
@@ -158,19 +156,15 @@ export default {
 										}
 									}]
 								})
-								/*new mapboxgl.Popup()
-									.setLngLat(ev.features[0].geometry.coordinates)
-									.setHTML(ev.features[0].properties.description)
-									.addTo(map);*/
 							});
-							map.on('mouseenter', 'myLayerId', function() {
+							map.on('mouseenter', layerID, function() {
 								map.getCanvas().style.cursor = 'pointer';
 							});
-							map.on('mouseleave', 'myLayerId', function() {
+							map.on('mouseleave', layerID, function() {
 								map.getCanvas().style.cursor = '';
 							});
-
-							console.timeEnd('adding markers on map');
+							//console.log(map.queryRenderedFeatures({layers:[layerID]}))
+							//console.timeEnd('adding markers on map');
 						}
 
 					}
@@ -181,31 +175,46 @@ export default {
 	components: {},
 	mounted: function() {
 		_vm = this;
-
 		map = new mapboxgl.Map({
 			container: 'map-container',
-			//style: 'mapbox://styles/mapbox/streets-v9',
-			style: 'mapbox://styles/d0esntmatter/cj2kdezgu001e2smvq8302bid',
+			style: 'mapbox://styles/d0esntmatter/cj2lokqx1000f2rs0ronhfmfy',
 			minZoom: 10,
 			zoom: 13,
-			center: [37.62113, 55.75184] // lng then lat
+			center: [37.62113, 55.75184] // lng then lat. Thats weird.
 		});
-		map.on('load', _vm.getEvents);
+		map.on('load', function(){
+			_vm.getEvents();
+			map.on('moveend', function() {
+				var features = map.queryRenderedFeatures({layers: [layerID]});
+				if (features) {
+					var uniqueFeatures = getUniqueFeatures(features, '_id');
+					// Populate features for the listing overlay.
+					renderListings(uniqueFeatures);
+
+					// Clear the input container
+					filterEl.value = '';
+
+					// Store the current features in sn `airports` variable to
+					// later use for filtering on `keyup`.
+					airports = uniqueFeatures;
+				}
+			});
+		});
 		window.mmm = map;
 
 		// Handling genre list
-		// If store have genres right now, they are copied to $data right now
+		// If vuex has genres right now, they are copied to $data right now
 		if (this.$store.state.genreList) {
 			setGenres(this.$store.state.genreList)
 		}
-		else { // Otherwise it happens after store mutation
+		// Otherwise it happens after store mutation
+		else { 
 			this.$store.subscribe(function(mutation, state) {
 				if (mutation.type === 'm_loadCommonData') {
 					setGenres(state.genreList)
 				}
 			})
 		}
-
 		function setGenres(state_genreList) {
 			var mapped = state_genreList.map((v) => {
 				_vm.$set(v, 'selected', true)
@@ -215,6 +224,23 @@ export default {
 		}
 	}
 }
+
+// Because features come from tiled vector data, feature geometries may be split
+// or duplicated across tile boundaries and, as a result, features may appear
+// multiple times in query results.
+function getUniqueFeatures(array, comparatorProperty) {
+	var existingFeatureKeys = {};
+	var uniqueFeatures = array.filter(function(el) {
+		if (existingFeatureKeys[el.properties[comparatorProperty]]) {
+			return false;
+		}
+		else {
+			existingFeatureKeys[el.properties[comparatorProperty]] = true;
+			return true;
+		}
+	});
+	return uniqueFeatures;
+}
 </script>
 
 <template>
@@ -223,9 +249,7 @@ export default {
 		<q-modal ref="modal_date" position="top">
 			<div class="generic-margin group">
 				<div>
-					<q-inline-datetime v-model="search.date" type="date" v-on:input="$refs.modal_date.close()">
-						
-					</q-inline-datetime>
+					<q-inline-datetime v-model="search.date" type="date" v-on:input="$refs.modal_date.close()"></q-inline-datetime>
 				</div>
 				<div class="row">
 					<div class="width-1of2">
@@ -317,7 +341,7 @@ export default {
 			<!-- Desktop -->
 			<div class="gt-sm">
 				<div v-if="currentUser">
-					<i v-on:click.prevent="GOTO_PROFILE" class="mdi mdi-account-box map-profile-icon"></i>
+					<i v-on:click.prevent="GOTO_PROFILE" class="mdi mdi-account-box icon-profile"></i>
 				</div>
 				<div v-if="!currentUser">
 					<button class="primary push bg-white text-black big" v-on:click="GOTO_LOGIN">
@@ -365,14 +389,25 @@ export default {
 		margin: 1.5em;
 		z-index: 1;
 	}
+	.mdi {
+		cursor: pointer;
+		font-size: 1.8em;
+	}
 	.search-icon {
-		cursor: pointer;	
-		font-size: 1.7em;
+		cursor: pointer;
+		font-size: 1.8em;
 	}
 	.search-icon-wrap {
 		width: 1.5em;
+		height: 40px;
+		line-height: 40px;
 		display: inline-block;
 	}
+	.icon-profile {
+		font-size: 6em;
+		cursor: pointer;
+	}
+
 	.-boxshad {
 		box-shadow: #000 1px 2px 4px 0px;
 	}
@@ -396,14 +431,6 @@ export default {
 			border: none;
 			width:15em;
 		}
-	}
-	.mdi {
-		cursor: pointer;
-		font-size: 1.8em;
-	}
-	.map-profile-icon {
-		font-size: 6em;
-		cursor: pointer;
 	}
 </style>
 

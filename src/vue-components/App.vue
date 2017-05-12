@@ -85,7 +85,7 @@
 					<hr />
 					<div>						
 						<lilink to="mainpage2" icon="chevron-right" v-bind:drawer="$refs.drawer_left">
-							<b>BETA VERSION</b>
+							<b>Main Page Gmaps</b>
 						</lilink>
 					</div>
 				</div>
@@ -94,10 +94,11 @@
 			<div class="row layout-view">
 				<div v-bind:class="$route.meta.fullWidth?'router-view-wrap width-1of1':'router-view-wrap offset-1of4 width-2of4 lt-bg-width-1of1 lt-bg-offset-0'">
 					<router-view></router-view>
+					<q-ajax-bar position="bottom" color="primary" v-bind:speed="100" size="15px"></q-ajax-bar>			
 				</div>
 			</div>
 
-			<q-ajax-bar position="bottom" color="primary" v-bind:speed="100" size="15px"></q-ajax-bar>			
+			
 		</q-layout>
 	</div>
 </template>
