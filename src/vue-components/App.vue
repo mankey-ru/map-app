@@ -92,7 +92,7 @@
 			</q-drawer>
 
 			<div class="row layout-view">
-				<div v-bind:class="$route.meta.fullWidth?'router-view-wrap width-1of1':'router-view-wrap offset-1of4 width-2of4 lt-bg-width-1of1 lt-bg-offset-0'">
+				<div v-bind:class="$route.meta.fullWidth?'router-view-wrap width-1of1':'router-view-wrap offset-1of5 width-2of5 lt-bg-width-1of1 lt-bg-offset-0'">
 					<router-view></router-view>
 					<q-ajax-bar position="bottom" color="primary" v-bind:speed="100" size="15px"></q-ajax-bar>			
 				</div>

@@ -112,7 +112,6 @@
 				});
 			},
 			nevt_date: function (){
-				console.log(this.$options.filters.dateTimeFormat)
 				return this.$options.filters.dateTimeFormat(this.$data.nevt.date)
 			}
 		},

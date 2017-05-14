@@ -15,7 +15,7 @@ import page_about from './vue-components/page-about.vue';
 const routes = [{
 		path: '/mainpage2',
 		name: 'mainpage2',
-		component: mainpage,
+		component: mainpageGmaps,
 		meta: {
 			fullscreen: true,
 			title: 'Main Page Gmaps',

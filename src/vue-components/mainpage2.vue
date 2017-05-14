@@ -35,7 +35,12 @@
 				evtHiddenQty: 0
 			}
 		},
-		computed: {},
+		computed: {
+			c_searchDate: function(){
+				var sdate = this.$data.search.date;
+				return sdate ? this.$options.filters.dateFormatPretty(sdate) : 'Любая дата';
+			}
+		},
 		methods: {
 			showAll: function() {
 				for (var i = 0, len = this.$data.evtList.length; i < len; i++) {
@@ -89,7 +94,7 @@
 			.end((err, res) => {
 				this.search_pending = false;
 				if (err) {
-					Toast.create.error(err || 'Failed to get events')
+					Toast.create.negative('Failed to get events')
 				}
 				else {
 					if (res.body.evtList instanceof Array) {
@@ -97,62 +102,61 @@
 							Toast.create.warning('По вашему запросу ничегошенки не нашлось :(');
 							return
 						}
-						if (layerRef) {
-								map.removeSource(layerID); // map.removeLayer(layerID); layer removed automatically with source
-							}
+						if (map.getLayer(layerID)) {
+							map.removeSource(layerID); // map.removeLayer(layerID); layer removed automatically with source
+						}
 
-							this.$data.evtList = [];
-							var featureList = [];
+						this.$data.evtList = [];
+						var featureList = [];
 
-							//console.time('adding markers on map');
-							for (var i = 0, len = res.body.evtList.length; i < len; i++) { // res.body.evtList.length 
-								var evt = res.body.evtList[i];
-								this.$data.evtList.push(evt);								
-								var evtFeature = {
-									type: 'Feature',
-									properties: {
-										_id: evt._id,
-										name: evt.name,
-										descr: evt.descr,
-										iconcode: 'fire-station' 
+						//console.time('adding markers on map');
+						for (var i = 0, len = res.body.evtList.length; i < len; i++) { // res.body.evtList.length 
+							var evt = res.body.evtList[i];
+							this.$data.evtList.push(evt);
+							var evtFeature = {
+								type: 'Feature',
+								properties: {
+									_id: evt._id,
+									name: evt.name,
+									descr: evt.descr,
+									iconcode: 'fire-station'
 										// https://github.com/mapbox/mapbox-gl-styles/tree/master/sprites/basic-v9/_svg
 										// https://www.mapbox.com/maki-icons/
 										// theatre art-gallery star music
-									},
-									geometry: {
-										type: 'Point',
-										coordinates: evt.latLng.reverse()
-									}
-								};
-								evt.mark = evtFeature;
-								featureList.push(evtFeature);
-							}
-							layerRef = map.addLayer({
-								id: layerID,
-								type: 'symbol',
-								source: {
-									type: 'geojson',
-									data: {
-										type: 'FeatureCollection',
-										features: featureList
-									}
 								},
-								layout: { // https://www.mapbox.com/mapbox-gl-js/style-spec/#layers-symbol
-									'icon-image': '{iconcode}-15', 
-									'icon-allow-overlap': true,
-									'icon-size': 1.3
+								geometry: {
+									type: 'Point',
+									coordinates: evt.latLng.reverse()
+								}
+							};
+							evt.mark = evtFeature;
+							featureList.push(evtFeature);
+						}
+						// On initial layer creation we should add layer-related event handlers
+						if (!layerRef) {
+							map.on('moveend', function() {
+								var features = map.queryRenderedFeatures({
+									layers: [layerID]
+								});
+								if (features) {
+									uniqueFeatures = getUniqueFeatures(features, '_id');
 								}
 							});
-
 							map.on('click', layerID, function(ev) {
 								var props = ev.features[0].properties;
 								Dialog.create({
 									title: props.name,
 									message: props.descr,
+									//stackButtons: true,
 									buttons: [{
 										label: 'Подробнее',
 										handler: function() {
 											_vm.$router.push(`event/card/${props._id}`);
+										}
+									}, {
+										label: 'Я пойду',
+										handler: function() {
+
 										}
 									}]
 								})
@@ -163,11 +167,28 @@
 							map.on('mouseleave', layerID, function() {
 								map.getCanvas().style.cursor = '';
 							});
-							//console.log(map.queryRenderedFeatures({layers:[layerID]}))
-							//console.timeEnd('adding markers on map');
 						}
-
+						layerRef = map.addLayer({
+							id: layerID,
+							type: 'symbol',
+							source: {
+								type: 'geojson',
+								data: {
+									type: 'FeatureCollection',
+									features: featureList
+								}
+							},
+							layout: { // https://www.mapbox.com/mapbox-gl-js/style-spec/#layers-symbol
+								'icon-image': '{iconcode}-15',
+								'icon-allow-overlap': true,
+								'icon-size': 1.3
+							}
+						});
+						//console.log(map.queryRenderedFeatures({layers:[layerID]}))
+						//console.timeEnd('adding markers on map');
 					}
+
+				}
 				})
 		}
 	},
@@ -179,17 +200,11 @@
 			container: 'map-container',
 			style: 'mapbox://styles/d0esntmatter/cj2lokqx1000f2rs0ronhfmfy',
 			minZoom: 10,
-			zoom: 13,
+			zoom: 12,
 			center: [37.62113, 55.75184] // lng then lat. Thats weird.
 		});
 		map.on('load', function(){
 			_vm.getEvents();
-			map.on('moveend', function() {
-				var features = map.queryRenderedFeatures({layers: [layerID]});
-				if (features) {
-					uniqueFeatures = getUniqueFeatures(features, '_id');
-				}
-			});
 		});
 		window.mmm = map;
 
@@ -310,7 +325,7 @@ function getUniqueFeatures(array, comparatorProperty) {
 			<span class="gt-md inline">
 				<div class="map-pane__date"><!-- Calendar Desktop -->
 					<div class="cursor-pointer" v-on:click="$refs.modal_date.open()">
-						<span>{{search.date | dateFormatPretty}}</span> 
+						<span>{{c_searchDate}}</span> 
 						<i class="mdi mdi-calendar"></i>
 					</div>
 				</div>				
