@@ -549,7 +549,11 @@ function handleError(res, errObjOrStr, message, code) {
 		message - error to return in response
 	*/
 	var reason = !!errObjOrStr && errObjOrStr.message ? errObjOrStr.message : errObjOrStr; // sweet jesus
-	console.log('API ERROR: ' + JSON.stringify(reason));
+	reason = JSON.stringify(reason);
+	if (reason === '"Topology was destroyed"') { // when dev server is running too long =)
+		dbtools.connect(); // restoring connection
+	}
+	console.log('API ERROR: ' + reason);
 	res.status(code || 500).json({
 		error: message
 	}).end();
