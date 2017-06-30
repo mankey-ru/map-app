@@ -3,14 +3,14 @@
 	import mapLib from './../map-lib.js'
 	import mixins from './../vue-mixins.js'
 	import request from 'superagent'	
-	import {QSpinner, QBtn, Toast, QModal, QLayout, QToolbar, QToolbarTitle, QCheckbox, QDialogSelect, QInlineDatetime} from 'quasar'
+	import {QInput, QSpinner, QIcon, QBtn, Toast, QModal, QMoadlLayout, QToolbar, QToolbarTitle, QCheckbox, QDialogSelect, QInlineDatetime} from 'quasar'
 
 	var _vm;
 	var mapInitd = false;
 	export default {
 		name: 'evt-new',		
-		components: {QSpinner, QBtn, Toast, QModal, QLayout, QToolbar, QToolbarTitle},
-		data: function () {
+		components: {QInput, QSpinner, QIcon, QBtn, Toast, QModal, QMoadlLayout, QToolbar, QToolbarTitle, QCheckbox, QDialogSelect, QInlineDatetime},
+		data: function () {QMoadlLayout
 			return {
 				title: 'Новое событие',
 				mark_cur: false,
@@ -132,23 +132,23 @@
 					<q-inline-datetime v-model="nevt.date" type="datetime"></q-inline-datetime>
 				</div>
 				<div class="text-right">
-					<button v-on:click="$refs.modal_datetime.close()" class="primary">
+					<q-btn v-on:click="$refs.modal_datetime.close()" color="primary">
 						Ок
-					</button>
+					</q-btn>
 				</div>
 			</div>
 		</q-modal>
 
-		<q-modal ref="modal_map" position="right" v-on:close="updateLocation" :content-css="{minWidth: '80vw', minHeight: '80vh'}">
-			<q-layout>
-				<div slot="header" class="toolbar">
-					<button @click="$refs.modal_map.close()">
-						<i>keyboard_arrow_right</i>
-					</button>
+		<q-modal ref="modal_map" position="right" v-on:close="updateLocation" :content-css="{minWidth: '80vw'}">
+			<q-modal-layout>
+				<q-toolbar slot="header">
+					<q-btn @click="$refs.modal_map.close()" flat>
+						<q-icon name="keyboard arrow right"/>
+					</q-btn>
 					<q-toolbar-title :padding="1">
 						Выберите место
 					</q-toolbar-title>
-				</div>
+				</q-toolbar>
 				<div class="layout-view">
 					<div class="layout-padding">
 						<div class="group">
@@ -163,16 +163,16 @@
 						</div>
 					</div>
 				</div>
-				<div slot="footer" class="toolbar">
+				<q-toolbar slot="footer">
 					<q-toolbar-title :padding="1">
 						<div class="text-right">
-							<button v-on:click="$refs.modal_map.close()" class="primary">
+							<q-btn v-on:click="$refs.modal_map.close()" color="primary">
 								Ок
-							</button>
+							</q-btn>
 						</div>
 					</q-toolbar-title>
-				</div>
-			</q-layout>
+				</q-toolbar>
+			</q-modal-layout>
 		</q-modal>
 		<form v-on:submit.prevent="nevt_submit">
 			<h1 class="h1-md">
@@ -181,49 +181,31 @@
 			<div class="group">
 
 				<div class="row">
-					<div class="width-1of3">
-						<button v-on:click.prevent="mapOpen" class="primary">
-							<span v-if="nevt.latLng">Изменить</span><span v-else>Указать</span> место
-						</button>
+					<div class="col-4">
+						<q-btn v-on:click.prevent="mapOpen" color="primary" small>
+							<span v-if="nevt.latLng">Изменить</span><span v-else>Указать</span>&nbsp;место
+						</q-btn>
 					</div>
-					<div class="width-1of3 text-right" style="padding-top:.4em;padding-right:1.4em;">
-						<label>
-							Запомнить место
-							<q-checkbox v-model="newplace.active"></q-checkbox>
-						</label>
+					<div class="col-3 text-right">
+						<q-checkbox v-model="newplace.active" label="Запомнить"></q-checkbox>
 					</div>
-					<div class="width-1of3">
-						<div v-show="newplace.active">
-							<input v-model="newplace.title" placeholder="Введите название" required class="full-width" />
-						</div>
+					<div class="col-5">
+						<q-input v-show="newplace.active" v-model="newplace.title" vlaue="" placeholder="Введите название" required class="full-width" />
 					</div>
 				</div>
-				<div class="floating-label">
-					<input v-model="nevt.name" required class="full-width" />
-					<label>Название мероприятия</label>
-				</div>
-				<div class="floating-label">
-					<input v-model="nevt_date" required class="full-width" v-on:focus.prevent="$refs.modal_datetime.open()" />
-					<label>Дата</label>
-				</div>
-				<div class="floating-label">
-					<textarea v-model="nevt.descr" required class="full-width"></textarea>
-					<label>Описание</label>
-				</div>
-				<div>
-					<q-dialog-select type="radio" required class="full-width"
-					v-model="nevt.genre_id" v-bind:options="genreList" ok-label="Выбрать" cancel-label="Отмена" 
-					title="Жанр мероприятия" label="Жанр"></q-dialog-select>
-				</div>
-				<br />
-				<br />
+				<q-input value="" v-model="nevt.name" required class="full-width" float-label="Название мероприятия"/>
+				<q-input value="" v-model="nevt_date" required class="full-width" v-on:focus.prevent="$refs.modal_datetime.open()" float-label="Дата" />
+				<q-input type="textarea" value="" v-model="nevt.descr" required class="full-width" float-label="Описание"/>				
+				<q-dialog-select type="radio" required class="full-width"
+				v-model="nevt.genre_id" v-bind:options="genreList" ok-label="Выбрать" cancel-label="Отмена" 
+				float-label="Жанр мероприятия"></q-dialog-select>
 				<br />
 				<div class="row">
-					<div class="width-2of3">
+					<div class="col-8">
 						<homebtn></homebtn>
 					</div>
-					<div class="width-1of3 text-right">
-						<q-btn big class="full-width" :disabled="nevt_invalid" :loader="submit_pending" type="submit">
+					<div class="col-4 text-right">
+						<q-btn big color="primary" class="full-width" :disabled="nevt_invalid" :loader="submit_pending" type="submit">
 							Готово
 						</q-btn>
 					</div>
