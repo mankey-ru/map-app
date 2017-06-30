@@ -2,12 +2,12 @@
 	import mixins from './../vue-mixins.js'
 	import lilink from './_lilink.vue'
 
-	import {QLayout, QToolbar, QToolbarTitle, QAjaxBar, QBtn, QIcon, QList}	from 'quasar'
+	import {QLayout, QToolbar, QToolbarTitle, QAjaxBar, QBtn, QIcon, QList, QItem, QItemSide, QItemMain}	from 'quasar'
 
 	export default {
 		name: 'AppRoot',
 		components: {  // TODO перенести часть в миксины?
-			lilink, QLayout, QToolbar, QToolbarTitle, QList, QAjaxBar, QIcon, QBtn
+			lilink, QLayout, QToolbar, QToolbarTitle, QList, QAjaxBar, QIcon, QBtn, QItem, QItemSide, QItemMain
 		}, 
 		data: function() {
 			return {
@@ -17,9 +17,9 @@
 				layoutLimitedWidth: `
 				col-xs-10	offset-xs-1
 				col-sm-10	offset-sm-1
-				col-md-8	offset-md-2
-				col-lg-6	offset-lg-2
-				col-xl-4	offset-xl-3
+				col-md-10	offset-md-1
+				col-lg-8	offset-lg-2
+				col-xl-6	offset-xl-3
 				`
 			}
 		},
@@ -55,7 +55,7 @@
 					</q-btn>
 				</q-toolbar>	
 			</div>
-			<div slot="left" ref="drawer_left" v-bind:backdrop-opacity="0"> <!-- Left Sidebar -->
+			<div slot="left" ref="drawer_left"> <!-- Left Sidebar :backdrop-opacity="0" -->
 
 				<h4 class="text-center mar-v">
 					<!-- <i class="mdi mdi-google-maps cursor-pointer sidebar-logo" v-on:click="$router.push({name:'mainpage'})"></i> -->
@@ -72,30 +72,27 @@
 							<lilink to="event-new" icon="fiber new" label="Добавить событие"/> 
 							<lilink to="event-list" icon="list" label="Мои события"/>
 						</div>
-						<q-btn color="black" class="full-width" :loader="auth.pending" v-on:click.native="LOG_OUT">
-							Выйти
-						</q-btn>
 					</div>
 					<div v-if="!currentUser">
 						<lilink to="user-login" icon="fa-sign-in" label="Вход"/>
 						<lilink to="user-register" icon="fa-sign-out" label="Регистрация" />
-						<hr />
-					</div>					
-					<div>
-						<lilink to="page-how" icon="chevron right" label="Как это работает"/>
-						<lilink to="page-about" icon="chevron right" label="О нас"/>
-					</div>					
+					</div>	
+					<hr />	
+					<lilink to="page-how" icon="chevron right" label="Как это работает"/>
+					<lilink to="page-about" icon="chevron right" label="О нас"/>
 					<hr />
-					<div>						
-						<lilink to="mainpage2" icon="chevron right" label="Main Page Gmaps" sublabel="Предыдущая версия"/>
-					</div>
+					<q-item :link="true" v-on:click.native="LOG_OUT" v-show="currentUser">
+						<q-item-side :icon="auth.pending ? 'fa-sign-out':'fa-sign-out'"/>
+						<q-item-main label="Выйти" />
+					</q-item>		
+
 				</q-list>
 			</div>
 
 			<div class="row layout-view">
 				<div v-bind:class="$route.meta.fullWidth?'router-view-wrap col-12':'router-view-wrap' + layoutLimitedWidth">
 					<router-view></router-view>
-					<q-ajax-bar position="bottom" color="primary" v-bind:speed="100" size="15px"></q-ajax-bar>			
+					<q-ajax-bar position="bottom" color="secondary" v-bind:speed="100" size="10px"></q-ajax-bar>			
 				</div>
 			</div>
 

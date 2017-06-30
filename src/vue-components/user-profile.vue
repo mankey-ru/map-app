@@ -8,58 +8,54 @@
 					</div>
 				</div>
 				<div class="row">
-					<div class="width-1of3 text-right">
+					<div class="col-4 text-right">
 						<img v-bind:src="user.pic" class="user-pic" />
 					</div>
-					<div class="width-2of3 mar-v-group">
-						<div v-if="own" class="floating-label">
-							<input v-model="user.name" v-bind:readonly="!own" class="full-width" required />
-							<label>Имя</label>
-						</div>
+					<div class="col-8 mar-v-group">
+						<q-input v-model="user.name" v-if="own" :readonly="!own" float-label="Имя" required />
 						<div>
-							<label>
-								<q-toggle v-bind:disable="!own" class="primary" v-model="currentUserIsMusician"></q-toggle>
-								Музыкант
-							</label>
+							<q-checkbox :disable="!own" v-model="currentUserIsMusician" label="Музыкант" />
 						</div>
-						<div class="__datepicker-wrap">
-							<label>День рождения</label>
-							<div v-if="own">
-								<datepicker 
-								:input-class="'full-width'" 
-								v-model="user.bdate"
-								:language="'ru'"
-								:monday-first="true"
-								:format="'dd.MM.yyyy'"
-								></datepicker>
-							</div>
-							<span v-if="!own">
-								{{user.bdate | df_pretty_dm}}
-							</span>
-						</div>
+						<q-datetime 
+						v-model="user.bdate" 
+						type="date" 
+						float-label="День рождения"
+						:month-names="LOC('monthNames')"
+						:day-names="LOC('dayNamesShort')"
+						:monday-first="true"
+						format="DD.MM.YYYY"
+						ok-label="Ок"
+						clear-label="Очистить"
+						cancel-label="Отмена"
+						/>
+						<span v-if="!own">
+							{{user.bdate | df_pretty_dm}}
+						</span>
 					</div>
 				</div>
 				<div class="mar-v-group"> 
-					<div class="floating-label" v-if="own">
-						<textarea v-if="own" v-model="user.descr" v-bind:readonly="!own" class="full-width user-textarea" required></textarea>
-						<label>О себе</label>
-					</div>
+					<q-input type="textarea"
+					v-model="user.descr" 
+					:readonly="!own" 
+					class="user-textarea" 
+					required 
+					float-label="О себе" />
 					<p v-if="!own">{{user.descr}}</p>
-
+					<br/>
 					<div class="row">
-						<div class="width-1of2">
+						<div class="col-6">
 							<homebtn></homebtn>
 						</div>
-						<div class="width-1of2 text-right">
-							<q-progress-button v-if="own" indeterminate class="primary big" v-bind:percentage="submit_pending" type="submit">
+						<div class="col-6 text-right">
+							<q-btn v-if="own" big color="primary" :loading="submit_pending" type="submit">
 								Сохранить
-							</q-progress-button>
+							</q-btn>
 						</div>
 					</div>
 				</div>
 			</div>
 			<div v-else class="spinner-wrap">
-				<spinner :size="50"></spinner>
+				<q-spinner :size="50"/>
 			</div>
 		</form>
 	</div>
@@ -69,17 +65,17 @@
 	var apiUrl = require('./../api-url.js').def;
 
 	import request from 'superagent'
-	import Datepicker from 'vuejs-datepicker'
-	import {Toast} from 'quasar'
+	import {Toast, QInput, QBtn, QDatetime, QCheckbox, QSpinner} from 'quasar'
 	import mixins from './../vue-mixins.js'
 
 	var Comp = {
-		name: 'user-profile',
+		name: 'user-profile',		
+		components: {QInput, QBtn, QDatetime, QCheckbox, QSpinner},
 		data: function () {
 			return {
 				user: false,
 				own: false,
-				submit_pending: 0
+				submit_pending: false
 			}
 		},
 		mixins: [mixins],
@@ -88,16 +84,16 @@
 				var user_id = this.$router.currentRoute.params.user_id;
 				if (user_id) {
 					request
-						.get(apiUrl + 'user/' + user_id) 
-						.end((err, res)=>{
-							if (err || !res.body) {
-								Toast.create.warning({html:res.body.error || 'User fetch failed'})
-							}
-							else {
-								this.user = res.body;
-								this.own = this.currentUser && this.currentUser._id === res.body._id;
-							}
-						})
+					.get(apiUrl + 'user/' + user_id) 
+					.end((err, res)=>{
+						if (err || !res.body) {
+							Toast.create.warning({html:res.body.error || 'User fetch failed'})
+						}
+						else {
+							this.user = res.body;
+							this.own = this.currentUser && this.currentUser._id === res.body._id;
+						}
+					})
 				}
 				else {
 					this.$nextTick(()=>{
@@ -117,7 +113,7 @@
 				}
 			},
 			userEdit: function(){
-				this.submit_pending = 1;
+				this.submit_pending = true;
 				request
 				.post(apiUrl + 'auth/edit')
 				.send(this.user)
@@ -129,7 +125,7 @@
 						Toast.create.positive({html:'Успех'})
 						this.$store.dispatch('updateUser', this.user);
 					}
-					this.submit_pending = 0;
+					this.submit_pending = false;
 				});
 			}
 		},
@@ -145,9 +141,6 @@
 					this.user.role = (val | 0);  
 				}
 			}
-		},
-		components: {
-			Datepicker
 		},
 		watch: {
 		    '$route': 'getUser' // чтобы при смене /#/user-profile/1 на /#/user-profile обовлялся пользователь

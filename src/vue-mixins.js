@@ -9,6 +9,8 @@ const apiUrl = require('./api-url.js').def;
 import request from 'superagent'
 import _ from 'lodash'
 
+import DICT from './dict.js'
+
 import {Toast, QBtn} from 'quasar'
 
 /*
@@ -133,6 +135,9 @@ export default {
 			else {
 				this.$router.push(to)
 			}
+		},
+		LOC: function(k){
+			return DICT.ru[k]
 		}
 	},
 	filters: {

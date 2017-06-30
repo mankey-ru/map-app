@@ -74,7 +74,7 @@
 </script>
 
 <template>
-	<q-item v-bind:active="isCurrent" v-bind:link="true" v-on:click="_GOTO">
+	<q-item :active="isCurrent" :link="true" v-on:click="_GOTO">
 		<q-item-side v-if="icon" v-bind:icon="icon" />
 		<q-item-main v-bind:label="label" v-bind:sublabel="sublabel" />
 	</q-item>
