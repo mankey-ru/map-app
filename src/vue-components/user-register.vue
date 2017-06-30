@@ -51,7 +51,7 @@
 <script>
 	import request from 'superagent';
 	import mixins from './../vue-mixins.js';
-	import miniToastr from 'mini-toastr';
+	import {Toast} from 'quasar';
 	import { required, email, sameAs } from 'vuelidate/lib/validators'
 
 	var apiUrl = require('./../api-url.js').def;
@@ -84,10 +84,10 @@
 				.send(this.$data)
 				.end((err, res)=>{
 					if (err || !res.body) {
-						miniToastr.error(res.body.error || 'Registration failed');
+						Toast.create.warning({html:res.body.error || 'Registration failed'})
 					}
 					else {
-						miniToastr.success('Registration succeeded');
+						Toast.create.positive({html:'Успех'})
 						this.$root.currentUser = res.body;
 						this.GOTO_PROFILE(); 
 					}

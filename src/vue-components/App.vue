@@ -2,17 +2,29 @@
 	import mixins from './../vue-mixins.js'
 	import lilink from './_lilink.vue'
 
+	import {QLayout, QToolbar, QToolbarTitle, QAjaxBar, QBtn, QIcon, QList}	from 'quasar'
+
 	export default {
 		name: 'AppRoot',
-		data: function () {
+		components: {  // TODO перенести часть в миксины?
+			lilink, QLayout, QToolbar, QToolbarTitle, QList, QAjaxBar, QIcon, QBtn
+		}, 
+		data: function() {
 			return {
 				auth: {
-					pending: 0
-				}
+					pending: false
+				},
+				layoutLimitedWidth: `
+				col-xs-10	offset-xs-1
+				col-sm-10	offset-sm-1
+				col-md-8	offset-md-2
+				col-lg-6	offset-lg-2
+				col-xl-4	offset-xl-3
+				`
 			}
 		},
 		mixins: [mixins],
-		components: {lilink}
+		mounted: function() {}
 	}
 </script>
 
@@ -21,78 +33,67 @@
 	<div>
 		<q-layout>
 
-			<div slot="header" class="toolbar primary" v-show="!$route.meta.noToolbar">
-				<button class="hide-on-drawer-visible" v-on:click="$refs.drawer_left.open()">
-					<i class="mdi mdi-menu"></i>
-				</button>
-				<q-toolbar-title v-bind:padding="1">
-					{{$route.meta.title}}
-				</q-toolbar-title>
-				<button v-on:click="$router.push({name:'mainpage'})">
-					<!-- <i class="mdi mdi-google-maps"></i> -->
-					<i>explore</i>
-				</button>
-				<button v-show="currentUser" v-on:click="$router.push({name:'user-profile-current'})">
-					<i class="mdi mdi-account-box"></i>
-				</button>
+			<div slot="header" v-show="!$route.meta.noToolbar">				
+				<q-toolbar>
+					<q-toolbar-title>
+						{{$route.meta.title}} 
+						<span slot="subtitle">
+							Subtitle
+						</span>
+					</q-toolbar-title>	
+
+					<q-btn v-on:click="$router.push({name:'mainpage'})" flat>
+						<q-icon name="explore" /> 
+						<span class="gt-md"> Карта событий</span>
+					</q-btn>				
+					<q-btn v-show="currentUser" v-on:click="$router.push({name:'user-profile-current'})" flat class="lt-lg">
+						<q-icon name="account box" />
+						<span class="gt-md">Аккаунт</span>
+					</q-btn>			
+					<q-btn v-on:click="$refs.drawer_left.open()" flat class="lt-lg">
+						<q-icon name="menu" />
+					</q-btn>
+				</q-toolbar>	
 			</div>
-			<q-drawer ref="drawer_left" v-bind:backdrop-opacity="0"> <!-- Left Sidebar -->
-				<div class="toolbar light" v-show="$route.meta.noToolbar">
-					<q-toolbar-title v-bind:padding="1">
-						{{$route.meta.title}}
-					</q-toolbar-title>
-				</div>
+			<div slot="left" ref="drawer_left" v-bind:backdrop-opacity="0"> <!-- Left Sidebar -->
+
 				<h4 class="text-center mar-v">
 					<!-- <i class="mdi mdi-google-maps cursor-pointer sidebar-logo" v-on:click="$router.push({name:'mainpage'})"></i> -->
 					<h1 class="h1-md cursor-pointer" v-on:click="$router.push({name:'mainpage'})">
-						Лого
+						<q-icon name="fa-map-o"/>
 					</h1>
 				</h4>
-				<div class="list platform-delimiter">
+
+				<q-list no-border link inset-delimiter>
+					
 					<div v-if="currentUser">
-						<lilink to="user-profile-current" class="multiple-lines" icon="account-box" v-bind:drawer="$refs.drawer_left">
-							{{currentUser.name}}
-						</lilink>
+						<lilink to="user-profile-current" class="multiple-lines" icon="account box" v-bind:label="currentUser.name"/>
 						<div v-if="currentUser.role">
-							<lilink to="event-new" icon="new-box" v-bind:drawer="$refs.drawer_left">
-								Добавить событие
-							</lilink>
-							<lilink to="event-list" icon="format-list-bulleted-type" v-bind:drawer="$refs.drawer_left">
-								Мои мероприятия
-							</lilink>
+							<lilink to="event-new" icon="fiber new" label="Добавить событие"/> 
+							<lilink to="event-list" icon="list" label="Мои события"/>
 						</div>
-						<q-progress-button indeterminate class="tertiary full-width" v-bind:percentage="auth.pending" v-on:click.native="LOG_OUT">
+						<q-btn color="black" class="full-width" :loader="auth.pending" v-on:click.native="LOG_OUT">
 							Выйти
-						</q-progress-button>
+						</q-btn>
 					</div>
 					<div v-if="!currentUser">
-						<lilink to="user-login" icon="login-variant" v-bind:drawer="$refs.drawer_left">
-							Вход
-						</lilink>
-						<lilink to="user-register" icon="account-card-details" v-bind:drawer="$refs.drawer_left">
-							Регистрация
-						</lilink>
-					</div>
-					<hr />
+						<lilink to="user-login" icon="fa-sign-in" label="Вход"/>
+						<lilink to="user-register" icon="fa-sign-out" label="Регистрация" />
+						<hr />
+					</div>					
 					<div>
-						<lilink to="page-how" icon="chevron-right" v-bind:drawer="$refs.drawer_left">
-							Как это работает
-						</lilink>
-						<lilink to="page-about" icon="chevron-right" v-bind:drawer="$refs.drawer_left">
-							О нас
-						</lilink>
+						<lilink to="page-how" icon="chevron right" label="Как это работает"/>
+						<lilink to="page-about" icon="chevron right" label="О нас"/>
 					</div>					
 					<hr />
 					<div>						
-						<lilink to="mainpage2" icon="chevron-right" v-bind:drawer="$refs.drawer_left">
-							<b>Main Page Gmaps</b>
-						</lilink>
+						<lilink to="mainpage2" icon="chevron right" label="Main Page Gmaps" sublabel="Предыдущая версия"/>
 					</div>
-				</div>
-			</q-drawer>
+				</q-list>
+			</div>
 
 			<div class="row layout-view">
-				<div v-bind:class="$route.meta.fullWidth?'router-view-wrap width-1of1':'router-view-wrap offset-1of5 width-2of5 lt-bg-width-1of1 lt-bg-offset-0'">
+				<div v-bind:class="$route.meta.fullWidth?'router-view-wrap col-12':'router-view-wrap' + layoutLimitedWidth">
 					<router-view></router-view>
 					<q-ajax-bar position="bottom" color="primary" v-bind:speed="100" size="15px"></q-ajax-bar>			
 				</div>
@@ -118,7 +119,7 @@
 		font-size: 3em;
 	}
 
- /* width took from drawer code */
+	/* width took from drawer code */
 /*	@media screen and (min-width: 921px) {
 		.sidebar-title {
 			display: none !important;
@@ -147,8 +148,15 @@
 		.--vspace();
 		height: 3em;
 	}
+	.vspace-4 {
+		.--vspace();
+		height: 4em;
+	}
 	.h1-md {
 		font-size: 2.5rem;
+	}
+	.h1-sm {
+		font-size: 1.8rem;
 	}
 	.group-x {
 		&>label, 
@@ -206,7 +214,7 @@
 		white-space: nowrap;
 	}
 	.pntr {
-		cursor: pointer;
+		cursor: pointer !important;
 	}
 	.hdn {
 		display: none;

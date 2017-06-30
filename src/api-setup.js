@@ -463,7 +463,10 @@ function setupAuth(app) {
 	/**
 		Reqistration
 	*/
-	const bcrypt = require('bcrypt');
+	const bcrypt = require('bcryptjs'); 
+	// this lib is slower (about 30%) but compatible with latest version of nodejs
+	// bcrypt does not because of node-gyp
+	// api seems to be the same so hot replacement is available :)
 	const saltRounds = 8;
 
 	app.post(apiUrl + 'auth/reg', function(req, res) {

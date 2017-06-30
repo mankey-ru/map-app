@@ -9,17 +9,7 @@ const apiUrl = require('./api-url.js').def;
 import request from 'superagent'
 import _ from 'lodash'
 
-import miniToastr from 'mini-toastr'
-_.extend(miniToastr.config.style['.mini-toastr'], {
-	'top': 'initial',
-	'bottom': '1em',
-	'right': '1em'
-})
-_.extend(miniToastr.config.style['.mini-toastr__notification'], {
-	'opacity': 1,
-	'box-shadow': 'none'
-})
-miniToastr.init();
+import {Toast, QBtn} from 'quasar'
 
 /*
 TODO add store mixins if needed
@@ -37,25 +27,25 @@ export default {
 				username: this.auth.email,
 				password: this.auth.password
 			} : {};
-			this.auth.pending = 1;
+			this.auth.pending = true;
 			var meth = this.auth.method || ''
 			request
 				.post(`${apiUrl}auth/in/${meth}`)
 				.send(credentials)
 				.end((err, res) => {
 					if (err || !res.body) {
-						miniToastr.error('Request error')
+						Toast.create.warning({html:'Request error'})
 					}
 					else {
 						var user = res.body.currentUser;
 						if (!user) {
-							miniToastr.warn('Email/password combination not found. Please try again.')
+							Toast.create.warning({html:'Email/password combination not found. Please try again.'})
 						}
 						else {
 							this.LOG_IN_SUCCESS(user);
 						}
 					}
-					this.auth.pending = 0;
+					this.auth.pending = false;
 				});
 			// TODO implement permanent credentials storage
 			// https://github.com/Crypho/cordova-plugin-secure-storage
@@ -69,8 +59,6 @@ export default {
 			var wo = window.open(`${apiUrl}auth/in?provider=${provider}`, '_blank', 'height=500,width=700,location=no,status=no,titlebar=no,toolbar=no')
 		},
 		LOG_IN_SUCCESS: function (user) {
-			//console.log(user)
-			//miniToastr.success('Success');
 			this.$store.dispatch('updateUser', user);
 			if (this.$route.name === 'user-login') {
 				this.$router.push('/')
@@ -84,13 +72,13 @@ export default {
 				.post(apiUrl + 'auth/out')
 				.end((err, res) => {
 					if (err || !res.body) {
-						miniToastr.error('Request error')
+						Toast.create.warning({html:'Request error'})
 					}
 					else if (res.body.user) {
-						miniToastr.warning('Logout failed')
+						Toast.create.warning({html:'Logout failed'})
 					}
 					else {
-						miniToastr.success('Success')
+						Toast.create.positive({html:'Success'})
 						this.$store.dispatch('updateUser', false);
 						//this.$router.push('/')
 					}
@@ -173,10 +161,11 @@ export default {
 	},
 	components: {
 		homebtn: {
+			components: {QBtn},
 			template: `
-			<button v-on:click="$router.push({name:'mainpage'})" class="primary outline small" type="button">
-				<i class="mdi mdi-google-maps"></i> Вернуться на карту
-			</button>`
+			<q-btn icon="fa-map-o" v-on:click="$router.push({name:'mainpage'})" color="primary" outline small type="button">
+				Вернуться на карту
+			</q-btn>`
 		}
 	},
 	computed: {

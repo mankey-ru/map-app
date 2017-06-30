@@ -2,13 +2,14 @@
 	var apiUrl = require('./../api-url.js').def;
 	import mapLib from './../map-lib.js'
 	import mixins from './../vue-mixins.js'
-	import miniToastr from 'mini-toastr'
-	import request from 'superagent'
+	import request from 'superagent'	
+	import {QSpinner, QBtn, Toast, QModal, QLayout, QToolbar, QToolbarTitle, QCheckbox, QDialogSelect, QInlineDatetime} from 'quasar'
 
 	var _vm;
 	var mapInitd = false;
 	export default {
-		name: 'evt-new',
+		name: 'evt-new',		
+		components: {QSpinner, QBtn, Toast, QModal, QLayout, QToolbar, QToolbarTitle},
 		data: function () {
 			return {
 				title: 'Новое событие',
@@ -24,26 +25,25 @@
 					active: false,
 					title: ''
 				},
-				submit_pending: 0
+				submit_pending: false
 			}
 		},
 		mixins: [mixins],
 		methods: {
 			nevt_submit: function(){
-				this.submit_pending = 1;
+				this.submit_pending = true;
 				request
 				.post(apiUrl + 'events')
 				.send(this.nevt)
 				.end((err, res)=>{
 					if (err || !res.body) {
-						miniToastr.error(res.body.error || 'Ошибка создания события')
+						Toast.create.warning({html:res.body.error || 'Ошибка создания события'})
 					}
 					else {
-						console.log(res)
-						miniToastr.success('Успех');
+						Toast.create.positive({html:'Успех'})
 						this.nevt_discard();
 					}
-					this.submit_pending = 0;
+					this.submit_pending = false;
 				});
 			},
 			nevt_discard: function(){
@@ -223,9 +223,9 @@
 						<homebtn></homebtn>
 					</div>
 					<div class="width-1of3 text-right">
-						<q-progress-button indeterminate class="primary full-width big" v-bind:disabled="nevt_invalid" v-bind:percentage="submit_pending" type="submit">
+						<q-btn big class="full-width" :disabled="nevt_invalid" :loader="submit_pending" type="submit">
 							Готово
-						</q-progress-button>
+						</q-btn>
 					</div>
 				</div>
 			</div>

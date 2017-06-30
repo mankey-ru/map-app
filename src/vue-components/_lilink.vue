@@ -1,12 +1,18 @@
 <script>
 	/**
 	List Item Link
-	Simple replacement for DrawerLink.vue from Quasar Framework
-	with non-ligature based icons from https://www.npmjs.com/package/mdi
 	*/
+	import {
+		QItem,
+		QItemSide,
+		QItemMain,
+		QIcon
+	} from 'quasar'
 	export default {
 		props: {
 			icon: String,
+			label: String,
+			sublabel: String,
 			to: [Object, String],
 			act: [Function],
 			drawer: [Object],
@@ -15,6 +21,7 @@
 				default: 'INSTANT'
 			}
 		},
+		components: {QItem, QItemSide, QItemMain},
 		methods: {
 			_GOTO: function(){
 				var vm = this.$router;
@@ -67,12 +74,10 @@
 </script>
 
 <template>
-	<div class="item item-link" v-bind:class="{'active':isCurrent}" v-on:click="_GOTO">
-		<i v-if="icon" class="item-primary mdi" v-bind:class="'mdi-'+icon"></i>
-		<div class="item-content"> 
-			<slot></slot>
-		</div>
-	</div>
+	<q-item v-bind:active="isCurrent" v-bind:link="true" v-on:click="_GOTO">
+		<q-item-side v-if="icon" v-bind:icon="icon" />
+		<q-item-main v-bind:label="label" v-bind:sublabel="sublabel" />
+	</q-item>
 </template>
 
 <style scoped>

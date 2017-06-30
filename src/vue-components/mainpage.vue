@@ -6,9 +6,7 @@
 	import mixins from './../vue-mixins.js'
 	import mapLib from './../map-lib.js'
 	import request from 'superagent'
-	import miniToastr from 'mini-toastr'
-	//import {Loading} from 'quasar-framework'
-	import {Toast} from 'quasar-framework'
+	import {Toast} from 'quasar'
 
 	var _vm;
 	var map;
@@ -79,7 +77,7 @@
 					this.search_pending = false;
 						//Loading.hide()
 						if (err) {
-							miniToastr.error(err || 'Failed to get events')
+							Toast.create.negative({html:err || 'Failed to get events'})
 						}
 						else {
 							if (res.body.evtList instanceof Array) {
@@ -247,7 +245,7 @@
 					<button class="gt-md push primary round big" v-on:click="GOTO_EVT_NEW">
 						Создать мероприятие 
 					</button>
-					<button class="lt-bg push primary circular big" v-on:click="GOTO_EVT_NEW">
+					<button class="lt-lg push primary circular big" v-on:click="GOTO_EVT_NEW">
 						<i class="mdi mdi-plus"></i>
 					</button>
 				</div>
@@ -261,7 +259,7 @@
 									LEFT
 								-->
 								<div class="width-2of3">
-									<div class="map-pane-main row inline"><!-- hide-on-drawer-visible -->
+									<div class="map-pane-main row inline lt-lg"><!-- hide-on-drawer-visible -->
 
 										<i v-on:click="$parent.$parent.$refs.drawer_left.open()" class="mdi mdi-menu"></i>
 

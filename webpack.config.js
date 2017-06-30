@@ -51,11 +51,11 @@ var conf_browser = {
 	resolve: {
 		alias: {
 			'vue$': 'vue/dist/vue.common.js',
-			// original material-design-icons npm package provides only stock icons
-			// and, by the way, is heavy as shit because of bunch of irrelevant files inside
-			'material-design-icons/iconfont/MaterialIcons-Regular.woff': path.resolve(__dirname, './node_modules/material-design-icons-iconfont/dist/fonts/MaterialIcons-Regular.woff')			
-			// so I made this dummy file to avoid build errors and use perfect mdi package
-			// 'material-design-icons/iconfont/MaterialIcons-Regular.woff': path.resolve(__dirname, './www/fonts/DummyFont.woff')
+			quasar: path.resolve(__dirname, 'node_modules/quasar-framework/')
+		/*	src: path.resolve(__dirname, 'src'),
+			assets: path.resolve(__dirname, 'src/assets'),
+			'@': path.resolve(__dirname, 'src/components'),
+			variables: path.resolve(__dirname, '../src/themes/quasar.variables.styl')*/
 		}
 	},
 	devServer: {
@@ -71,7 +71,10 @@ var conf_browser = {
 	// https://webpack.github.io/docs/configuration.html#devtool
 	devtool: '#cheap-module-eval-source-map', // faster than '#eval-source-map', 
 	plugins: [
-		new FriendlyErrorsWebpackPlugin()
+		new FriendlyErrorsWebpackPlugin(),
+		new webpack.DefinePlugin({
+			'__THEME': '"mat"' // TODO receive from arguments
+		}),
 	]
 }
 
@@ -88,7 +91,7 @@ if (process.env.NODE_ENV === 'production' || bAnalyze) { // http://vue-loader.vu
 			sourceMap: true,
 			compress: {
 				warnings: false,
-                comparisons: false  // workaround for https://github.com/mapbox/mapbox-gl-js/issues/4359
+				comparisons: false // workaround for https://github.com/mapbox/mapbox-gl-js/issues/4359
 			}
 		}),
 		new webpack.LoaderOptionsPlugin({

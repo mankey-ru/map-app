@@ -70,7 +70,7 @@
 
 	import request from 'superagent'
 	import Datepicker from 'vuejs-datepicker'
-	import miniToastr from 'mini-toastr'
+	import {Toast} from 'quasar'
 	import mixins from './../vue-mixins.js'
 
 	var Comp = {
@@ -91,7 +91,7 @@
 						.get(apiUrl + 'user/' + user_id) 
 						.end((err, res)=>{
 							if (err || !res.body) {
-								miniToastr.error(res.body.error || 'User fetch failed')
+								Toast.create.warning({html:res.body.error || 'User fetch failed'})
 							}
 							else {
 								this.user = res.body;
@@ -123,11 +123,10 @@
 				.send(this.user)
 				.end((err, res)=>{
 					if (err || !res.body ||  !res.body.ok) {
-						console.log(res.body)
-						miniToastr.error(res.body.error || 'User edit failed');
+						Toast.create.warning({html:res.body.error || 'User edit failed'})
 					}
 					else {
-						miniToastr.success('Успех');
+						Toast.create.positive({html:'Успех'})
 						this.$store.dispatch('updateUser', this.user);
 					}
 					this.submit_pending = 0;

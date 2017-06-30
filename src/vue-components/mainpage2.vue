@@ -7,12 +7,27 @@
 	}
 	from 'quasar-framework'
 
+	import {
+		QModal,
+		QAjaxBar,
+		QLayout,
+		QToolbar,
+		QToolbarTitle,
+		QSpinner,
+		QInlineDatetime,
+		QInput,
+		QIcon,
+		QBtn,
+		QTooltip,
+		QFixedPosition
+	}
+	from 'quasar'
+
 	var apiUrl = require('./../api-url.js').def;
-
-	require('mapbox-gl/dist/mapbox-gl.css');
-
+	
 	import mapboxgl from 'mapbox-gl';
 	mapboxgl.accessToken = 'pk.eyJ1IjoiZDBlc250bWF0dGVyIiwiYSI6ImNqMmxtdHF2ODAwMHAycW82NTkycmlrNXcifQ.FoKPoQo54xurQSdHSnShRw';
+	require('mapbox-gl/dist/mapbox-gl.css');
 
 	var _vm;
 	var map;
@@ -21,7 +36,10 @@
 	var uniqueFeatures;
 
 	export default {
-		name: 'MainPage',
+		name: 'MainPage',		
+		components: {
+			QModal, QAjaxBar, QLayout, QToolbarTitle, QSpinner, QInlineDatetime, QInput, QIcon, QBtn, QTooltip, QFixedPosition
+		},
 		data: function() {
 			return {
 				search: {
@@ -94,12 +112,12 @@
 			.end((err, res) => {
 				this.search_pending = false;
 				if (err) {
-					Toast.create.negative('Failed to get events')
+					Toast.create.negative('Ошибка запроса')
 				}
 				else {
 					if (res.body.evtList instanceof Array) {
 						if (res.body.evtList.length === 0) {
-							Toast.create.warning('По вашему запросу ничегошенки не нашлось :(');
+							Toast.create.info('По вашему запросу ничегошенки не нашлось :(');
 							return
 						}
 						if (map.getLayer(layerID)) {
@@ -123,15 +141,15 @@
 										// https://github.com/mapbox/mapbox-gl-styles/tree/master/sprites/basic-v9/_svg
 										// https://www.mapbox.com/maki-icons/
 										// theatre art-gallery star music
-								},
-								geometry: {
-									type: 'Point',
-									coordinates: evt.latLng.reverse()
-								}
-							};
-							evt.mark = evtFeature;
-							featureList.push(evtFeature);
-						}
+									},
+									geometry: {
+										type: 'Point',
+										coordinates: evt.latLng.reverse()
+									}
+								};
+								evt.mark = evtFeature;
+								featureList.push(evtFeature);
+							}
 						// On initial layer creation we should add layer-related event handlers
 						if (!layerRef) {
 							map.on('moveend', function() {
@@ -189,11 +207,10 @@
 					}
 
 				}
-				})
+			})
 		}
 	},
 	mixins: [mixins],
-	components: {},
 	mounted: function() {
 		_vm = this;
 		map = new mapboxgl.Map({
@@ -258,15 +275,15 @@ function getUniqueFeatures(array, comparatorProperty) {
 					<q-inline-datetime v-model="search.date" type="date" v-on:input="$refs.modal_date.close()"></q-inline-datetime>
 				</div>
 				<div class="row">
-					<div class="width-1of2">
-						<button v-on:click.prevent="search.date = ''" class="tertiary">
+					<div class="col-6">
+						<q-btn v-on:click.prevent="search.date = ''" color="purple">
 							Любая дата
-						</button>
+						</q-btn>
 					</div>
-					<div class="width-1of2 text-right">
-						<button v-on:click="$refs.modal_date.close()" class="primary">
+					<div class="col-6 text-right">
+						<q-btn v-on:click="$refs.modal_date.close()" color="primary">
 							Ок
-						</button>
+						</q-btn>
 					</div>
 				</div>
 			</div>
@@ -312,21 +329,20 @@ function getUniqueFeatures(array, comparatorProperty) {
 		</q-modal>
 
 		<div class="map-ctrl-wrap absolute-top-left">
-			<div class="map-pane-main row inline"><!-- hide-on-drawer-visible -->
-				<i v-on:click="$parent.$parent.$refs.drawer_left.open()" class="mdi mdi-menu"></i>
+			<div class="map-pane-main row inline"><!-- lt-lg === hide-on-drawer-visible-->
+				<q-icon name="menu" color="black" class="pntr lt-lg" v-on:click="$parent.$parent.$refs.drawer_left.open()"/>
 				<form class="gt-md" v-on:submit.prevent="evtSearch">
-					<input v-model="search.text" placeholder="Поиск" />
-					<span class="search-icon-wrap">
-						<spinner v-show="search_pending" v-bind:size="30"></spinner>
-						<i v-show="!search_pending" v-on:click="evtSearch" class="search-icon">search</i>
-					</span>
+					<q-input v-model="search.text" placeholder="Поиск" class="no-margin">
+						<q-icon name="fa-search" color="black" class="pntr" v-show="!search_pending" v-on:click="evtSearch"/>
+						<q-spinner v-show="search_pending" />
+					</q-input>
 				</form>
 			</div>
 			<span class="gt-md inline">
 				<div class="map-pane__date"><!-- Calendar Desktop -->
 					<div class="cursor-pointer" v-on:click="$refs.modal_date.open()">
 						<span>{{c_searchDate}}</span> 
-						<i class="mdi mdi-calendar"></i>
+						<q-icon name="fa-calendar" />
 					</div>
 				</div>				
 			</span>
@@ -334,22 +350,22 @@ function getUniqueFeatures(array, comparatorProperty) {
 
 
 		<div class="map-ctrl-wrap absolute-top-right">			
-			<div class="lt-bg"><!-- Calendar Mobile -->
+			<div class="lt-lg"><!-- Calendar Mobile -->
 				<button class="primary push bg-white text-black big" v-on:click="$refs.modal_date.open()">
-					<i class="mdi mdi-calendar"></i>
+					<q-icon name="fa-calendar" />
 				</button>
 			</div>			
 			<div class="gt-md"><!-- Desktop -->
 				<div v-if="currentUser">
-					<i v-on:click.prevent="GOTO_PROFILE" class="mdi mdi-account-box icon-profile"></i>
+					<q-icon v-on:click.prevent="GOTO_PROFILE" name="fa-user-circle" class="icon-profile"/>
 				</div>
 				<div v-if="!currentUser">
-					<button class="primary push bg-white text-black big" v-on:click="GOTO_LOGIN">
+					<q-btn color="primary" big push v-on:click="GOTO_LOGIN">
 						Вход
-					</button> &#160;
-					<button class="primary push bg-white text-black big" v-on:click="GOTO_REGISTER">
+					</q-btn> &#160;
+					<q-btn color="primary" big push v-on:click="GOTO_REGISTER">
 						Регистрация
-					</button>
+					</q-btn>
 				</div>
 			</div>
 		</div>
@@ -362,20 +378,21 @@ function getUniqueFeatures(array, comparatorProperty) {
 						<a class="link-dotted" v-on:click="showAll">Показать все</a>
 					</span>
 				</div>
-				<button class="primary push" v-on:click="$refs.modal_genres.open()">
-					Фильтр по жанрам
-				</button>
+				<q-btn big color="primary" push v-on:click="$refs.modal_genres.open()">
+					<q-tooltip :delay="500" anchor="center right" self="center left" :offset="[20, 0]">Отфильтровать события по жанрам</q-tooltip>
+					Жанры
+				</q-btn>
 			</div>
 		</div>
 
 		<div v-if="currentUser && currentUser.role" >
 			<div class="map-ctrl-wrap absolute-bottom-right">
-				<button class="gt-md push primary round big" v-on:click="GOTO_EVT_NEW">
-					Создать мероприятие 
-				</button>
-				<button class="lt-bg push primary circular big" v-on:click="GOTO_EVT_NEW">
-					<i class="mdi mdi-plus"></i>
-				</button>
+				<q-fixed-position corner="bottom-right" :offset="[18, 18]">
+					<q-btn round color="primary" v-on:click="GOTO_EVT_NEW">
+						<q-icon name="fa-plus" />
+						<q-tooltip anchor="center left" self="center right" :offset="[20, 0]">Создать мероприятие</q-tooltip>
+					</q-btn>
+				</q-fixed-position>
 			</div>
 		</div>
 
@@ -389,25 +406,10 @@ function getUniqueFeatures(array, comparatorProperty) {
 		margin: 1.5em;
 		z-index: 1;
 	}
-	.mdi {
-		cursor: pointer;
-		font-size: 1.8em;
-	}
-	.search-icon {
-		cursor: pointer;
-		font-size: 1.8em;
-	}
-	.search-icon-wrap {
-		width: 1.5em;
-		height: 40px;
-		line-height: 40px;
-		display: inline-block;
-	}
 	.icon-profile {
 		font-size: 6em;
 		cursor: pointer;
 	}
-
 	.-boxshad {
 		box-shadow: #000 1px 2px 4px 0px;
 	}

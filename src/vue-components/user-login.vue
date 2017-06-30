@@ -1,6 +1,7 @@
 <template>
-	<div >
-		<h1 class="text-center h1-md">
+	<div>
+		<div class="vspace-2 gt-lg"></div>
+		<h1 class="text-center h1-sm">
 			Войти с паролем
 		</h1>
 		<form v-on:submit.prevent="LOG_IN" class="group-x">
@@ -17,8 +18,13 @@
 						</span>
 					</span>
 				</label>
-				<input v-model="auth.email" type="email" class="full-width" 
-				v-on:input="$v.auth.email.$touch()" v-bind:class="{'has-error':$v.auth.email.$error}" />
+				<q-input type="email" value=""
+				v-model="auth.email" 
+				v-on:input="$v.auth.email.$touch()" 
+				v-bind:error="$v.auth.email.$error"
+				v-bind:clearable="true"
+				v-bind:autofocus="true"
+				/>
 			</div>
 			<div class="stacked-label">
 				<label>
@@ -29,39 +35,34 @@
 						</span>
 					</span>
 				</label>
-				<input  v-model="auth.password" type="password" class="full-width" v-on:input="$v.auth.password.$touch()" v-bind:class="{'has-error':$v.auth.password.$error}" />
+				<q-input type="password" value="" 	
+				v-model="auth.password"
+				v-on:input="$v.auth.password.$touch()"
+				v-bind:error="$v.auth.password.$error"
+				v-bind:clearable="true" 
+				v-bind:autofocus="true"
+				/>
 			</div>
 			<br/>
 			<div>
-				<button class="tertiary clear small" v-link="'register'" type="button">Регистрация</button> 
-				<button class="tertiary clear small" type="button">Забыли пароль?</button>
-				<q-progress-button indeterminate dark-filler class="primary pull-right" v-bind:percentage="auth.pending" v-bind:disabled="$v.$invalid">
+				<q-btn small flat v-on:click="GOTO('register')">Регистрация</q-btn> 
+				<q-btn small flat>Забыли пароль?</q-btn>
+				<q-btn color="primary" v-bind:loader="auth.pending" v-bind:disabled="$v.$invalid" class="float-right">
 					Войти
-				</q-progress-button> <!-- http://quasar-framework.org/components/progress-button.html -->
+				</q-btn>
 				
 			</div>
 		</form>
-		<!-- <div class="vspace-2"></div> -->
 		<div>
-			<h1 class="text-center h1-md">
+			<h1 class="text-center h1-sm">
 				Войти через соцсети
 			</h1>
 			<div class="flex justify-around social-login-btn-wrap">
-				<button class="primary circular" v-bind:disabled="auth.pending===1" v-on:click="LOG_IN_EXT('facebook')">
-					<i class="mdi mdi-facebook"></i>
-				</button> 
-				<button class="primary circular" v-bind:disabled="auth.pending===1" v-on:click="LOG_IN_EXT('vkontakte')">
-					<i class="mdi mdi-vk"></i>
-				</button> 
-				<button class="primary circular" v-bind:disabled="auth.pending===1" v-on:click="LOG_IN_EXT('twitter')">
-					<i class="mdi mdi-twitter"></i>
-				</button>
-				<button class="primary circular" v-bind:disabled="1 || auth.pending" v-on:click="LOG_IN_EXT('youtube')">
-					<i class="mdi mdi-youtube-play"></i>
-				</button>
-				<button class="primary circular" v-bind:disabled="1 || auth.pending" v-on:click="LOG_IN_EXT('instagram')">
-					<i class="mdi mdi-instagram"></i>
-				</button>
+				<q-btn icon="fa-youtube" v-bind:round="true" v-bind:disable="auth.pending" v-on:click="LOG_IN_EXT('facebook')"/>
+				<q-btn icon="fa-vk" v-bind:round="true" v-bind:disable="auth.pending" v-on:click="LOG_IN_EXT('vkontakte')"/>
+				<q-btn icon="fa-twitter" v-bind:round="true" v-bind:disable="auth.pending" v-on:click="LOG_IN_EXT('twitter')"/>
+				<q-btn icon="fa-youtube" v-bind:round="true" v-bind:disable="true||auth.pending" v-on:click="LOG_IN_EXT('youtube')"/>
+				<q-btn icon="fa-instagram" v-bind:round="true" v-bind:disable="true||auth.pending" v-on:click="LOG_IN_EXT('instagram')"/>
 			</div>
 		</div>
 		<!-- <div class="text-center"><a href="#/" class="primary clear">Перейти к карте</a><br/><br/><a href="#/" class="mdi mdi-map-marker-circle"></a></div> -->
@@ -73,16 +74,18 @@
 <script>
 	import mixins from './../vue-mixins.js'
 	import { required, email } from 'vuelidate/lib/validators'
+	import { QBtn,QInput  } from 'quasar'
 
 	var Comp = {
 		name: 'user-login-page',
 		mixins: [mixins],
+		components: {QBtn,QInput },
 		data: function () {
 			return {
 				auth: {
 					email: '',
 					password: '',
-					pending: 0
+					pending: false
 				}
 			}
 		},

@@ -3,7 +3,8 @@
 	import mixins from './../vue-mixins.js'
 	import _ from 'lodash'
 	import request from 'superagent'
-	import miniToastr from 'mini-toastr'
+	import {Toast} from 'quasar'
+	import {QSpinner} from 'quasar'
 
 	export default {
 		name: 'event-card',
@@ -12,6 +13,7 @@
 				evt: false
 			}
 		},
+		components: {QSpinner},
 		methods: {
 			evt_fetch: function() {
 				var event_id = this.$router.currentRoute.params.event_id;
@@ -41,7 +43,7 @@
 <template>
 	<div>
 		<div v-if="evt">
-			<h2 class="gt-bg">{{evt.name}}</h2>
+			<h2 class="gt-lg">{{evt.name}}</h2>
 			<p>
 				<i class="mdi mdi-calendar"></i>&#160;
 				{{evt.date | dateFormatPretty}}
@@ -56,7 +58,7 @@
 			<pre>Координаты: {{evt.latLng}}</pre>
 		</div>
 		<div v-else class="spinner-wrap">
-			<spinner :size="50"></spinner>
+			<q-spinner :size="50"></q-spinner>
 		</div>
 	</div>
 </template>

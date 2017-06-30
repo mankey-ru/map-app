@@ -3,12 +3,13 @@
 <script>
 	import request from 'superagent'
 	import mixins from './../vue-mixins.js'
-	import miniToastr from 'mini-toastr'
+	import {QSpinner, Toast} from 'quasar'
 
 	var apiUrl = require('./../api-url.js').def;
 
 	export default {
 		name: 'evt-list',
+		components: {QSpinner},
 		data: function () {
 			return {
 				pageTitle: this.$route.query.all ? 'Мероприятия' : 'Мои мероприятия',
@@ -27,7 +28,7 @@
 				.end((err, res)=>{
 					this.evtList_loading = false;
 					if (err) {
-						miniToastr.error(err || 'Ошибка запроса')
+						Toast.create.warning({html:err || 'Ошибка запроса'})
 					}
 					else if (res.body.evtList instanceof Array) {
 						if (res.body.evtList.length > 0) {
@@ -81,7 +82,7 @@
 			</table>
 		</div>
 		<div v-else class="spinner-wrap">
-			<spinner :size="50"></spinner>
+			<q-spinner :size="50"/>
 		</div>
 	</div>
 </template>
