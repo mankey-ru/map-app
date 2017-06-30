@@ -3,14 +3,14 @@
 	import mapLib from './../map-lib.js'
 	import mixins from './../vue-mixins.js'
 	import request from 'superagent'	
-	import {QInput, QSpinner, QIcon, QBtn, Toast, QModal, QMoadlLayout, QToolbar, QToolbarTitle, QCheckbox, QDialogSelect, QInlineDatetime} from 'quasar'
+	import {QInput, QSpinner, QIcon, QBtn, Toast, QModal, QModalLayout, QToolbar, QToolbarTitle, QCheckbox, QDialogSelect, QInlineDatetime} from 'quasar'
 
 	var _vm;
 	var mapInitd = false;
 	export default {
 		name: 'evt-new',		
-		components: {QInput, QSpinner, QIcon, QBtn, Toast, QModal, QMoadlLayout, QToolbar, QToolbarTitle, QCheckbox, QDialogSelect, QInlineDatetime},
-		data: function () {QMoadlLayout
+		components: {QInput, QSpinner, QIcon, QBtn, Toast, QModal, QModalLayout, QToolbar, QToolbarTitle, QCheckbox, QDialogSelect, QInlineDatetime},
+		data: function () {
 			return {
 				title: 'Новое событие',
 				mark_cur: false,
@@ -139,7 +139,7 @@
 			</div>
 		</q-modal>
 
-		<q-modal ref="modal_map" position="right" v-on:close="updateLocation" :content-css="{minWidth: '80vw'}">
+		<q-modal ref="modal_map" position="right" v-on:close="updateLocation" :content-css="{minWidth: '80vw', minHeight: '60vh'}">
 			<q-modal-layout>
 				<q-toolbar slot="header">
 					<q-btn @click="$refs.modal_map.close()" flat>
