@@ -1,13 +1,12 @@
 <script>
 	import mixins from './../vue-mixins.js'
-	import lilink from './_lilink.vue'
 
 	import {QLayout, QToolbar, QToolbarTitle, QAjaxBar, QBtn, QIcon, QList, QItem, QItemSide, QItemMain, QSideLink}	from 'quasar'
 
 	export default {
 		name: 'AppRoot',
 		components: {  // TODO перенести часть в миксины?
-			lilink, QLayout, QToolbar, QToolbarTitle, QList, QAjaxBar, QIcon, QBtn, QItem, QItemSide, QItemMain, QSideLink
+			QLayout, QToolbar, QToolbarTitle, QList, QAjaxBar, QIcon, QBtn, QItem, QItemSide, QItemMain, QSideLink
 		}, 
 		data: function() {
 			return {
@@ -37,9 +36,7 @@
 				<q-toolbar>
 					<q-toolbar-title>
 						{{$route.meta.title}} 
-						<span slot="subtitle">
-							Subtitle
-						</span>
+						<span slot="subtitle">Для пидоров</span>
 					</q-toolbar-title>	
 
 					<q-btn v-on:click="$router.push({name:'mainpage'})" flat>
@@ -53,36 +50,62 @@
 					</q-btn>
 				</q-toolbar>	
 			</div>
-			<div slot="left" ref="drawer_left"> <!-- Left Sidebar :backdrop-opacity="0" -->
-
+			<div slot="left">
 				<h4 class="text-center mar-v">
 					<h1 class="h1-md cursor-pointer" v-on:click="$router.push({name:'mainpage'})">
 						<q-icon name="fa-map-o"/>
 					</h1>
 				</h4>
 
-				<q-list no-border link inset-delimiter>
-					
+				<q-list no-border link inset-delimiter>					
 					<div v-if="currentUser">
-						<lilink to="user-profile-current" class="multiple-lines" icon="account box" v-bind:label="currentUser.name"/>
+						<q-side-link item :to="{name:'user-profile-current'}">
+							<q-item-side icon="account box" />
+							<q-item-main :label="currentUser.name" class="multiple-lines" />
+						</q-side-link>
 						<div v-if="currentUser.role">
-							<lilink to="event-new" icon="fiber new" label="Добавить событие"/> 
-							<lilink to="event-list" icon="list" label="Мои события"/>
-							<lilink to="place-list" icon="fa-map-marker" label="Мои места"/>
+							<q-side-link item :to="{name:'event-new'}">
+								<q-item-side icon="fiber new" />
+								<q-item-main label="Добавить событие" />
+							</q-side-link>
+
+							<q-side-link item :to="{name:'event-list'}">
+								<q-item-side icon="list" />
+								<q-item-main label="Мои события" />
+							</q-side-link>
+
+							<q-side-link item :to="{name:'place-list'}">
+								<q-item-side icon="fa-map-marker" />
+								<q-item-main label="Мои места" />
+							</q-side-link>
 						</div>
 					</div>
 					<div v-if="!currentUser">
-						<lilink to="user-login" icon="fa-sign-in" label="Вход"/>
-						<lilink to="user-register" icon="fa-sign-out" label="Регистрация" />
+						<q-side-link item :to="{name:'user-login'}">
+							<q-item-side icon="fa-sign-in" />
+							<q-item-main label="Вход" />
+						</q-side-link>
+						<q-side-link item :to="{name:'user-register'}">
+							<q-item-side icon="fa-sign-out" />
+							<q-item-main label="Регистрация" />
+						</q-side-link>
 					</div>	
 					<hr />	
-					<lilink to="page-how" icon="chevron right" label="Как это работает"/>
-					<lilink to="page-about" icon="chevron right" label="О нас"/>
-					<hr />
-					<q-item :link="true" v-on:click="LOG_OUT" v-show="currentUser">
-						<q-item-side :icon="auth.pending ? 'fa-sign-out':'fa-sign-out'"/>
-						<q-item-main label="Выйти" />
-					</q-item>		
+					<q-side-link item :to="{name:'page-how'}">
+						<q-item-side icon="chevron right" />
+						<q-item-main label="Как это работает" />
+					</q-side-link>
+					<q-side-link item :to="{name:'page-about'}">
+						<q-item-side icon="chevron right" />
+						<q-item-main label="О нас" />
+					</q-side-link>		
+					<div v-show="currentUser">			
+						<hr />
+						<q-item :link="true" v-on:click="LOG_OUT">
+							<q-item-side :icon="auth.pending ? 'fa-sign-out':'fa-sign-out'"/>
+							<q-item-main label="Выйти" />
+						</q-item>
+					</div>
 
 				</q-list>
 			</div>

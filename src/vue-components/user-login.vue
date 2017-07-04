@@ -1,7 +1,7 @@
 <template>
 	<div>
-		<div class="vspace-2 gt-lg"></div>
-		<h1 class="text-center h1-xs">
+		<div class="vspace-2"></div>
+		<h1 class="text-center h1-xs gt-lg">
 			Войти с паролем
 		</h1>
 		<form v-on:submit.prevent="LOG_IN" class="group-x">
@@ -21,9 +21,9 @@
 				<q-input type="email" value=""
 				v-model="auth.email" 
 				v-on:input="$v.auth.email.$touch()" 
-				v-bind:error="$v.auth.email.$error"
-				v-bind:clearable="true"
-				v-bind:autofocus="true"
+				:error="$v.auth.email.$error"
+				:clearable="true"
+				:autofocus="true"
 				/>
 			</div>
 			<div class="stacked-label">

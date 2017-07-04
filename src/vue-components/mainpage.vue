@@ -335,10 +335,10 @@ function getUniqueFeatures(array, comparatorProperty) {
 					<q-icon v-on:click.prevent="GOTO('user-profile-current')" name="fa-user-circle" class="icon-profile"/>
 				</div>
 				<div v-if="!currentUser">
-					<q-btn color="primary" big push v-on:click="GOTO('login')">
+					<q-btn color="primary" big push v-on:click="GOTO('user-login')">
 						Вход
 					</q-btn> &#160;
-					<q-btn color="primary" big push v-on:click="GOTO('register')">
+					<q-btn color="primary" big push v-on:click="GOTO('user-register')">
 						Регистрация
 					</q-btn>
 				</div>

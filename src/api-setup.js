@@ -488,7 +488,7 @@ function setupAuth(app) {
 		newUser.date = new Date;
 		newUser.online = true;
 		newUser.rating_total = 0;
-		newUser.pic = 'userpics/2.png';
+		newUser.pic = '//res.cloudinary.com/mankey/image/upload/v1490938032/userpics/4.png';
 
 		var db = dbtools.getDb();
 

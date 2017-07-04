@@ -83,7 +83,7 @@ export default {
 					else {
 						Toast.create.positive({html:'Success'})
 						this.$store.dispatch('updateUser', false);
-						//this.$router.push('/')
+						// this.$router.push('/')
 					}
 					if (this.auth) {
 						this.auth.pending = 0;

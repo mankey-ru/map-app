@@ -125,6 +125,8 @@ router.beforeEach((to, from, next) => {
 		_toggleClass(document.body, '__fullscreen', to.meta.fullscreen);
 	}
 	var store = this.a.app.$store;
+	next()
+	return
 	if (store && !store.getters.currentUser && to.meta.needAuth === true) {
 		console.warn('vue-router.js: this page needs auth')
 		next({
