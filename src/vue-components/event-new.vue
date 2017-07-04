@@ -223,15 +223,14 @@
 				&nbsp; 
 				<q-checkbox v-model="newplace_remember" label="Запомнить"></q-checkbox>
 
-				<q-input v-model="nevt.name" required float-label="Название мероприятия"/>
+				<q-input v-model="nevt.name" required float-label="Название события"/>
 				<q-input v-model="nevt_date" required v-on:focus.prevent="$refs.modal_datetime.open()" float-label="Дата" />
 				<q-input v-model="nevt.descr" type="textarea" required float-label="Описание"/>				
 				<q-dialog-select v-model="nevt.genre_id" type="radio" required v-bind:options="genreList" ok-label="Выбрать" cancel-label="Отмена" 
-				float-label="Жанр мероприятия"></q-dialog-select>
+				float-label="Жанр события"></q-dialog-select>
 				<br />
 				<div class="row">
 					<div class="col-8">
-						<homebtn></homebtn>
 					</div>
 					<div class="col-4 text-right">
 						<q-btn big color="primary" :disabled="nevt_invalid" :loader="submit_pending" type="submit">

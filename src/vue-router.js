@@ -36,14 +36,14 @@ const routes = [{
 		name: 'event-card',
 		component: eventCard,
 		meta: {
-			title: 'Мероприятие'
+			title: 'Событие'
 		}
 	}, {
 		path: '/event/list/',
 		name: 'event-list',
 		component: eventList,
 		meta: {
-			title: 'Список мероприятий'
+			title: 'Список событий'
 		}
 	}, {
 		name: 'user-profile-current',

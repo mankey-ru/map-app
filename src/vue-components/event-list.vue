@@ -12,7 +12,7 @@
 		components: {QSpinner},
 		data: function () {
 			return {
-				pageTitle: this.$route.query.all ? 'Мероприятия' : 'Мои мероприятия',
+				pageTitle: this.$route.query.all ? 'События' : 'Мои события',
 				evtList: [],
 				evtList_loading: true,
 				status: ''

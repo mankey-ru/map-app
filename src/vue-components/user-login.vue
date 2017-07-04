@@ -23,7 +23,6 @@
 				v-on:input="$v.auth.email.$touch()" 
 				:error="$v.auth.email.$error"
 				:clearable="true"
-				:autofocus="true"
 				/>
 			</div>
 			<div class="stacked-label">
@@ -38,9 +37,8 @@
 				<q-input type="password" value="" 	
 				v-model="auth.password"
 				v-on:input="$v.auth.password.$touch()"
-				v-bind:error="$v.auth.password.$error"
-				v-bind:clearable="true" 
-				v-bind:autofocus="true"
+				:error="$v.auth.password.$error"
+				:clearable="true" 
 				/>
 			</div>
 			<div class="row">	

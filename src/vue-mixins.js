@@ -135,7 +135,7 @@ export default {
 			components: {QBtn},
 			template: `
 			<q-btn icon="fa-map-o" v-on:click="$router.push({name:'mainpage'})" color="primary" outline small type="button">
-				Вернуться на карту
+				На главную
 			</q-btn>`
 		}
 	},

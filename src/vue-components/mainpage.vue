@@ -31,7 +31,8 @@
 				map_pending: true,
 				genres: [],
 				evtList: [],
-				evtHiddenQty: 0
+				evtHiddenQty: 0,
+				controlsOffset: [23,23]
 			}
 		},
 		computed: {
@@ -263,7 +264,7 @@ function getUniqueFeatures(array, comparatorProperty) {
 			</div>
 		</q-modal>
 
-		<q-modal ref="modal_genres" position="bottom" v-bind:content-css="{minWidth: '70vw', minHeight: '40vh'}">
+		<q-modal ref="modal_genres" position="bottom" v-bind:content-css="{minWidth: '70vw', minHeight: '60vh'}">
 			<q-modal-layout>
 				<q-toolbar slot="header">
 					<q-toolbar-title :padding="1">
@@ -300,8 +301,8 @@ function getUniqueFeatures(array, comparatorProperty) {
 			</q-modal-layout>
 		</q-modal>
 
-		<div class="map-ctrl-wrap absolute-top-left">
 
+		<q-fixed-position class="map-ctrl-wrap" corner="top-left" :offset="controlsOffset">
 			<q-btn push big color="light" class="lt-lg" v-on:click="TOGGLESIDE">
 				<q-icon name="menu" color="black" /><!-- lt-lg === hide-on-drawer-visible-->
 			</q-btn>
@@ -319,12 +320,11 @@ function getUniqueFeatures(array, comparatorProperty) {
 						<span>{{c_searchDate}}</span> 
 						<q-icon name="fa-calendar" />
 					</div>
-				</div>				
+				</div>
 			</span>
-		</div>
+		</q-fixed-position>
 
-
-		<div class="map-ctrl-wrap absolute-top-right">			
+		<q-fixed-position class="map-ctrl-wrap" corner="top-right" :offset="controlsOffset">
 			<div class="lt-lg"><!-- Calendar Mobile -->
 				<q-btn push big color="light" v-on:click="$refs.modal_date.open()">
 					<q-icon name="fa-calendar" color="black" />
@@ -343,34 +343,25 @@ function getUniqueFeatures(array, comparatorProperty) {
 					</q-btn>
 				</div>
 			</div>
-		</div>
+		</q-fixed-position>
 
-		<div class="map-ctrl-wrap">
-			<div>
-				<span v-show="evtHiddenQty!==0">
-					Скрыто {{evtHiddenQty}} из {{evtList.length}}. 
-					<a class="link-dotted" v-on:click="showAll">Показать все</a>
-				</span>
-			</div>
+		<q-fixed-position class="map-ctrl-wrap" corner="bottom-left" :offset="[23,23]">
+			<q-btn big color="primary" push v-on:click="$refs.modal_genres.open()">
+				<q-tooltip :delay="500" anchor="center right" self="center left" :offset="controlsOffset">Отфильтровать события по жанрам</q-tooltip>
+				Жанры
+			</q-btn>
+			<span v-show="evtHiddenQty!==0">
+				Скрыто {{evtHiddenQty}} из {{evtList.length}}. 
+				<a class="link-dotted" v-on:click="showAll">Показать все</a>
+			</span>
+		</q-fixed-position>
 
-			<q-fixed-position corner="bottom-left" :offset="[23,23]">
-				<q-btn big color="primary" push v-on:click="$refs.modal_genres.open()">
-					<q-tooltip :delay="500" anchor="center right" self="center left" :offset="[20, 0]">Отфильтровать события по жанрам</q-tooltip>
-					Жанры
-				</q-btn>
-			</q-fixed-position>
-		</div>
-
-		<div v-if="currentUser && currentUser.role" >
-			<div class="map-ctrl-wrap">
-				<q-fixed-position corner="bottom-right" :offset="[23,23]">
-					<q-btn round color="primary" v-on:click="GOTO('event-new')">
-						<q-icon name="fa-plus" />
-						<q-tooltip anchor="center left" self="center right" :offset="[20, 0]">Создать мероприятие</q-tooltip>
-					</q-btn>
-				</q-fixed-position>
-			</div>
-		</div>
+		<q-fixed-position class="map-ctrl-wrap" corner="bottom-right" :offset="controlsOffset" v-if="currentUser && currentUser.role">
+			<q-btn round color="primary" v-on:click="GOTO('event-new')">
+				<q-icon name="fa-plus" />
+				<q-tooltip anchor="center left" self="center right" :offset="controlsOffset">Создать мероприятие</q-tooltip>
+			</q-btn>
+		</q-fixed-position>
 
 		<div id="map-container" class="__fullscreen"></div>
 	</div>
@@ -379,11 +370,7 @@ function getUniqueFeatures(array, comparatorProperty) {
 
 <style scoped lang="less">
 	.map-ctrl-wrap {
-		margin: 1.5em;
 		z-index: 1;
-		&>div {
-			z-index: 1;
-		}
 	}
 	.icon-profile {
 		font-size: 6em;

@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<form v-on:submit.prevent="register_submit" class="group-x">
-			<h1 class="h1-md">Регистрация</h1>
+			<h1 class="h1-md gt-lg">Регистрация</h1>
 
 			<q-toggle class="primary" v-model="role" label="Я музыкант"></q-toggle>
 			<q-input float-label="Имя" v-model="name" required :clearable="true"/>
