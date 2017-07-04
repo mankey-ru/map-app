@@ -18,8 +18,8 @@
 				col-xs-10	offset-xs-1
 				col-sm-10	offset-sm-1
 				col-md-10	offset-md-1
-				col-lg-8	offset-lg-2
-				col-xl-6	offset-xl-3
+				col-lg-8	offset-lg-1
+				col-xl-6	offset-xl-2
 				`
 			}
 		},
@@ -31,7 +31,7 @@
 
 <template>
 	<div>
-		<q-layout>
+		<q-layout ref="AppLayout">
 
 			<div slot="header" v-show="!$route.meta.noToolbar">				
 				<q-toolbar>
@@ -44,11 +44,9 @@
 
 					<q-btn v-on:click="$router.push({name:'mainpage'})" flat>
 						<q-icon name="explore" /> 
-						<span class="gt-md"> Карта событий</span>
 					</q-btn>				
 					<q-btn v-show="currentUser" v-on:click="$router.push({name:'user-profile-current'})" flat class="lt-lg">
 						<q-icon name="account box" />
-						<span class="gt-md">Аккаунт</span>
 					</q-btn>			
 					<q-btn v-on:click="$refs.drawer_left.open()" flat class="lt-lg">
 						<q-icon name="menu" />
@@ -58,7 +56,6 @@
 			<div slot="left" ref="drawer_left"> <!-- Left Sidebar :backdrop-opacity="0" -->
 
 				<h4 class="text-center mar-v">
-					<!-- <i class="mdi mdi-google-maps cursor-pointer sidebar-logo" v-on:click="$router.push({name:'mainpage'})"></i> -->
 					<h1 class="h1-md cursor-pointer" v-on:click="$router.push({name:'mainpage'})">
 						<q-icon name="fa-map-o"/>
 					</h1>
@@ -71,6 +68,7 @@
 						<div v-if="currentUser.role">
 							<lilink to="event-new" icon="fiber new" label="Добавить событие"/> 
 							<lilink to="event-list" icon="list" label="Мои события"/>
+							<lilink to="place-list" icon="fa-map-marker" label="Мои места"/>
 						</div>
 					</div>
 					<div v-if="!currentUser">

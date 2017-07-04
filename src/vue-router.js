@@ -8,6 +8,7 @@ import eventList from './vue-components/event-list.vue';
 import user_profile from './vue-components/user-profile.vue';
 import user_register from './vue-components/user-register.vue';
 import user_login from './vue-components/user-login.vue';
+import placeList from './vue-components/place-list.vue';
 import page_how from './vue-components/page-how.vue';
 import page_about from './vue-components/page-about.vue';
 
@@ -27,7 +28,7 @@ const routes = [{
 		component: eventNew,
 		meta: {
 			needAuth: true,
-			title: 'Новое мероприятие'
+			title: 'Новое событие'
 		}
 	}, {
 		path: '/event/card/:event_id',
@@ -49,6 +50,13 @@ const routes = [{
 		component: user_profile,
 		meta: {
 			title: 'Ваш профиль'
+		}
+	}, {
+		name: 'place-list',
+		path: '/place-list',
+		component: placeList,
+		meta: {
+			title: 'Мои места'
 		}
 	}, {
 		name: 'user-profile-any',

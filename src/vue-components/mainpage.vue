@@ -1,5 +1,6 @@
 <script>
 	import mixins from './../vue-mixins.js'
+	import mapLib from './../map-lib.js'
 	import request from 'superagent'
 	import {
 		Toast,
@@ -11,15 +12,10 @@
 	from 'quasar'
 
 	var apiUrl = require('./../api-url.js').def;
-	
-	import mapboxgl from 'mapbox-gl';
-	mapboxgl.accessToken = 'pk.eyJ1IjoiZDBlc250bWF0dGVyIiwiYSI6ImNqMmxtdHF2ODAwMHAycW82NTkycmlrNXcifQ.FoKPoQo54xurQSdHSnShRw';
-	require('mapbox-gl/dist/mapbox-gl.css');
 
 	var _vm;
 	var map;
 	var layerRef;
-	var layerID = 'evtLayerID';
 	var uniqueFeatures;
 
 	export default {
@@ -72,10 +68,10 @@
 				}
 			}
 			this.evtHiddenQty = this.evtList.length - matchedEvents.length;
-			var features = map.queryRenderedFeatures({layers: [layerID]});
+			var features = map.queryRenderedFeatures({layers: [mapLib.layerID]});
 			if (features) {				
-				// map.setFilter(layerID, ['has', '_id']); ---- показать все
-				map.setFilter(layerID, ['in', '_id'].concat(matchedEvents.map(function(event) {
+				// map.setFilter(mapLib.layerID, ['has', '_id']); ---- показать все
+				map.setFilter(mapLib.layerID, ['in', '_id'].concat(matchedEvents.map(function(event) {
 					return event._id;
 				})));
 			}
@@ -105,8 +101,8 @@
 							Toast.create.info('По вашему запросу ничегошенки не нашлось :(');
 							return
 						}
-						if (map.getLayer(layerID)) {
-							map.removeSource(layerID); // map.removeLayer(layerID); layer removed automatically with source
+						if (map.getLayer(mapLib.layerID)) {
+							map.removeSource(mapLib.layerID); // map.removeLayer(mapLib.layerID); layer removed automatically with source
 						}
 
 						this.$data.evtList = [];
@@ -139,13 +135,13 @@
 						if (!layerRef) {
 							map.on('moveend', function() {
 								var features = map.queryRenderedFeatures({
-									layers: [layerID]
+									layers: [mapLib.layerID]
 								});
 								if (features) {
 									uniqueFeatures = getUniqueFeatures(features, '_id');
 								}
 							});
-							map.on('click', layerID, function(ev) {
+							map.on('click', mapLib.layerID, function(ev) {
 								var props = ev.features[0].properties;
 								Dialog.create({
 									title: props.name,
@@ -164,15 +160,15 @@
 									}]
 								})
 							});
-							map.on('mouseenter', layerID, function() {
+							map.on('mouseenter', mapLib.layerID, function() {
 								map.getCanvas().style.cursor = 'pointer';
 							});
-							map.on('mouseleave', layerID, function() {
+							map.on('mouseleave', mapLib.layerID, function() {
 								map.getCanvas().style.cursor = '';
 							});
 						}
 						layerRef = map.addLayer({
-							id: layerID,
+							id: mapLib.layerID,
 							type: 'symbol',
 							source: {
 								type: 'geojson',
@@ -187,7 +183,7 @@
 								'icon-size': 1.3
 							}
 						});
-						//console.log(map.queryRenderedFeatures({layers:[layerID]}))
+						//console.log(map.queryRenderedFeatures({layers:[mapLib.layerID]}))
 						//console.timeEnd('adding markers on map');
 					}
 
@@ -198,17 +194,10 @@
 	mixins: [mixins],
 	mounted: function() {
 		_vm = this;
-		map = new mapboxgl.Map({
-			container: 'map-container',
-			style: 'mapbox://styles/d0esntmatter/cj2lokqx1000f2rs0ronhfmfy',
-			minZoom: 10,
-			zoom: 12,
-			center: [37.62113, 55.75184] // lng then lat. Thats weird.
-		});
+		map = mapLib.newMap();
 		map.on('load', function(){
 			_vm.getEvents();
 		});
-		window.mmm = map;
 
 		// Handling genre list
 		// If vuex has genres right now, they are copied to $data right now
@@ -312,8 +301,11 @@ function getUniqueFeatures(array, comparatorProperty) {
 		</q-modal>
 
 		<div class="map-ctrl-wrap absolute-top-left">
-			<div class="map-pane-main row inline"><!-- lt-lg === hide-on-drawer-visible-->
-				<q-icon name="menu" color="black" class="pntr lt-lg" v-on:click="$parent.$parent.$refs.drawer_left.open()"/>
+
+			<q-btn push big color="light" class="lt-lg" v-on:click="$parent.$parent.$refs.AppLayout.toggleLeft()">
+				<q-icon name="menu" color="black" /><!-- lt-lg === hide-on-drawer-visible-->
+			</q-btn>
+			<div class="map-pane-main row inline gt-md" >
 				<form class="gt-md" v-on:submit.prevent="evtSearch">
 					<q-input v-model="search.text" placeholder="Поиск" class="no-margin">
 						<q-icon name="fa-search" color="black" class="pntr" v-show="!search_pending" v-on:click="evtSearch"/>
@@ -334,9 +326,9 @@ function getUniqueFeatures(array, comparatorProperty) {
 
 		<div class="map-ctrl-wrap absolute-top-right">			
 			<div class="lt-lg"><!-- Calendar Mobile -->
-				<button class="primary push bg-white text-black big" v-on:click="$refs.modal_date.open()">
-					<q-icon name="fa-calendar" />
-				</button>
+				<q-btn push big color="light" v-on:click="$refs.modal_date.open()">
+					<q-icon name="fa-calendar" color="black" />
+				</q-btn>
 			</div>			
 			<div class="gt-md"><!-- Desktop -->
 				<div v-if="currentUser">
@@ -416,18 +408,5 @@ function getUniqueFeatures(array, comparatorProperty) {
 			border: none;
 			width:15em;
 		}
-	}
-</style>
-
-<style>
-	.mark-custom-cls {
-		width: 44px;
-		/* background-image: url(pin.svg); */
-		width: 22px;
-		height: 22px;
-		background-color: #1290fd;
-		box-shadow: #aaa 0px 0px 9px 3px;
-		border-radius: 50%;
-		cursor: pointer;
 	}
 </style>
