@@ -2,12 +2,12 @@
 	import mixins from './../vue-mixins.js'
 	import lilink from './_lilink.vue'
 
-	import {QLayout, QToolbar, QToolbarTitle, QAjaxBar, QBtn, QIcon, QList, QItem, QItemSide, QItemMain}	from 'quasar'
+	import {QLayout, QToolbar, QToolbarTitle, QAjaxBar, QBtn, QIcon, QList, QItem, QItemSide, QItemMain, QSideLink}	from 'quasar'
 
 	export default {
 		name: 'AppRoot',
 		components: {  // TODO перенести часть в миксины?
-			lilink, QLayout, QToolbar, QToolbarTitle, QList, QAjaxBar, QIcon, QBtn, QItem, QItemSide, QItemMain
+			lilink, QLayout, QToolbar, QToolbarTitle, QList, QAjaxBar, QIcon, QBtn, QItem, QItemSide, QItemMain, QSideLink
 		}, 
 		data: function() {
 			return {
@@ -48,7 +48,7 @@
 					<q-btn v-show="currentUser" v-on:click="$router.push({name:'user-profile-current'})" flat class="lt-lg">
 						<q-icon name="account box" />
 					</q-btn>			
-					<q-btn v-on:click="$refs.drawer_left.open()" flat class="lt-lg">
+					<q-btn v-on:click="TOGGLESIDE" flat class="lt-lg">
 						<q-icon name="menu" />
 					</q-btn>
 				</q-toolbar>	
@@ -79,7 +79,7 @@
 					<lilink to="page-how" icon="chevron right" label="Как это работает"/>
 					<lilink to="page-about" icon="chevron right" label="О нас"/>
 					<hr />
-					<q-item :link="true" v-on:click.native="LOG_OUT" v-show="currentUser">
+					<q-item :link="true" v-on:click="LOG_OUT" v-show="currentUser">
 						<q-item-side :icon="auth.pending ? 'fa-sign-out':'fa-sign-out'"/>
 						<q-item-main label="Выйти" />
 					</q-item>		
@@ -102,24 +102,15 @@
 
 
 <style lang="less">/* Global (not scoped) styles */
-	.drawer-content.left-side {
-		/*box-shadow: 6px 0 19px 3px #888;*/
-	}
 	body.mobile, body.cordova {		
 		.router-view-wrap {
-			padding: 10px 15px;
+			padding: 5px 10px;
 		}
 	}
 	.sidebar-logo {
 		font-size: 3em;
 	}
 
-	/* width took from drawer code */
-/*	@media screen and (min-width: 921px) {
-		.sidebar-title {
-			display: none !important;
-		}
-	}*/
 
 	.spinner-wrap {
 		padding: 5em;
@@ -152,6 +143,9 @@
 	}
 	.h1-sm {
 		font-size: 1.8rem;
+	}
+	.h1-xs {
+		font-size: 1.4rem;
 	}
 	.group-x {
 		&>label, 

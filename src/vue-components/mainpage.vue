@@ -302,7 +302,7 @@ function getUniqueFeatures(array, comparatorProperty) {
 
 		<div class="map-ctrl-wrap absolute-top-left">
 
-			<q-btn push big color="light" class="lt-lg" v-on:click="$parent.$parent.$refs.AppLayout.toggleLeft()">
+			<q-btn push big color="light" class="lt-lg" v-on:click="TOGGLESIDE">
 				<q-icon name="menu" color="black" /><!-- lt-lg === hide-on-drawer-visible-->
 			</q-btn>
 			<div class="map-pane-main row inline gt-md" >
@@ -332,38 +332,39 @@ function getUniqueFeatures(array, comparatorProperty) {
 			</div>			
 			<div class="gt-md"><!-- Desktop -->
 				<div v-if="currentUser">
-					<q-icon v-on:click.prevent="GOTO_PROFILE" name="fa-user-circle" class="icon-profile"/>
+					<q-icon v-on:click.prevent="GOTO('user-profile-current')" name="fa-user-circle" class="icon-profile"/>
 				</div>
 				<div v-if="!currentUser">
-					<q-btn color="primary" big push v-on:click="GOTO_LOGIN">
+					<q-btn color="primary" big push v-on:click="GOTO('login')">
 						Вход
 					</q-btn> &#160;
-					<q-btn color="primary" big push v-on:click="GOTO_REGISTER">
+					<q-btn color="primary" big push v-on:click="GOTO('register')">
 						Регистрация
 					</q-btn>
 				</div>
 			</div>
 		</div>
 
-		<div class="map-ctrl-wrap absolute-bottom-left">
-			<div class="text-center">
-				<div>
-					<span v-show="evtHiddenQty!==0">
-						Скрыто {{evtHiddenQty}} из {{evtList.length}}. 
-						<a class="link-dotted" v-on:click="showAll">Показать все</a>
-					</span>
-				</div>
+		<div class="map-ctrl-wrap">
+			<div>
+				<span v-show="evtHiddenQty!==0">
+					Скрыто {{evtHiddenQty}} из {{evtList.length}}. 
+					<a class="link-dotted" v-on:click="showAll">Показать все</a>
+				</span>
+			</div>
+
+			<q-fixed-position corner="bottom-left" :offset="[23,23]">
 				<q-btn big color="primary" push v-on:click="$refs.modal_genres.open()">
 					<q-tooltip :delay="500" anchor="center right" self="center left" :offset="[20, 0]">Отфильтровать события по жанрам</q-tooltip>
 					Жанры
 				</q-btn>
-			</div>
+			</q-fixed-position>
 		</div>
 
 		<div v-if="currentUser && currentUser.role" >
-			<div class="map-ctrl-wrap absolute-bottom-right">
-				<q-fixed-position corner="bottom-right" :offset="[18, 18]">
-					<q-btn round color="primary" v-on:click="GOTO_EVT_NEW">
+			<div class="map-ctrl-wrap">
+				<q-fixed-position corner="bottom-right" :offset="[23,23]">
+					<q-btn round color="primary" v-on:click="GOTO('event-new')">
 						<q-icon name="fa-plus" />
 						<q-tooltip anchor="center left" self="center right" :offset="[20, 0]">Создать мероприятие</q-tooltip>
 					</q-btn>
@@ -380,6 +381,9 @@ function getUniqueFeatures(array, comparatorProperty) {
 	.map-ctrl-wrap {
 		margin: 1.5em;
 		z-index: 1;
+		&>div {
+			z-index: 1;
+		}
 	}
 	.icon-profile {
 		font-size: 6em;

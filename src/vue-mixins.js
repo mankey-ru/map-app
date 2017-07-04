@@ -52,6 +52,7 @@ export default {
 			// TODO implement permanent credentials storage
 			// https://github.com/Crypho/cordova-plugin-secure-storage
 			// https://github.com/TheCocoaProject/cordova-plugin-nativestorage
+			// https://dbwriteups.wordpress.com/2016/01/24/sharing-data-between-hybrid-app-and-inapp-browser/
 		},
 		LOG_IN_EXT: function (provider) {
 			window._handleLogonSuccess = (user) => {
@@ -89,55 +90,20 @@ export default {
 					}
 				});
 		},
-		GOTO_PROFILE: function (author) {
-			var rt;
-			if (author && author._id) {
-				rt = {
-					name: 'user-profile-any',
-					params: {
-						user_id: author._id
-					}
-				}
-			}
-			else {
-				rt = {
-					name: 'user-profile-current'
-				}
-			}
-			this.$router.push(rt)
-		},
-		GOTO_MAIN: function (drawer) {
-			this.GOTO({
-				name: 'mainpage'
-			}, drawer)
-		},
-		GOTO_REGISTER: function (drawer) {
-			this.GOTO({
-				name: 'user-register'
-			}, drawer)
-		},
-		GOTO_EVT_NEW: function (drawer) {
-			this.GOTO({
-				name: 'event-new'
-			}, drawer)
-		},
-		GOTO_LOGIN: function (drawer) {
-			this.GOTO({
-				name: 'user-login'
-			}, drawer)
-		},
 		GOTO: function(to, drawer){
-			if (drawer && drawer.setState) {
-				drawer.setState(false, () => {
-					this.$router.push(to)
-				});
+			if (typeof to === 'string') {
+				to = {name: to}
 			}
-			else {
-				this.$router.push(to)
-			}
+			this.$router.push(to)
 		},
 		LOC: function(k){
 			return DICT.ru[k]
+		},
+		TOGGLESIDE: function(){
+			var Lay = this.$root.$children[0].$refs.AppLayout;
+			if (Lay.leftOnLayout === false) { // not closing sidebar on big screens (also NB Lay.leftState.openedBig)
+				Lay.toggleLeft()
+			}
 		}
 	},
 	filters: {

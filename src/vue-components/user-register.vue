@@ -89,7 +89,7 @@
 					else {
 						Toast.create.positive({html:'Успех'})
 						this.$root.currentUser = res.body;
-						this.GOTO_PROFILE(); 
+						this.GOTO('user-profile-current'); 
 					}
 					submit_pending = 0;
 				});

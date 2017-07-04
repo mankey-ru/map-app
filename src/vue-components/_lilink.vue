@@ -2,6 +2,7 @@
 	/**
 	List Item Link
 	*/
+	import mixins from './../vue-mixins.js'
 	import {
 		QItem,
 		QItemSide,
@@ -14,14 +15,10 @@
 			label: String,
 			sublabel: String,
 			to: [Object, String],
-			act: [Function],
-			drawer: [Object],
-			drawer_mode: {
-				type: String,
-				default: 'INSTANT'
-			}
+			act: [Function]
 		},
 		components: {QItem, QItemSide, QItemMain},
+		mixins: [mixins],
 		methods: {
 			_GOTO: function(){
 				var vm = this.$router;
@@ -34,35 +31,8 @@
 					vm.push(toObj)
 				};
 				var drawer = this.drawer; //  || this.$parent.$refs.drawer_left
-				if (drawer) {
-					// if drawer is provided we have three ways to deal with it:
-
-					// a) close it immediately (WITHOUT animation) and perform an action
-					if (this.drawer_mode === 'INSTANT') {
-						if (drawer.active === true) {
-							// now its the only way to avoid animation
-							drawer.active = false;
-							drawer.opened = false;
-							drawer.backPosition = 0;
-							drawer.nodePosition = -280;
-						}
-						action();
-					}
-
-					// b) close it normally (WITH animation), THEN WHEN ITS DONE perform an action
-					else if (this.drawer_mode === 'AFTERCLOSE') {
-						drawer.setState(false, action);
-					}
-
-					// c) close it normally (WITH animation), AND perform an action
-					else {
-						drawer.setState(false);						
-						action();
-					}
-				}
-				else {
-					action();
-				}
+				this.TOGGLESIDE();
+				action();
 			}
 		},
 		computed: {

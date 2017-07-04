@@ -11,6 +11,7 @@ import user_login from './vue-components/user-login.vue';
 import placeList from './vue-components/place-list.vue';
 import page_how from './vue-components/page-how.vue';
 import page_about from './vue-components/page-about.vue';
+import pwdrestore from './vue-components/user-pwd-restore.vue';
 
 const routes = [{
 		path: '/mainpage',
@@ -92,6 +93,13 @@ const routes = [{
 		component: page_how,
 		meta: {
 			title: 'Как это работает'
+		}
+	},, {
+		path: '/pwdrestore',
+		name: 'pwdrestore',
+		component: pwdrestore,
+		meta: {
+			title: 'Восстановление пароля'
 		}
 	},
 	// 404
