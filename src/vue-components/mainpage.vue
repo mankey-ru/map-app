@@ -1,5 +1,6 @@
 <script>
-	import mixins from './../vue-mixins.js'
+	import mixins from './../vue-mixins/_global.js'
+	import mixinsGenres from './../vue-mixins/genres.js'
 	import mapLib from './../map-lib.js'
 	import request from 'superagent'
 	import {
@@ -85,9 +86,9 @@
 		},
 		evtSearch: function() {
 			this.search_pending = true;
-			this.getEvents();
+			this.fetchEvents();
 		},
-		getEvents: function() {
+		fetchEvents: function() {
 			request
 			.get(apiUrl + 'events')
 			.query(this.search)
@@ -192,34 +193,11 @@
 			})
 		}
 	},
-	mixins: [mixins],
+	mixins: [mixins, mixinsGenres],
 	mounted: function() {
-		_vm = this;
+		this.fetchGenres();
 		map = mapLib.newMap();
-		map.on('load', function(){
-			_vm.getEvents();
-		});
-
-		// Handling genre list
-		// If vuex has genres right now, they are copied to $data right now
-		if (this.$store.state.genreList) {
-			setGenres(this.$store.state.genreList)
-		}
-		// Otherwise it happens after store mutation
-		else { 
-			this.$store.subscribe(function(mutation, state) {
-				if (mutation.type === 'm_loadCommonData') {
-					setGenres(state.genreList)
-				}
-			})
-		}
-		function setGenres(state_genreList) {
-			var mapped = state_genreList.map((v) => {
-				_vm.$set(v, 'selected', true)
-				return v
-			});
-			_vm.$data.genres = mapped;
-		}
+		map.on('load', this.fetchEvents); // TODO do it immediately, then, on mapready, just load the points
 	}
 }
 
@@ -347,7 +325,6 @@ function getUniqueFeatures(array, comparatorProperty) {
 
 		<q-fixed-position class="map-ctrl-wrap" corner="bottom-left" :offset="[23,23]">
 			<q-btn big color="primary" push v-on:click="$refs.modal_genres.open()">
-				<q-tooltip :delay="500" anchor="center right" self="center left" :offset="controlsOffset">Отфильтровать события по жанрам</q-tooltip>
 				Жанры
 			</q-btn>
 			<span v-show="evtHiddenQty!==0">

@@ -71,7 +71,7 @@
 
 
 <script>
-	import mixins from './../vue-mixins.js'
+	import mixins from './../vue-mixins/_global.js'
 	import { required, email } from 'vuelidate/lib/validators'
 	import { QBtn,QInput  } from 'quasar'
 

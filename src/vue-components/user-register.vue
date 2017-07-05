@@ -17,7 +17,7 @@
 
 <script>
 	import request from 'superagent';
-	import mixins from './../vue-mixins.js';
+	import mixins from './../vue-mixins/_global.js';
 	import {Toast, QToggle, QBtn, QInput} from 'quasar';
 	import { required, email, sameAs } from 'vuelidate/lib/validators'
 

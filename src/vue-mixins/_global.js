@@ -5,11 +5,11 @@
 const moment = require('moment')
 moment.locale('ru');
 
-const apiUrl = require('./api-url.js').def;
+const apiUrl = require('./../api-url.js').def;
 import request from 'superagent'
 import _ from 'lodash'
 
-import DICT from './dict.js'
+import DICT from './../dict.js'
 
 import {Toast, QBtn} from 'quasar'
 
@@ -63,9 +63,9 @@ export default {
 		},
 		LOG_IN_SUCCESS: function (user) {
 			this.$store.dispatch('updateUser', user);
-			if (this.$route.name === 'user-login') {
-				this.$router.push('/')
-			}
+			var fromName = this.$route.params.navGuardedFrom; // see vue-router.js
+			var redirect = typeof fromName === 'string' ? {name: fromName} : '/';
+			this.$router.push(redirect)
 		},
 		LOG_OUT: function () {
 			if (this.auth) {

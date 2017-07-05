@@ -56,7 +56,8 @@ const routes = [{
 		name: 'place-list',
 		path: '/place-list',
 		component: placeList,
-		meta: {
+		meta: {			
+			needAuth: true,
 			title: 'Мои места'
 		}
 	}, {
@@ -125,12 +126,13 @@ router.beforeEach((to, from, next) => {
 		_toggleClass(document.body, '__fullscreen', to.meta.fullscreen);
 	}
 	var store = this.a.app.$store;
-	next()
-	return
-	if (store && !store.getters.currentUser && to.meta.needAuth === true) {
-		console.warn('vue-router.js: this page needs auth')
+	if (!store.getters.currentUser && to.meta.needAuth === true) {
+		console.warn(`vue-router.js: page «${to.name}» needs auth`)
 		next({
-			name: 'user-login'
+			name: 'user-login',
+			params: {
+				navGuardedFrom: to.name
+			}
 		})
 	}
 	else {

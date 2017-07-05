@@ -50,12 +50,11 @@ var conf_browser = {
 	},
 	resolve: {
 		alias: {
-			'vue$': 'vue/dist/vue.common.js',
-			quasar: path.resolve(__dirname, 'node_modules/quasar-framework/')
-		/*	src: path.resolve(__dirname, 'src'),
-			assets: path.resolve(__dirname, 'src/assets'),
-			'@': path.resolve(__dirname, 'src/components'),
-			variables: path.resolve(__dirname, '../src/themes/quasar.variables.styl')*/
+			vue$: 'vue/dist/vue.common.js',
+			quasar: path.resolve(__dirname, 'node_modules/quasar-framework/'),
+			src: path.resolve(__dirname, 'src'),
+			vmix: path.resolve(__dirname, 'src/vue-mixins'),
+			vcomp: path.resolve(__dirname, 'src/vue-components')
 		}
 	},
 	devServer: {

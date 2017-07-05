@@ -33,6 +33,12 @@
 		}
 	</style>
 	<script src="cordova.js"></script>
+	<script>
+		window.GLOBAL_SYNCRONOUS_DATA = function (data) {
+			window.GLOBAL_SYNCRONOUS_DATA = data; // to be used and then removed by vuex
+		}
+	</script>
+	<script src="/api/global-syncronous-data?callback=GLOBAL_SYNCRONOUS_DATA"></script>
 	<script src="build-browser.js"></script>
 </body>
 </html>

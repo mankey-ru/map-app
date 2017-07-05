@@ -1,5 +1,5 @@
 <script>
-	import mixins from './../vue-mixins.js'
+	import mixins from './../vue-mixins/_global.js'
 
 	import {QLayout, QToolbar, QToolbarTitle, QAjaxBar, QBtn, QIcon, QList, QItem, QItemSide, QItemMain, QSideLink}	from 'quasar'
 
@@ -66,7 +66,7 @@
 						<div v-if="currentUser.role">
 							<q-side-link item :to="{name:'event-new'}">
 								<q-item-side icon="fiber new" />
-								<q-item-main label="Добавить событие" />
+								<q-item-main label="Новое событие" />
 							</q-side-link>
 
 							<q-side-link item :to="{name:'event-list'}">

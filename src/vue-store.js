@@ -5,33 +5,25 @@ const apiUrl = require('./api-url.js').def;
 
 const state = {}
 const mutations = {
-	m_loadCommonData: function (state, cdata) {
+	m_GLOBAL_SYNCRONOUS_DATA: function(state, cdata) {
 		for (var k in cdata) { // straightforward merge
 			Vue.set(state, k, cdata[k])
 		}
 	},
-	m_updateUser: function (state, user) {
+	m_updateUser: function(state, user) {
 		Vue.set(state, 'currentUser', user);
 	}
 }
 const actions = {
-	loadCommonData: function (store) {
+	a_GLOBAL_SYNCRONOUS_DATA: function(store) {
 		// Getting initial page data (since page itself contains nothing)
 		// http://stackoverflow.com/a/40393742
-		request
-			.get(apiUrl + 'commondata')
-			.end((err, res) => {
-				if (err || !res.body) {
-					console.log('Resource "api/commondata" did not responded. Reloading page in 3 sec');
-					window.setTimeout(window.location.reload, 3000)
-				}
-				else {
-					store.commit('m_loadCommonData', res.body)
-				}
-			});
-		
+		if (GLOBAL_SYNCRONOUS_DATA) {			
+			store.commit('m_GLOBAL_SYNCRONOUS_DATA', window.GLOBAL_SYNCRONOUS_DATA);		
+			delete window.GLOBAL_SYNCRONOUS_DATA;
+		}
 	},
-	updateUser: function (store, user) {
+	updateUser: function(store, user) {
 		return store.commit('m_updateUser', user)
 	}
 };

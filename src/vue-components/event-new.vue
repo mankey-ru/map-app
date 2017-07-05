@@ -1,7 +1,8 @@
 <script>
-	var apiUrl = require('./../api-url.js').def;
-	import mapLib from './../map-lib.js'
-	import mixins from './../vue-mixins.js'
+	var apiUrl = require('src/api-url.js').def;
+	import mapLib from 'src/map-lib.js'
+	import mixins from 'vmix/_global.js'
+	import mixinsGenres from 'vmix/genres.js'
 	import request from 'superagent'	
 	import {QInput, QSpinner, QIcon, QBtn, Toast, QModal, QModalLayout, QToolbar, QToolbarTitle, QCheckbox, QDialogSelect, QInlineDatetime} from 'quasar'
 
@@ -19,13 +20,14 @@
 					descr: '',
 					latLng: false,
 					date: '',
-					genre_id: ''
-				},
-				newplace_remember: false,
+					genre_id: '',
+					place_remember: false
+				},	
+				genres: [],			
 				submit_pending: false
 			}
 		},
-		mixins: [mixins],
+		mixins: [mixins, mixinsGenres],
 		methods: {
 			nevt_submit: function(){
 				this.submit_pending = true;
@@ -146,20 +148,12 @@
 				var valid = this.$data.nevt.latLng && this.$data.nevt.name && this.$data.nevt.descr;
 				return !valid;
 			},
-			genreList: function(){
-				var glist = this.$store.state.genreList || [];
-				return glist.map(function(el){
-					return {
-						label: el.name,
-						value: el._id
-					}
-				});
-			},
 			nevt_date: function (){
 				return this.$options.filters.dateTimeFormat(this.$data.nevt.date)
 			}
 		},
 		mounted: function () {
+			this.fetchGenres(true);
 			if (this.currentUser && (this.currentUser.role | 0) < 1) {
 				console.log('User cannot create events')
 				this.$router.push('/user-profile')
@@ -214,19 +208,20 @@
 				</q-toolbar>
 			</q-modal-layout>
 		</q-modal>
-		<form v-on:submit.prevent="nevt_submit">
-			<h1 class="h1-md">{{$route.meta.title}}</h1>
+		<form v-on:submit.prevent="nevt_submit">			
+			<div class="vspace-2"></div>
+			<h1 class="h1-md gt-lg">{{$route.meta.title}}</h1>
 			<div class="group">
 				<q-btn v-on:click.prevent="mapOpen" color="primary" big>
 					<span v-if="nevt.latLng">Изменить</span><span v-else>Указать</span>&nbsp;место
 				</q-btn>
-				&nbsp; 
-				<q-checkbox v-model="newplace_remember" label="Запомнить"></q-checkbox>
+				&nbsp;
+				<q-checkbox v-model="nevt.place_remember" label="Запомнить"></q-checkbox>
 
 				<q-input v-model="nevt.name" required float-label="Название события"/>
 				<q-input v-model="nevt_date" required v-on:focus.prevent="$refs.modal_datetime.open()" float-label="Дата" />
 				<q-input v-model="nevt.descr" type="textarea" required float-label="Описание"/>				
-				<q-dialog-select v-model="nevt.genre_id" type="radio" required v-bind:options="genreList" ok-label="Выбрать" cancel-label="Отмена" 
+				<q-dialog-select v-model="nevt.genre_id" type="radio" required v-bind:options="genres" ok-label="Выбрать" cancel-label="Отмена" 
 				float-label="Жанр события"></q-dialog-select>
 				<br />
 				<div class="row">

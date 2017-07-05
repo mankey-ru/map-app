@@ -1,5 +1,5 @@
 <script>
-	import mixins from './../vue-mixins.js';
+	import mixins from './../vue-mixins/_global.js';
 	export default {
 		name: 'PlaceList',
 		data: function () {

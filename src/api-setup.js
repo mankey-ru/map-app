@@ -5,6 +5,7 @@ const ISODate = mongodb.ISODate;
 const C_EVENTS = "events";
 const C_USERS = "users";
 const C_GENRES = "genres";
+const C_PLACES = "places";
 // Auth strategies
 const passport = require('passport')
 const LocalStrategy = require('passport-local').Strategy;
@@ -31,26 +32,15 @@ module.exports = function(app) {
 function setupApi(app) {
 
 	// https://docs.mongodb.com/v3.2/tutorial/geospatial-tutorial/#differences-between-flat-and-spherical-geometry
-
-	app.get(apiUrl + 'commondata', function(req, res) {
+	app.get(apiUrl + 'global-syncronous-data', function(req, res) {
 		var currentUser = req.user;
 		if (currentUser) {
 			currentUser.pwd = '<NO>';
 		}
-
-		dbtools.getDb().collection(C_GENRES).find().toArray(
-			function(err, docs) {
-				if (err) {
-					handleError(res, err, 'Failed to get common data');
-				}
-				else {
-					res.status(200).json({
-						currentUser: currentUser,
-						genreList: docs
-					}).end();
-				}
-			});
-	});
+		res.jsonp({
+			currentUser
+		})
+	})
 
 	app.get(apiUrl + 'user/:user_id', function(req, res) {
 		var user_id = ObjectID(req.params.user_id);
@@ -65,6 +55,127 @@ function setupApi(app) {
 			}
 		});
 	});
+	/**		
+		-------------------------------------------------------------------
+									Genres
+		-------------------------------------------------------------------
+	*/	
+	app.get(apiUrl + 'genres', function(req, res) {
+		dbtools.getDb().collection(C_GENRES).find().toArray(
+			function(err, docs) {
+				if (err) {
+					handleError(res, err, 'Failed to get genres');
+				}
+				else {
+					res.status(200).json({
+						genreList: docs
+					}).end();
+				}
+			});
+	});
+	/**		
+		-------------------------------------------------------------------
+									Places
+		-------------------------------------------------------------------
+	*/
+	app.get(apiUrl + 'places', function(req, res) {
+		var COL = dbtools.getDb().collection(C_PLACES);
+		var match = {};
+		if (req.query.own) {
+			if (req.user) {
+				match.author_id = ObjectID(req.user._id)
+			}
+			else {
+				handleError(res, 'Unauthorized', 'Unauthorized', 403);
+				return
+			}
+		}
+		var TS = req.query.text;
+		if (TS) {
+			COL.createIndex({ // do I need to check text index each time via getIndexes?
+				name: 'text'
+			});
+			/*
+				Mongo 's full-text doesnt support word partials and wildcards, so
+				if search string length less than 4 then mongo will look for exact words			
+			*/
+			if (TS.length < 4) {
+				match.$text = {
+					$search: TS // , $language: 'russian' TODO req.user.lang or something
+				};
+			}
+			else {
+				var reSearch = {
+					$regex: TS,
+					$options: 'i'
+				};
+				match.$or = [{
+					name: reSearch
+				}, {
+					descr: reSearch
+				}];
+			}
+		}
+
+		var aRules = [{
+			$match: match
+		}];
+		COL.aggregate(aRules).toArray(function(err, docs) {
+			if (err) {
+				handleError(res, err, 'Failed to get places');
+			}
+			else {
+				res.status(200).json({
+					placeList: docs
+				}).end();
+			}
+		});
+	});
+	// New place
+	app.post(apiUrl + 'places', insertPlace);
+
+	// Edit place
+	app.post(apiUrl + 'places/edit', function(req, res) {
+		dbtools.getDb().collection(C_PLACES)
+			.updateOne({
+				_id: ObjectID(req.body._id)
+			}, {
+				$set: _.pick(req.body, ['name'])
+			}, function(err, cmdres) {
+				if (err || !cmdres || !cmdres.result || !cmdres.result.ok) {
+					handleError(res, err || cmdres, 'Place update failed');
+				}
+				else {
+					res.status(201).json({
+						ok: 1
+					}).end();
+				}
+			});
+	});
+
+	function insertPlace(req, res, customCallback) {
+		if (!req.user) {
+			handleError(res, "User not authed");
+			return
+		}
+		var newPlace = _.pick(req.body, ['name', 'latLng']);
+		newPlace.author_id = ObjectID(req.user._id);
+
+		dbtools.getDb().collection(C_PLACES)
+			.insertOne(newPlace, function(err, insert) {
+				if (err || !insert.result.ok) {
+					handleError(res, err, 'Failed to create place');
+				}
+				else {
+					if (typeof customCallback === 'function') {
+						customCallback(insert)
+					}
+					else {
+						res.status(200).json(insert).end();
+					}
+				}
+			});
+	}
 	/**		
 		-------------------------------------------------------------------
 									Events
@@ -158,15 +269,42 @@ function setupApi(app) {
 		var newEvent = _.pick(req.body, ['name', 'date', 'descr', 'latLng', 'genre_id']);
 		newEvent.author_id = ObjectID(req.user._id);
 
-		dbtools.getDb().collection(C_EVENTS)
-			.insertOne(newEvent, function(err, insert) {
-				if (err || !insert.result.ok) {
-					handleError(res, err, 'Failed to create first reply');
+		var db = dbtools.getDb();
+		var insertedData = {}
+
+		waterfall([
+			// Insering event
+			function(next) {
+				db.collection(C_EVENTS)
+					.insertOne(newEvent, function(err, insert) {
+						insertedData.event = insert;
+						var err = err || !insert.result.ok ? 'Failed to create event' : null;
+						next(err || !insert.result.ok ? 'Failed to create event' : null)
+					});
+			},
+			// Inserting place
+			function(next) {
+				console.log(req.body.place_remember);
+				if (req.body.place_remember === true) {
+					insertPlace(req, res, function(insert) {
+						insertedData.place = insert;
+						next();
+					})
 				}
 				else {
-					res.status(200).json(insert).end();
+					next()
 				}
-			});
+			}
+		], waterfallFinal)
+
+		function waterfallFinal(err) {
+			if (err) {
+				handleError(res, err, err);
+			}
+			else {
+				res.status(201).json(insertedData).end()
+			}
+		}
 	});
 
 	app.get(apiUrl + 'events/:event_id', function(req, res) {
@@ -463,7 +601,7 @@ function setupAuth(app) {
 	/**
 		Reqistration
 	*/
-	const bcrypt = require('bcryptjs'); 
+	const bcrypt = require('bcryptjs');
 	// this lib is slower (about 30%) but compatible with latest version of nodejs
 	// bcrypt does not because of node-gyp
 	// api seems to be the same so hot replacement is available :)
