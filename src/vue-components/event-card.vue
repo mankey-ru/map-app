@@ -1,6 +1,6 @@
 <script>
 	var apiUrl = require('./../api-url.js').def;
-	import mixins from './../vue-mixins.js'
+	import mixins from './../vue-mixins/_global.js'
 	import _ from 'lodash'
 	import request from 'superagent'
 	import {Toast} from 'quasar'

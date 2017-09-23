@@ -5,11 +5,11 @@
 const moment = require('moment')
 moment.locale('ru');
 
-const apiUrl = require('./api-url.js').def;
+const apiUrl = require('./../api-url.js').def;
 import request from 'superagent'
 import _ from 'lodash'
 
-import DICT from './dict.js'
+import DICT from './../dict.js'
 
 import {Toast, QBtn} from 'quasar'
 
@@ -52,6 +52,7 @@ export default {
 			// TODO implement permanent credentials storage
 			// https://github.com/Crypho/cordova-plugin-secure-storage
 			// https://github.com/TheCocoaProject/cordova-plugin-nativestorage
+			// https://dbwriteups.wordpress.com/2016/01/24/sharing-data-between-hybrid-app-and-inapp-browser/
 		},
 		LOG_IN_EXT: function (provider) {
 			window._handleLogonSuccess = (user) => {
@@ -62,9 +63,9 @@ export default {
 		},
 		LOG_IN_SUCCESS: function (user) {
 			this.$store.dispatch('updateUser', user);
-			if (this.$route.name === 'user-login') {
-				this.$router.push('/')
-			}
+			var fromName = this.$route.params.navGuardedFrom; // see vue-router.js
+			var redirect = typeof fromName === 'string' ? {name: fromName} : '/';
+			this.$router.push(redirect)
 		},
 		LOG_OUT: function () {
 			if (this.auth) {
@@ -82,62 +83,27 @@ export default {
 					else {
 						Toast.create.positive({html:'Success'})
 						this.$store.dispatch('updateUser', false);
-						//this.$router.push('/')
+						// this.$router.push('/')
 					}
 					if (this.auth) {
 						this.auth.pending = 0;
 					}
 				});
 		},
-		GOTO_PROFILE: function (author) {
-			var rt;
-			if (author && author._id) {
-				rt = {
-					name: 'user-profile-any',
-					params: {
-						user_id: author._id
-					}
-				}
-			}
-			else {
-				rt = {
-					name: 'user-profile-current'
-				}
-			}
-			this.$router.push(rt)
-		},
-		GOTO_MAIN: function (drawer) {
-			this.GOTO({
-				name: 'mainpage'
-			}, drawer)
-		},
-		GOTO_REGISTER: function (drawer) {
-			this.GOTO({
-				name: 'user-register'
-			}, drawer)
-		},
-		GOTO_EVT_NEW: function (drawer) {
-			this.GOTO({
-				name: 'event-new'
-			}, drawer)
-		},
-		GOTO_LOGIN: function (drawer) {
-			this.GOTO({
-				name: 'user-login'
-			}, drawer)
-		},
 		GOTO: function(to, drawer){
-			if (drawer && drawer.setState) {
-				drawer.setState(false, () => {
-					this.$router.push(to)
-				});
+			if (typeof to === 'string') {
+				to = {name: to}
 			}
-			else {
-				this.$router.push(to)
-			}
+			this.$router.push(to)
 		},
 		LOC: function(k){
 			return DICT.ru[k]
+		},
+		TOGGLESIDE: function(){
+			var Lay = this.$root.$children[0].$refs.AppLayout;
+			if (Lay.leftOnLayout === false) { // not closing sidebar on big screens (also NB Lay.leftState.openedBig)
+				Lay.toggleLeft()
+			}
 		}
 	},
 	filters: {
@@ -169,7 +135,7 @@ export default {
 			components: {QBtn},
 			template: `
 			<q-btn icon="fa-map-o" v-on:click="$router.push({name:'mainpage'})" color="primary" outline small type="button">
-				Вернуться на карту
+				На главную
 			</q-btn>`
 		}
 	},

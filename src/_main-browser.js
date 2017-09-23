@@ -1,6 +1,6 @@
 import Vue from 'vue'
-import router from './vue-router.js'
 import store from './vue-store.js'
+import router from './vue-router.js'
 import App from './vue-components/App.vue'
 
 import Vuelidate from 'vuelidate'
@@ -24,15 +24,14 @@ import 'quasar-extras/fontawesome'
 // import 'quasar-extras/ionicons'
 // import 'quasar-extras/animate'
 
+store.dispatch('a_GLOBAL_SYNCRONOUS_DATA');
+
 Quasar.start(() => {
 	/* eslint-disable no-new */
 	new Vue({
 		el: '#vue-app',
 		router,
 		store,
-		render: (h) => h(App),
-		mounted: () => {
-			store.dispatch('loadCommonData')
-		}
+		render: (h) => h(App)
 	})
 })

@@ -66,7 +66,7 @@
 
 	import request from 'superagent'
 	import {Toast, QInput, QBtn, QDatetime, QCheckbox, QSpinner} from 'quasar'
-	import mixins from './../vue-mixins.js'
+	import mixins from './../vue-mixins/_global.js'
 
 	var Comp = {
 		name: 'user-profile',		

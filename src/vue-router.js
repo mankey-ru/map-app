@@ -8,8 +8,10 @@ import eventList from './vue-components/event-list.vue';
 import user_profile from './vue-components/user-profile.vue';
 import user_register from './vue-components/user-register.vue';
 import user_login from './vue-components/user-login.vue';
+import placeList from './vue-components/place-list.vue';
 import page_how from './vue-components/page-how.vue';
 import page_about from './vue-components/page-about.vue';
+import pwdrestore from './vue-components/user-pwd-restore.vue';
 
 const routes = [{
 		path: '/mainpage',
@@ -27,21 +29,21 @@ const routes = [{
 		component: eventNew,
 		meta: {
 			needAuth: true,
-			title: 'Новое мероприятие'
+			title: 'Новое событие'
 		}
 	}, {
 		path: '/event/card/:event_id',
 		name: 'event-card',
 		component: eventCard,
 		meta: {
-			title: 'Мероприятие'
+			title: 'Событие'
 		}
 	}, {
 		path: '/event/list/',
 		name: 'event-list',
 		component: eventList,
 		meta: {
-			title: 'Список мероприятий'
+			title: 'Список событий'
 		}
 	}, {
 		name: 'user-profile-current',
@@ -49,6 +51,14 @@ const routes = [{
 		component: user_profile,
 		meta: {
 			title: 'Ваш профиль'
+		}
+	}, {
+		name: 'place-list',
+		path: '/place-list',
+		component: placeList,
+		meta: {			
+			needAuth: true,
+			title: 'Мои места'
 		}
 	}, {
 		name: 'user-profile-any',
@@ -85,6 +95,13 @@ const routes = [{
 		meta: {
 			title: 'Как это работает'
 		}
+	},, {
+		path: '/pwdrestore',
+		name: 'pwdrestore',
+		component: pwdrestore,
+		meta: {
+			title: 'Восстановление пароля'
+		}
 	},
 	// 404
 	{
@@ -109,10 +126,13 @@ router.beforeEach((to, from, next) => {
 		_toggleClass(document.body, '__fullscreen', to.meta.fullscreen);
 	}
 	var store = this.a.app.$store;
-	if (store && !store.getters.currentUser && to.meta.needAuth === true) {
-		console.warn('vue-router.js: this page needs auth')
+	if (!store.getters.currentUser && to.meta.needAuth === true) {
+		console.warn(`vue-router.js: page «${to.name}» needs auth`)
 		next({
-			name: 'user-login'
+			name: 'user-login',
+			params: {
+				navGuardedFrom: to.name
+			}
 		})
 	}
 	else {
