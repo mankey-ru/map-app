@@ -4,11 +4,12 @@
 			<div v-if="user">
 				<div class="row">
 					<div class="width-1">
-						<h3>{{user.name}}</h3>
+						<h3 class="gt-sm">{{user.name}}</h3>
+						<h5 class="lt-md">{{user.name}}</h5>
 					</div>
 				</div>
 				<div class="row">
-					<div class="col-4 text-right">
+					<div class="col-4 text-center">
 						<img v-bind:src="user.pic" class="user-pic" />
 					</div>
 					<div class="col-8 mar-v-group">
@@ -31,25 +32,32 @@
 						<span v-if="!own">
 							{{user.bdate | df_pretty_dm}}
 						</span>
+						<div class="clearfix"></div>
 					</div>
 				</div>
-				<div class="mar-v-group"> 
-					<q-input type="textarea"
-					v-model="user.descr" 
-					:readonly="!own" 
-					class="user-textarea" 
-					required 
-					float-label="О себе" />
-					<p v-if="!own">{{user.descr}}</p>
-					<br/>
-					<div class="row">
-						<div class="col-6">
-							<homebtn></homebtn>
-						</div>
-						<div class="col-6 text-right">
-							<q-btn v-if="own" big color="primary" :loading="submit_pending" type="submit">
-								Сохранить
-							</q-btn>
+				<br />
+				<br />
+				<div class="row">
+					<div class="col-12">						
+						<div class="mar-v-group"> 
+							<q-input type="textarea"
+							v-model="user.descr" 
+							:readonly="!own" 
+							class="user-textarea" 
+							required 
+							float-label="О себе" />
+							<p v-if="!own">{{user.descr}}</p>
+							<br/>
+							<div class="row">
+								<div class="col-6">
+									<homebtn></homebtn>
+								</div>
+								<div class="col-6 text-right">
+									<q-btn v-if="own" big color="primary" :loading="submit_pending" type="submit">
+										Сохранить
+									</q-btn>
+								</div>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -152,14 +160,23 @@
 	export default Comp;
 </script>
 
-<style scoped>
+<style scoped lang="less">
+.user-pic {
+	border-radius: .5em;
+	margin-right: 1em;
+}
+body.desktop {
 	.user-pic {
 		max-width:200px;
-		border-radius: .5em;
-		margin-right: 1em;
 	}
-	.user-textarea {
-		height: 7em;
-		resize: none;
+}
+body.mobile {
+	.user-pic {
+		max-width:50px;
 	}
+}
+.user-textarea {
+	height: 7em;
+	resize: none;
+}
 </style>

@@ -22,8 +22,7 @@
 				v-model="auth.email" 
 				v-on:input="$v.auth.email.$touch()" 
 				:error="$v.auth.email.$error"
-				:clearable="true"
-				/>
+				:clearable="true" />
 			</div>
 			<div class="stacked-label">
 				<label>
@@ -105,11 +104,11 @@
 
 
 <style lang="less" scoped>
-	.social-login-btn-wrap {
-		margin-top: 2em;
-		margin-bottom: 2em;
-	}
-	.mdi {
-		font-size: 2.5em;
-	}
+.social-login-btn-wrap {
+	margin-top: 2em;
+	margin-bottom: 2em;
+}
+.mdi {
+	font-size: 2.5em;
+}
 </style>

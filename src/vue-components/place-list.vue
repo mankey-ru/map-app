@@ -72,10 +72,6 @@
 			this.place_fetch();
 		}
 	}
-
-	function getForum(arg) {
-		return arg;
-	}
 </script>
 
 <template>
