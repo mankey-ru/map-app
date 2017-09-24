@@ -6,6 +6,8 @@ const moment = require('moment')
 moment.locale('ru');
 
 const apiUrl = require('./../api-url.js').def;
+const NSTOR = require('./../native-storage.js');
+
 import request from 'superagent'
 import _ from 'lodash'
 
@@ -44,6 +46,7 @@ export default {
 							Toast.create.warning({html:'Email/password combination not found. Please try again.'})
 						}
 						else {
+							NSTOR.setAuth(credentials);
 							this.LOG_IN_SUCCESS(user);
 						}
 					}
@@ -81,7 +84,8 @@ export default {
 						Toast.create.warning({html:'Logout failed'})
 					}
 					else {
-						Toast.create.positive({html:'Success'})
+						NSTOR.removeAuth(); // Cordova only: remove credentials from persistent storage
+						Toast.create.positive({html:'Logged out'})
 						this.$store.dispatch('updateUser', false);
 						// this.$router.push('/')
 					}

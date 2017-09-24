@@ -4,6 +4,7 @@
 		name: 'start',
 		data: function () {
 			return {
+				test: ''
 			}
 		},
 		mounted: function () {

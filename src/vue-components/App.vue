@@ -1,4 +1,5 @@
 <script>
+	const NSTOR = require('./../native-storage.js')
 	import mixins from './../vue-mixins/_global.js'
 
 	import {QLayout, QToolbar, QToolbarTitle, QAjaxBar, QBtn, QIcon, QList, QItem, QItemSide, QItemMain, QSideLink}	from 'quasar'
@@ -23,7 +24,18 @@
 			}
 		},
 		mixins: [mixins],
-		mounted: function() {}
+		mounted: function() {
+			var vm = this;
+			// Only for Cordova:
+			// Checking previous auth credentials
+			// and if present use them
+			NSTOR.getAuth(function(data) {
+				console.log(data);
+				vm.auth.email = data.username;
+				vm.auth.password = data.password;
+				vm.LOG_IN();
+			})
+		}
 	}
 </script>
 

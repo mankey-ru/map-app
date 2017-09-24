@@ -14,18 +14,18 @@
 			return {
 				pageTitle: this.$route.query.all ? 'Места' : 'Мои места',
 				placeList: [],
-				placeList_loading: true,
+				LOADING: true,
 				status: ''
 			}
 		},
 		methods: {
 			place_fetch: function() {
-				this.placeList_loading = true;
+				this.LOADING = true;
 
 				request
 				.get(apiUrl + 'places?own=1')
 				.end((err, res)=>{
-					this.placeList_loading = false;
+					this.LOADING = false;
 					if (err) {
 						Toast.create.warning({html:err || 'Ошибка запроса'})
 					}
@@ -38,7 +38,7 @@
 							}
 						}
 						else {
-							this.status = 'Не найдено ни одного вашего места'
+							this.status = 'У вас нет сохранённых мест'
 						}
 					}
 				})
@@ -81,13 +81,16 @@
 <template>
 	<div>
 		<h1 class="h1-md">{{pageTitle}}</h1>
-		<div v-if="placeList.length" class="group-x">
+		<div v-if="LOADING" class="spinner-wrap">
+			<q-spinner :size="50"/>
+		</div>
+		<div v-else class="group-x">
 			<div v-if="status">
-				<h2>
+				<h5>
 					<div class="label label-warning">
 						{{status}}
 					</div>
-				</h2>
+				</h5>
 			</div>
 			<div class="row" v-for="place in placeList">
 				<div class="col-8">
@@ -105,9 +108,6 @@
 					</q-input>
 				</div>
 			</div>
-		</div>
-		<div v-else class="spinner-wrap">
-			<q-spinner :size="50"/>
 		</div>
 	</div>
 </template>
