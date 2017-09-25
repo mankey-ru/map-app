@@ -16,6 +16,11 @@ const FacebookStrategy = require('passport-facebook').Strategy;
 const _ = require('lodash');
 const waterfall = require('async/waterfall');
 const moment = require('moment');
+// Image upload stuff
+const cloudinary = require('cloudinary');
+const cloudinaryStorage = require('multer-storage-cloudinary');
+const multer = require('multer');
+var multerUserpicUploader;
 // Homebrew stuff
 const CONF = require('./conf/conf.js');
 const dbtools = require('./dbtools.js');
@@ -25,8 +30,9 @@ const apiUrl = _api.path;
 module.exports = function(app) {
 	dbtools.connect();
 	app.use(require("body-parser").json());
-	setupAuth(app);
-	setupApi(app);
+	setupUpload(app); // upload stuff, i.e. userpics
+	setupAuth(app); // login & register
+	setupApi(app); // all remaining stuff
 }
 
 function setupApi(app) {
@@ -59,7 +65,7 @@ function setupApi(app) {
 		-------------------------------------------------------------------
 									Genres
 		-------------------------------------------------------------------
-	*/	
+	*/
 	app.get(apiUrl + 'genres', function(req, res) {
 		dbtools.getDb().collection(C_GENRES).find().toArray(
 			function(err, docs) {
@@ -343,6 +349,29 @@ function setupApi(app) {
 	})*/
 }
 
+function setupUpload(app) {
+
+	cloudinary.config({
+		cloud_name: 'mankey',
+		api_key: '475668113898214',
+		api_secret: CONF.get().cloudinary_api_secret
+	});
+
+	var storage = cloudinaryStorage({
+		cloudinary: cloudinary,
+		folder: 'userpics',
+		allowedFormats: ['jpg', 'png', 'gif'],
+		/*filename: function(req, file, cb) {
+			// здесь можно указать произвольное имя. Если имя и папка будут совпадать, файл будет перезаписыватсья. Можно айди пользователя заюзать
+			cb(undefined, file.originalname);
+		}*/
+	});
+
+	multerUserpicUploader = multer({
+		storage: storage
+	});
+}
+
 
 /**
 	======================================================================================
@@ -422,7 +451,7 @@ function setupAuth(app) {
 		});
 
 	/** 
-		Local auth
+		Local (classic) auth
 		http://passportjs.org/docs/username-password
 	*/
 	var resultUrl = apiUrl + 'auth/result';
@@ -607,7 +636,7 @@ function setupAuth(app) {
 	// api seems to be the same so hot replacement is available :)
 	const saltRounds = 8;
 
-	app.post(apiUrl + 'auth/reg', function(req, res) {
+	app.post(apiUrl + 'auth/reg', multerUserpicUploader.single('fileUploadInput_name'), function(req, res) {
 		if (req.user) {
 			// user already authed
 			req.logout();
@@ -626,11 +655,21 @@ function setupAuth(app) {
 		newUser.date = new Date;
 		newUser.online = true;
 		newUser.rating_total = 0;
-		newUser.pic = '//res.cloudinary.com/mankey/image/upload/v1490938032/userpics/4.png';
 
 		var db = dbtools.getDb();
 
 		waterfall([
+			function(next) {
+				if (!req.file) {
+					// using default user pic
+					newUser.pic = '//res.cloudinary.com/mankey/image/upload/v1490938032/userpics/4.png';
+					next(null)
+				}
+				else {					
+					newUser.pic = req.file.url;
+					next(req.file.url ? 'Upload to cloudinary failed' : null);
+				}
+			},
 			// check if email is unique
 			// TODO create unique constraint on email
 			// https://docs.mongodb.com/manual/reference/method/db.collection.createIndex/

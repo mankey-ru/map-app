@@ -5,5 +5,6 @@ module.exports = {
   "twitter_consumer_key": "",
   "twitter_consumer_secret": "",
   "facebook_app_id": "",
-  "facebook_app_secret": ""
+  "facebook_app_secret": "",
+  "cloudinary_api_secret": ""
 }

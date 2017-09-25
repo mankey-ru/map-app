@@ -43,6 +43,8 @@
 							<q-input type="textarea"
 							v-model="user.descr" 
 							:readonly="!own" 
+							:max-height="100"
+							:min-rows="4"
 							class="user-textarea" 
 							required 
 							float-label="О себе" />
@@ -162,7 +164,7 @@
 
 <style scoped lang="less">
 .user-pic {
-	border-radius: .5em;
+	border-radius: 1em;
 	margin-right: 1em;
 }
 body.desktop {
@@ -172,11 +174,11 @@ body.desktop {
 }
 body.mobile {
 	.user-pic {
-		max-width:50px;
+		max-width:70px;
 	}
 }
-.user-textarea {
+/*.user-textarea {
 	height: 7em;
 	resize: none;
-}
+}*/
 </style>

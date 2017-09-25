@@ -9,9 +9,12 @@ Script will automatically perform several actions
 - flush all credentials from config.blank.js
 - backup raw unencryped credentials to config.backup.js. This file is not tracked by git.
 
-Edit
+How to edit stored credentials
 ---
-Rename config.backup.js to config.blank.js, then edit it, then make _fresh start_ (see above)
+# Remove previously generated config.encrypted.js and config.blank.js
+# Rename config.backup.js to config.blank.js
+# Edit it
+# Run app via "npm run dev" or "npm start"
 
 TODOs
 ---
