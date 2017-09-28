@@ -15,11 +15,11 @@
 						Загрузить фото
 					</q-btn>
 					<span v-if="picPath">
-						Выбран файл <b>{{picPath}}</b>
+						Выбран файл <b>{{picName | cutString}}</b>
 						<q-icon name="delete forever" size="30px" color="red" v-on:click="uploadReset" class="cursor-pointer" />
 					</span>			
 					<div class="hidden">
-						<input type="file" ref="fileUploadInput" name="fileUploadInput_name" v-on:change="uploadChange" />
+						<input type="file" ref="fileUploadInput" v-on:change="uploadChange" />
 					</div>
 				</div>
 			</div>
@@ -44,6 +44,7 @@
 		data: function () {
 			return {
 				picPath: '',
+				picName: '',
 				role: false, // to be converted to boolean server-side
 				name: '',
 				email: '',
@@ -55,13 +56,22 @@
 				submit_pending: false
 			}
 		},
+		filters: {
+			cutString: function(s){
+				var maxlen = 40;
+				var extraSuffix = s.length > maxlen ? '…' : '';
+				return s.slice(0, maxlen) + extraSuffix;				
+			}
+		},
 		methods: {
 			uploadReset: function(){
 				this.$data.picPath = '';
+				this.$data.picName = '';
 				this.$refs.fileUploadInput.value = '';
 			},
 			uploadChange: function(){
 				this.$data.picPath = this.$refs.fileUploadInput.value;
+				this.$data.picName = this.$refs.fileUploadInput.files[0].name;
 			},
 			uploadClick: function(){
 				this.$refs.fileUploadInput.click();
@@ -73,8 +83,8 @@
 				this.submit_pending = true;
 				request
 					.post(apiUrl + 'auth/reg')
-					.attach('fileUploadInput_name', this.$data.picPath)
 					.field(this.$data)
+					.attach('fileUploadInput_name', this.$refs.fileUploadInput.files[0])
 					.end((err, res) => {
 						this.submit_pending = false;
 						if (err || !res.body) {
@@ -85,13 +95,9 @@
 						else {
 							Toast.create.positive({
 								html: 'Успех'
-							})
-							console.log(res.body);
-
-							// TODO state mutation!
-							// this.$root.currentUser = res.body;
-							this.$store.updateUser(res.body);
-
+							});
+							this.$store.dispatch('updateUser', res.body.newUser);
+							console.log(res.body)
 							this.GOTO('user-profile-current');
 						}
 					});

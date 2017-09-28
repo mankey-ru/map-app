@@ -52,6 +52,15 @@ call quasar build win32
 explorer "%cd%\dist\MappApp-win32-x64"
 ```
 
+Global modules (optional)
+--------
+```bash
+# this one is for convenient debugging of server-side code (api-setup.js)
+npm i -g nodemon
+# this one needs admin rights to be executed
+npm i -g windows-build-tools --add-python-to-path
+```
+
 # Major TODOs
 - replace homebrewed server validation with plugin like [express-validation](https://www.npmjs.com/package/express-validation) or [express-validator](https://www.npmjs.com/package/express-validator)
 - unit testing (i.e. [mocha](https://mochajs.org/) or [chai](http://chaijs.com/))

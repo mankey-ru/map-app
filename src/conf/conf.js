@@ -5,7 +5,10 @@ const algorithm = 'aes-256-ctr';
 const password_key = 'MAPP_CRYPTO_KEY';
 const password = process.env[password_key];
 if (!password || password.length < 8) {
-	throw new Error(`\n\n\n    Please create environment variable ${password_key} containing your new 8-character password \n\n\n`)
+	throw new Error(`\n\n\n    
+		Please create environment variable ${password_key} containing your new 8-character password.
+		How it works: https://github.com/mankey-ru/map-app/blob/master/src/conf/README.md
+	 \n\n\n`)
 }
 
 const fs = require('fs');

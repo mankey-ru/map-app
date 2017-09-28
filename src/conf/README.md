@@ -2,7 +2,7 @@ Fresh start
 ---
 1. Create env variable MAPP_CRYPTO_KEY containing your new 8-character password
 2. Put your credentials into config.blank.js
-3. Run app via "npm run dev" or "npm start"
+3. Run app via "npm run dev"
 
 Script will automatically perform several actions
 - generation of a new config.encrypted.js
@@ -11,10 +11,10 @@ Script will automatically perform several actions
 
 How to edit stored credentials
 ---
-# Remove previously generated config.encrypted.js and config.blank.js
-# Rename config.backup.js to config.blank.js
-# Edit it
-# Run app via "npm run dev" or "npm start"
+1. Remove previously generated config.encrypted.js and config.blank.js
+2. Rename config.backup.js to config.blank.js
+3. Edit it
+4. Run app via "npm run dev"
 
 TODOs
 ---

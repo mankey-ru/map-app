@@ -16,6 +16,7 @@ const FacebookStrategy = require('passport-facebook').Strategy;
 const _ = require('lodash');
 const waterfall = require('async/waterfall');
 const moment = require('moment');
+const CircularJSON = require('circular-json');
 // Image upload stuff
 const cloudinary = require('cloudinary');
 const cloudinaryStorage = require('multer-storage-cloudinary');
@@ -290,7 +291,7 @@ function setupApi(app) {
 			},
 			// Inserting place
 			function(next) {
-				console.log(req.body.place_remember);
+				//console.log(req.body.place_remember);
 				if (req.body.place_remember === true) {
 					insertPlace(req, res, function(insert) {
 						insertedData.place = insert;
@@ -667,7 +668,7 @@ function setupAuth(app) {
 				}
 				else {					
 					newUser.pic = req.file.url;
-					next(req.file.url ? 'Upload to cloudinary failed' : null);
+					next(req.file.url ? null : 'Upload to cloudinary failed');
 				}
 			},
 			// check if email is unique
@@ -709,10 +710,15 @@ function setupAuth(app) {
 					if (err) {
 						// potential error from the login() callback would come from your serializeUser() function
 						handleError(res, 'Automatic login of new user failed');
+						console.log(err);
 					}
 					else {
 						newUser.pwd = '<NO>';
-						res.status(201).json(newUser).end();
+						//var _req = JSON.parse(CircularJSON.stringify(req));
+						res.status(201).json({
+							newUser: newUser,
+							//req: _req
+						}).end();
 					}
 				})
 			}
