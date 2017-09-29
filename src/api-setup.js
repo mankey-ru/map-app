@@ -600,8 +600,8 @@ function setupAuth(app) {
 	/**
 		Edit profile
 	*/
-	app.post(apiUrl + 'auth/edit', function(req, res) {
-		if (!req.user) {
+	app.post(apiUrl + 'auth/edit', multerUserpicUploader.single('fileUploadInput_name'), function(req, res) {
+		if (!req.user) { 
 			handleError(res, 'User not authed');
 			return
 		}
@@ -611,6 +611,17 @@ function setupAuth(app) {
 		}
 		var userUpd = _.pick(req.body, ['email', 'name', 'bdate', 'password', 'role', 'descr'])
 		userUpd.role = Math.abs(req.body.role | 0); // -1 is Admin, 0 is listener, 1 is musician
+
+
+		if (req.file) {			
+			if (!req.file.url) {
+				handleError(res,  'Upload to cloudinary failed.', 'Upload to cloudinary failed 1');
+				// return
+			}
+			else {
+				userUpd.pic = req.file.url;
+			}
+		}
 
 		dbtools.getDb().collection(C_USERS)
 			.updateOne({
@@ -623,7 +634,8 @@ function setupAuth(app) {
 				}
 				else {
 					res.status(201).json({
-						ok: 1
+						ok: cmdres.result.ok,
+						userUpd: userUpd
 					}).end();
 				}
 			});

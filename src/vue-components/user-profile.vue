@@ -10,7 +10,10 @@
 				</div>
 				<div class="row">
 					<div class="col-4 text-center">
-						<img v-bind:src="user.pic" class="user-pic" />
+						<img v-bind:src="user.pic" class="user-pic" v-on:click.prevent="uploadClick"/>
+						<div class="hidden">
+							<input type="file" ref="fileUploadInput" v-on:change="uploadChange" />
+						</div>
 					</div>
 					<div class="col-8 mar-v-group">
 						<q-input v-model="user.name" v-if="own" :readonly="!own" float-label="Имя" required />
@@ -85,7 +88,9 @@
 			return {
 				user: false,
 				own: false,
-				submit_pending: false
+				submit_pending: false,
+				picPath: '',
+				picName: ''
 			}
 		},
 		mixins: [mixins],
@@ -94,16 +99,16 @@
 				var user_id = this.$router.currentRoute.params.user_id;
 				if (user_id) {
 					request
-					.get(apiUrl + 'user/' + user_id) 
-					.end((err, res)=>{
-						if (err || !res.body) {
-							Toast.create.warning({html:res.body.error || 'User fetch failed'})
-						}
-						else {
-							this.user = res.body;
-							this.own = this.currentUser && this.currentUser._id === res.body._id;
-						}
-					})
+						.get(apiUrl + 'user/' + user_id) 
+						.end((err, res)=>{
+							if (err || !res.body) {
+								Toast.create.warning({html:res.body.error || 'User fetch failed'})
+							}
+							else {
+								this.user = res.body;
+								this.own = this.currentUser && this.currentUser._id === res.body._id;
+							}
+						})
 				}
 				else {
 					this.$nextTick(()=>{
@@ -114,29 +119,46 @@
 							this.own = true;
 						}
 						else {
-							console.log('User not authorized')
-							this.$router.push('/')
+							console.log('User not authorized');
+							this.$router.push('/');
 						}
 					})
 
 					
 				}
 			},
-			userEdit: function(){
+			userEdit: function() {
 				this.submit_pending = true;
 				request
-				.post(apiUrl + 'auth/edit')
-				.send(this.user)
-				.end((err, res)=>{
-					if (err || !res.body ||  !res.body.ok) {
-						Toast.create.warning({html:res.body.error || 'User edit failed'})
-					}
-					else {
-						Toast.create.positive({html:'Успех'})
-						this.$store.dispatch('updateUser', this.user);
-					}
-					this.submit_pending = false;
-				});
+					.post(apiUrl + 'auth/edit')
+					.field(this.user)
+					.attach('fileUploadInput_name', this.$refs.fileUploadInput.files[0])
+					.end((err, res) => {
+						if (err || !res.body || !res.body.ok) {
+							Toast.create.warning({
+								html: res.body.error || 'User edit failed'
+							})
+						}
+						else {
+							Toast.create.positive({
+								html: 'Успех'
+							})
+							this.$store.dispatch('a_updateUser', res.body.userUpd);
+						}
+						this.submit_pending = false;
+					});
+			},
+			uploadReset: function(){
+				this.$data.picPath = '';
+				this.$data.picName = '';
+				this.$refs.fileUploadInput.value = '';
+			},
+			uploadChange: function(){
+				this.$data.picPath = this.$refs.fileUploadInput.value;
+				this.$data.picName = this.$refs.fileUploadInput.files[0].name;
+			},
+			uploadClick: function(){
+				this.$refs.fileUploadInput.click();
 			}
 		},
 		mounted: function(){
@@ -166,6 +188,7 @@
 .user-pic {
 	border-radius: 1em;
 	margin-right: 1em;
+	cursor: pointer;
 }
 body.desktop {
 	.user-pic {

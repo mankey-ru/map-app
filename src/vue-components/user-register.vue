@@ -96,8 +96,7 @@
 							Toast.create.positive({
 								html: 'Успех'
 							});
-							this.$store.dispatch('updateUser', res.body.newUser);
-							console.log(res.body)
+							this.$store.dispatch('a_setUser', res.body.newUser);
 							this.GOTO('user-profile-current');
 						}
 					});

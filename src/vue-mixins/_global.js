@@ -65,7 +65,7 @@ export default {
 			var wo = window.open(`${apiUrl}auth/in?provider=${provider}`, '_blank', 'height=500,width=700,location=no,status=no,titlebar=no,toolbar=no')
 		},
 		LOG_IN_SUCCESS: function (user) {
-			this.$store.dispatch('updateUser', user);
+			this.$store.dispatch('a_setUser', user);
 			var fromName = this.$route.params.navGuardedFrom; // see vue-router.js
 			var redirect = typeof fromName === 'string' ? {name: fromName} : '/';
 			this.$router.push(redirect)
@@ -86,7 +86,7 @@ export default {
 					else {
 						NSTOR.removeAuth(); // Cordova only: remove credentials from persistent storage
 						Toast.create.positive({html:'Logged out'})
-						this.$store.dispatch('updateUser', false);
+						this.$store.dispatch('a_setUser', false);
 						// this.$router.push('/')
 					}
 					if (this.auth) {
