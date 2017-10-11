@@ -8,8 +8,10 @@ Keywords
 - ElectronJS
 - ExpressJS
 - MongoDB
-- Heroku
-- crypto (all credentials like database url and api keys are encrypted with AES-256-CTR)
+- [crypto](https://github.com/brix/crypto-js) (all credentials like database url and api keys are encrypted with AES-256-CTR)
+- [Heroku](https://www.heroku.com/) (hosting binded to this repo)
+- [MongoLab](https://mlab.com/) (remote DB)
+- [Cloudinary](https://cloudinary.com/) (remote image storage)
 
 App is as much universal as it possible at all
 =========
