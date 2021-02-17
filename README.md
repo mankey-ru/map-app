@@ -13,7 +13,7 @@ Keywords
 - [MongoLab](https://mlab.com/) (remote DB)
 - [Cloudinary](https://cloudinary.com/) (remote image storage)
 
-App is as much universal as it possible at all
+App is as much universal as it possible at all (as a proof of concept)
 =========
 - it has both client- and server-side
 - it works in browser
