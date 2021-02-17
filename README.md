@@ -64,7 +64,7 @@ npm i -g windows-build-tools --add-python-to-path
 ```
 
 # Major TODOs
-- replace homebrewed server validation with plugin like [express-validation](https://www.npmjs.com/package/express-validation) or [express-validator](https://www.npmjs.com/package/express-validator)
+- replace homebrew server validation with plugin like [express-validation](https://www.npmjs.com/package/express-validation) or [express-validator](https://www.npmjs.com/package/express-validator)
 - unit testing (i.e. [mocha](https://mochajs.org/) or [chai](http://chaijs.com/))
 - Vue testing (i.e. [avoriaz](https://github.com/eddyerburgh/avoria))
 - logger (i.e. [bunyan](https://github.com/trentm/node-bunyan))
