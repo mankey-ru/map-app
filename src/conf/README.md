@@ -1,9 +1,10 @@
 Fresh start
 ---
 1. Create env variable MAPP_CRYPTO_KEY containing your new 8-character password on your local machine
-2. Create same env variable on your Heroku instance (if any)
+2. Create same env variable on your Heroku instance
 3. Put your credentials into `config.blank.js`
-4. Run app via `npm run dev`
+4. Check that `config.encrypted.js` not exists
+5. Run app via `npm run dev`
 
 Script will automatically perform several actions
 - generation of a new `config.encrypted.js` - you should commit it
